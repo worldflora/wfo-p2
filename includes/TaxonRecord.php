@@ -194,11 +194,18 @@ class TaxonRecord{
         return $this->solrDoc ? true : false;
     }
 
+    public function getAcceptedWfoId(){
+        return substr($this->getAcceptedId(), 0, 14);
+    }
 
     public function getAcceptedId(){
         if(!$this->exists()) return null;
         if(!isset($this->solrDoc->accepted_id_s)) return null;
         return $this->solrDoc->accepted_id_s;
+    }
+
+    public function getBasionymWfoId(){
+        return substr($this->getBasionymId(), 0, 14);
     }
 
     public function getBasionymId(){
@@ -424,7 +431,7 @@ class TaxonRecord{
                 if($ref_context == 'taxon') $ref_context = 'taxonomic';
                 
                 // we only return appropriate references for the context                
-                 if($context == 'nomenclatural' && $ref_context != 'nomenclatural') continue;
+                if($context == 'nomenclatural' && $ref_context != 'nomenclatural') continue;
                 if($context == 'taxonomic' && $ref_context != 'taxonomic') continue;
                 if($context == 'treatment' && $ref_context != 'treatment') continue;
                 
