@@ -4,6 +4,7 @@
 require_once('../config.php');
 require_once('../includes/SolrIndex.php');
 require_once('../includes/TaxonRecord.php');
+require_once('../includes/FacetDetails.php');
 
 // this is the landing page that parses all the other calls
 $path_parts = explode('/', parse_url($_SERVER["REQUEST_URI"],  PHP_URL_PATH));

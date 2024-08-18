@@ -82,23 +82,59 @@ require_once('header.php');
     }
 
     // Synonyms
-    $syns = $record->getSynonyms();
-    if($syns){
-    echo '<div class="card">';
-    echo '<div class="card-header">Synonyms <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($syns), 0)  .'</span> </div>';
-        echo '<div class="list-group  list-group-flush" style="max-height: 10em; overflow: auto;">';
-    for($i = 0; $i < count($syns); $i++){
-        $syn = $syns[$i];
-        echo "<a href=\"{$syn->getWfoId()}\" class=\"list-group-item  list-group-item-action\">{$syn->getFullNameStringHtml()}</a>";
-    }
-    echo '</div>'; // end list group
-    echo '</div>'; // end card
+    render_name_list($record->getSynonyms(), $record, "Synonyms", "Other names that are placed in this taxon but that are not the formally accepted name of this taxon.");
+
+    // attributes (facets)
+    $facets = $record->getFacets();
+    if($facets){
+        
+        echo '<div class="card">';
+        echo '<div class="card-header">';
+         echo '<span
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Features of this taxon. Number of sources in brackets. Click for provenance details." >Taxon Attributes</span>&nbsp;';
+        echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($facets), 0)  .'</span> </div>';
+        echo '<ul class="list-group  list-group-flush" style="max-height: 10em; overflow: auto;">';
+
+        foreach($facets as $f){
+            echo '<li class="list-group-item  list-group-item-action">';
+            echo "<strong>{$f->name}: </strong>";
+            $spacer = '';
+            foreach($f->facet_values as $fv){
+                echo $spacer;
+                $spacer = '; ';
+                echo '<span>';
+                if($fv->link){
+                    echo "<a target=\"facet_info\" href=\"{$fv->link}\">{$fv->name}</a>";
+                }else{
+                    echo $fv->name;
+                }
+
+                $prov_json = urlencode(json_encode($fv->provenance));
+
+                echo '<strong data-bs-toggle="modal" data-bs-target="#provModal" data-wfoprov="'. $prov_json .'" style="cursor: zoom-in;"> ('. count($fv->provenance) .')</strong>';
+                echo '</span>';
+               
+            } // end facet value
+
+            echo '</li>';
+    
+        } // end facet
+
+       echo '</ul>'; // end list group
+       echo '</div>'; // end card
+
     }
 
     // references    
-    render_references($record->getNomenclaturalReferences(), 'Nomenclatural Resources');
-    render_references($record->getTaxonomicReferences(), 'Taxonomic Sources');
-    render_references($record->getTreatmentReferences(), 'Other Treatments');
+    render_references($record->getNomenclaturalReferences(), 'Nomenclatural Resources', "Links to information useful for understanding the nomenclature of this name.");
+    render_references($record->getTaxonomicReferences(), 'Taxonomic Sources', "Links information supporting the taxonomy accepted here.");
+    render_references($record->getTreatmentReferences(), 'Other Treatments', "Other occurrences of this name that may be useful, including alternative taxonomic views.");
+
+    // unplaced names
+    render_name_list($record->getUnplacedNames(), $record, "Unplaced Names", "Names that experts have not yet placed in the classification.");
+
 
 ?>
             </div>
@@ -115,40 +151,124 @@ require_once('header.php');
                     <div class="row" style="width: 100%">
                         <div class="col">
                             <div class="card" style="width: 100%">
-                                <div class="card-header">Placement</div>
-                                <div class="list-group  list-group-flush">
-                                    <?php
+                                <?php
+                            
+                            // taxonomic placement
 
-                                    // classification - ancestor path 
-                                    $ancestors = $record->getPath();
-                                    $ancestors = array_reverse($ancestors);
-                                    array_shift($ancestors);
+                            // header
+                            echo '<div class="card-header">';
+                            if($record->getRole() == 'unplaced'){
+                                    echo '<span
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="left"
+                                    title="The genus part of the names suggests it could occur here in the classification, if it isn\'t synonymised." >Potential Placement</span>&nbsp;';
+                            }else{
+                                echo '<span
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="left"
+                                    title="The position of the taxon within the classification." >Placement</span>&nbsp;';
+                            }
+                            
+                            
+                            // list depends on role
+                            switch ($record->getRole()) {
 
-                                    for($i = 0; $i < count($ancestors); $i++){
-                                        $anc = $ancestors[$i];
-                                        $disabled = $i == count($ancestors) - 1 ? 'disabled' : '';
+                                // placement of a synonym
+                                case 'synonym':
+                                $accepted = new TaxonRecord($record->getAcceptedId());
+                                $ancestors = $accepted->getPath(); // get the path to the root
+                                $ancestors = array_reverse($ancestors); // reverse order
+                                array_shift($ancestors); // remove 'code'
+                                
+                                // add badge
+                                echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($ancestors), 0)  . '</span>';
+                                echo '</div>'; // end header
+                                echo '<div class="list-group  list-group-flush">'; // start list
 
-                                        echo "<a href=\"{$anc->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\">";
-                                        echo '<div class="row gx-1">';
-                                        echo '<div class="col-4 text-end" style="font-size:90%">' . $anc->getRank() . ':</div>';
-                                        echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() . '</div>';
+                                // write in the path to the accepted name
+                                render_ancestors($ancestors, false);
+
+                                // add in self as a synonym
+                                echo "<a href=\"{$record->getWfoId()}\" class=\"list-group-item list-group-item-action
+                                    disabled\">";
+                                    echo '<div class="row gx-1">';
+                                        echo '<div class="col-4 text-end" style="font-size:90%">synonym:</div>';
+                                        echo '<div class="col text-start fw-bold">' .
+                                            $record->getFullNameStringNoAuthorsHtml() . '</div>';
                                         echo '</div>'; // end row
-                                        
-                                        echo "</a>";
-                                    }
-                                    
-                                    ?>
-                                </div>
-                            </div>
-                            <div>&nbsp;</div>
+                                    echo "</a>";
 
-                            <?php
+                                break;
+
+                                // Unplaced - we try and find something!
+                                case 'unplaced':
+                                    $candidates = $record->getAssociatedGenusNames();
+                                    if($candidates){
+
+                                    if(count($candidates) == 1 && $candidates[0]->getRole() == 'accepted'){
+                                        $candidate = new TaxonRecord($candidates[0]->getId() . '-'. WFO_DEFAULT_VERSION); // convert to taxon object
+                                        $ancestors = $candidate->getPath(); // get the path to the root
+                                        $ancestors = array_reverse($ancestors); // reverse order
+                                        array_shift($ancestors); // remove 'code'
+                                        
+                                        // add badge
+                                        echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($ancestors), 0)  . '</span>';
+                                        echo '</div>'; // end header
+                                        echo '<div class="list-group  list-group-flush">'; // start list
+                                        render_ancestors($ancestors, false); // write it out
+
+                                    }else{
+                                        
+                                        // add badge
+                                        echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($candidates), 0)  . '</span>';
+                                        echo '</div>'; // end header
+                                        echo '<div class="list-group  list-group-flush">'; // start list
+                                        render_ancestors($candidates, false);
+                                    }
+
+                                    }else{
+                                        // no badge
+                                        echo '</div>'; // end header
+                                        echo '<div class="list-group  list-group-flush">'; // start list   
+                                        echo "<a class=\"list-group-item list-group-item-action disabled\">Unknown</a>";
+                                    }
+                                    break;
+
+                                case 'deprecated':
+                                    echo '</div>'; // end header
+                                    echo '<div class="list-group  list-group-flush">'; // start list  
+                                    echo "<a class=\"list-group-item list-group-item-action disabled\">Deprecated names will not be placed in the classification.</a>";
+                                    break;
+
+                                // by default we treat it like it is accepted
+                                default:
+                                    $ancestors = $record->getPath(); // get the path to the root
+                                    $ancestors = array_reverse($ancestors); // reverse order
+                                    array_shift($ancestors); // remove 'code'
+
+                                    // badge
+                                    echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($ancestors), 0)  . '</span>';
+                                    echo '</div>'; // end header
+                                    echo '<div class="list-group  list-group-flush">'; // start list
+                                    render_ancestors( $ancestors, true);
+                                    break;
+
+                            } // end switch
+                                ?>
+                            </div>
+                        </div>
+                        <?php
 
                         // children
                         $kids = $record->getChildren();
                         if($kids){
                             echo '<div class="card" style="width: 100%">';
-                            echo '<div class="card-header">Child Taxa  <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($kids), 0)  . '</span>  </div>';
+                            echo '<div class="card-header">';
+                             echo '<span
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="left"
+                                    title="Direct descendants of this taxon." >Child Taxa</span>&nbsp;';
+                            echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($kids), 0)  . '</span>  </div>';
                             echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
 
                             for($i = 0; $i < count($kids); $i++){
@@ -159,39 +279,43 @@ require_once('header.php');
                             echo '</div>'; // end list
                             echo '</div>'; // end card
                         
-                        }else{
+                        }
 
-                            // no children so are there any siblings?
-                            $parent = $record->getParent();
-                            if($parent){
-                                $siblings = $parent->getChildren();
-                                if(count($siblings) > 1){
+                        // Do we have siblings?
+                        $parent = $record->getParent();
+                        if($parent){
+                            $siblings = $parent->getChildren();
+                            if(count($siblings) > 1){
 
-                                    echo '<div class="card" style="width: 100%">';
-                                    echo '<div class="card-header">Sibling Taxa  <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($siblings), 0)  . '</span>  </div>';
-                                    echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
+                                echo '<div class="card" style="width: 100%">';
+                                echo '<div class="card-header">';
+                                echo '<span
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="left"
+                                        title="Taxa at the same level in the classification." >Sibling Taxa</span>&nbsp;';
+                                echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($siblings), 0)  . '</span>  </div>';
+                                echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
 
-                                    for($i = 0; $i < count($siblings); $i++){
-                                        $bro = $siblings[$i];
-                                        $disabled = $bro->getId() == $record->getId() ? 'disabled' : '';
-                                        echo "<a href=\"{$bro->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\" >{$bro->getFullNameStringHtml()}</a>";
-                                    }
+                                for($i = 0; $i < count($siblings); $i++){
+                                    $bro = $siblings[$i];
+                                    $disabled = $bro->getId() == $record->getId() ? 'disabled' : '';
+                                    echo "<a href=\"{$bro->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\" >{$bro->getFullNameStringHtml()}</a>";
+                                }
 
-                                    echo '</div>'; // end list
-                                    echo '</div>'; // end card
+                                echo '</div>'; // end list
+                                echo '</div>'; // end card
 
-                                } // has more than one sibling
-                            } // has parent
+                            } // has more than one sibling
+                        } // has parent
                             
-                        } // end siblings
                                       
                         ?>
-                        </div> <!-- end col -->
-                    </div><!-- end row -->
+                    </div> <!-- end col -->
+                </div><!-- end row -->
 
-                </div>
             </div>
         </div>
+</div>
 
 </div>
 </form>
@@ -200,7 +324,7 @@ require_once('header.php');
 <?php
 require_once('footer.php');
 
-function render_references($refs_all, $title){
+function render_references($refs_all, $title, $help = ''){
 
     // filter out undesirables
     $refs = array();
@@ -215,7 +339,14 @@ function render_references($refs_all, $title){
     
     // render the card
     echo '<div class="card">';
-    echo '<div class="card-header">' . $title . ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($refs), 0)  .'</span> </div>';
+    echo '<div class="card-header">';
+    echo '<span
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="'. $help .'" >';
+    echo $title;
+    echo '</span>';
+    echo ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($refs), 0)  .'</span> </div>';
     echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
     
     // people first
@@ -280,5 +411,51 @@ function render_reference($ref){
     echo "</a>";
 }
 
+function render_ancestors($ancestors, $disable_last = true){
+
+            for($i = 0; $i < count($ancestors); $i++){
+                $anc = $ancestors[$i];
+                $disabled = $i == count($ancestors) - 1 &&  $disable_last ? 'disabled' : '';
+
+                echo "<a href=\"{$anc->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\">";
+                echo '<div class="row gx-1">';
+                echo '<div class="col-4 text-end" style="font-size:90%">' . $anc->getRank() . ':</div>';
+                echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() . '</div>';
+                echo '</div>'; // end row
+                echo "</a>";
+            }
+}
+
+
+function render_name_list($names, $record, $title, $help){
+
+    if(!$names) return;
+
+    echo '<div class="card">';
+    echo '<div class="card-header">';
+    echo '<span
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="'. $help .'" >';
+    echo $title;
+    echo '</span>';
+    echo ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($names), 0)  .'</span> </div>';
+    echo '<div class="list-group  list-group-flush" style="max-height: 10em; overflow: auto;">';
+    for($i = 0; $i < count($names); $i++){
+        $n = $names[$i];
+
+        // is this homotypic with the current record?
+        if($n->getBasionymWfoId() == $record->getWfoId() || $record->getBasionymWfoId() == $n->getWfoId()){
+            $status = "<span class=\"fw-bold\">[{$n->getNomenclaturalStatus()} : homotypic]</span>";
+        }else{
+            $status = "<span class=\"fw-bold\">[{$n->getNomenclaturalStatus()}]</span>";
+        }
+
+        echo "<a href=\"{$n->getWfoId()}\" class=\"list-group-item  list-group-item-action\">{$n->getFullNameStringHtml()} $status</a>";
+    }
+    echo '</div>'; // end list group
+    echo '</div>'; // end card
+
+}
 
 ?>

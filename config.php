@@ -19,3 +19,49 @@ define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 
 // This will normally be the most recent.
 define('WFO_DEFAULT_VERSION','2024-06');
+
+
+// the facets cache
+$facets_cache = @$_SESSION['facets_cache'];
+
+if(!$facets_cache || @$_GET['facet_cache_refresh'] == 'true'){
+
+    $facets_cache = array();
+
+    $query = array(
+        'query' => "kind_s:wfo-facet",
+        'limit' => 10000
+    );
+  
+    $docs  = PlantList::getSolrDocs($query);
+    foreach($docs as $doc){
+        $facets_cache[$doc->id] = json_decode($doc->json_t);
+    }
+
+    $_SESSION['facets_cache'] = $facets_cache;
+
+
+}
+
+
+// we do the same for sources of info
+$sources_cache = @$_SESSION['sources_cache'];
+
+if(!$sources_cache || @$_GET['sources_cache_refresh'] == 'true'){
+    
+    $sources_cache = array();
+
+    $query = array(
+        'query' => "kind_s:wfo-facet-source",
+        'limit' => 10000
+    );
+  
+    $docs  = PlantList::getSolrDocs($query);
+    foreach($docs as $doc){
+        $sources_cache[$doc->id] = json_decode($doc->json_t);
+    }
+
+    $_SESSION['sources_cache'] = $sources_cache;
+
+
+}
