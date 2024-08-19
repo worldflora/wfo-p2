@@ -93,29 +93,37 @@ require_once('header.php');
          echo '<span
             data-bs-toggle="tooltip"
             data-bs-placement="top"
-            title="Features of this taxon. Number of sources in brackets. Click for provenance details." >Taxon Attributes</span>&nbsp;';
+            title="Features of this taxon. Click for provenance details." >Taxon Attributes</span>&nbsp;';
         echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($facets), 0)  .'</span> </div>';
         echo '<ul class="list-group  list-group-flush" style="max-height: 10em; overflow: auto;">';
 
+        // work through the facets
         foreach($facets as $f){
             echo '<li class="list-group-item  list-group-item-action">';
             echo "<strong>{$f->name}: </strong>";
             $spacer = '';
+
+            // work through the facet values
             foreach($f->facet_values as $fv){
                 echo $spacer;
-                $spacer = '; ';
-                echo '<span>';
-                if($fv->link){
-                    echo "<a target=\"facet_info\" href=\"{$fv->link}\">{$fv->name}</a>";
-                }else{
-                    echo $fv->name;
-                }
+                $spacer = '- ';
 
-                $prov_json = urlencode(json_encode($fv->provenance));
+                // package the provenance data up into a data attribute
+                $prov_data = (object)array(
+                    'facet_name' => $f->name,
+                    'facet_value' => $fv,
+                    'taxon_wfo' => $record->getWfoId(), 
+                    'taxon_name' => $record->getFullNameStringHtml() 
+                );
+                $prov_json = urlencode(json_encode($prov_data));
 
-                echo '<strong data-bs-toggle="modal" data-bs-target="#provModal" data-wfoprov="'. $prov_json .'" style="cursor: zoom-in;"> ('. count($fv->provenance) .')</strong>';
+                // render the actual facet value.
+                echo '<span data-bs-toggle="modal" data-bs-target="#provModal" data-wfoprov="'. $prov_json .'" style="cursor: pointer;">';
+                echo $fv->name;
+                // badge with the data source count 
+                echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format(count($fv->provenance), 0)  .'</span>';
                 echo '</span>';
-               
+                            
             } // end facet value
 
             echo '</li>';
@@ -126,7 +134,40 @@ require_once('header.php');
        echo '</div>'; // end card
 
     }
+?>
+                <!-- Modal for facet provenance -->
+                <div class="modal fade" id="provModal" tabindex="-1" aria-labelledby="provModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="provModalLabel">Attribute Provenance</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div id="provModalContent">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                                    class="btn btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <script>
+                document.getElementById('provModal').addEventListener('show.bs.modal', event => {
+
+                    const modalContent = document.getElementById('provModalContent');
+                    modalContent.innerHTML = 'Loading ...';
+                    fetch("facet_provenance.php?prov=" + event.relatedTarget.dataset.wfoprov)
+                        .then(response => response.text())
+                        .then(text => modalContent.innerHTML = text);
+
+                })
+                </script>
+
+                <?php
     // references    
     render_references($record->getNomenclaturalReferences(), 'Nomenclatural Resources', "Links to information useful for understanding the nomenclature of this name.");
     render_references($record->getTaxonomicReferences(), 'Taxonomic Sources', "Links information supporting the taxonomy accepted here.");
