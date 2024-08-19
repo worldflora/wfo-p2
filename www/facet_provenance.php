@@ -40,12 +40,12 @@ foreach($provs->facet_value->provenance as $prov){
     $source = new SourceDetails($matches[2]);
     
     if($source->getLink()){
-        echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">DS ';
+        echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Data Source ';
         echo $counter;
         echo ':</div><div class="col">';
         echo "<em><a target=\"wfo-source\" href=\"{$source->getLink()}\">{$source->getName()}</a></em>";
     }else{
-        echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">DS ';
+        echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Data Source ';
         echo $counter;
         echo ':</div><div class="col">';
         echo "<em>{$source->getName()}</em>";

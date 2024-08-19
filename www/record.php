@@ -85,9 +85,17 @@ require_once('header.php');
     render_name_list($record->getSynonyms(), $record, "Synonyms", "Other names that are placed in this taxon but that are not the formally accepted name of this taxon.");
 
     // attributes (facets)
-    $facets = $record->getFacets();
+    $all_facets = $record->getFacets();
+    $facets = array(); // these are the facets to display - and in the correct order as defined in attribute_facets
+    foreach($attribute_facets as $facet_id){ // attribute_facets is defined in the config.php
+        if(isset($all_facets[$facet_id])) $facets[] = $all_facets[$facet_id];
+    }
+
+    
     if($facets){
         
+        // we have facets to render as attribute box
+
         echo '<div class="card">';
         echo '<div class="card-header">';
          echo '<span
@@ -168,6 +176,128 @@ require_once('header.php');
                 </script>
 
                 <?php
+
+    // mapping card
+    $facets = array(); // these are the facets to display - and in the correct order as defined in map_facets
+    foreach($map_facets as $facet_id){ // map_facets is defined in the config.php
+        if(isset($all_facets[$facet_id])) $facets[$facet_id] = $all_facets[$facet_id];
+    }
+
+    if($facets){
+        // we have facets to render as a map interface
+        // we make a card
+        // add the map
+        // add each facet as a layer to the card
+
+?>
+                <div class="card">
+                    <div class="card-header">
+                        <span data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Areas the taxon is found in. Click an area for provenance info.">Taxon Maps</span>
+                        &nbsp;
+                        <span class="badge rounded-pill text-bg-success"
+                            style="font-size: 70%; vertical-align: super;"><?php echo number_format(count($facets), 0) ?></span>
+                    </div>
+
+                    <div id="map"></div>
+                    <script>
+                    // the map itself
+                    const map = L.map('map').setView([33, 0], 1);
+
+                    // the default base layer - streets 
+                    const osm = L.tileLayer(
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        }).addTo(map);
+
+                    // alternate base layer - topo
+                    const openTopoMap = L.tileLayer(
+                        'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                        });
+
+                    // labels for the layer control - base layers
+                    const baseMaps = {
+                        "Open Street Map": osm,
+                        "Open Topology": openTopoMap
+                    };
+
+
+                    // labels for the layer control overlays
+                    let overlayMaps = {};
+                    <?php
+
+        foreach($facets as $f_id => $f){
+            echo "let lg = L.layerGroup();\n";                            
+            foreach($f->facet_values as $fv){
+                $path = "data/{$f_id}/{$fv->code}.json";
+                if(file_exists($path)){
+
+                    // the actual polygon
+                    $json = file_get_contents($path);
+
+                    // package the provenance data up into a data attribute
+                    $prov_data = (object)array(
+                        'facet_name' => $f->name,
+                        'facet_value' => $fv,
+                        'taxon_wfo' => $record->getWfoId(), 
+                        'taxon_name' => $record->getFullNameStringHtml() 
+                    );
+                    $prov_json = urlencode(json_encode($prov_data));
+
+                    ?>
+
+                    var p = L.geoJSON(<?php echo $json ?>, {
+                        style: {
+                            fillColor: 'green',
+                            fillOpacity: 0.7,
+                            weight: 0
+                        }
+                    }).addTo(lg);
+                    p.openPopup();
+                    p.on('click', function() {
+                        const myModal = new bootstrap.Modal(document.getElementById('provModal'));
+                        const span = document.createElement('span');
+                        span.setAttribute('data-wfoprov', '<?php echo $prov_json ?>');
+                        myModal.show(span);
+                    });
+
+
+                    <?php
+                }
+            }
+            echo "lg.addTo(map);\n";
+            echo "overlayMaps['{$f->name}'] = lg;\n";
+            
+        } // end facet
+?>
+
+                    // we add a layer control to the map
+                    const layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+                    </script>
+
+                </div>
+                <?php
+
+    } // end if we have a map to render
+
+
+    /*
+
+                // if this facet is the country iso then we put a map in
+            if($f['id'] == 'wfo-f-2' && count($f['facet_values'])){
+                echo '<p>';
+
+                echo '</p>';
+                
+            }// is country iso
+
+    */
+
+
+
     // references    
     render_references($record->getNomenclaturalReferences(), 'Nomenclatural Resources', "Links to information useful for understanding the nomenclature of this name.");
     render_references($record->getTaxonomicReferences(), 'Taxonomic Sources', "Links information supporting the taxonomy accepted here.");

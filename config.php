@@ -20,6 +20,26 @@ define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 // This will normally be the most recent.
 define('WFO_DEFAULT_VERSION','2024-06');
 
+/*
+    Facet configuration
+    Which facets are displayed on taxon pages and in the faceted searching
+*/
+
+// attributes
+// these are the facets displayed in the attributes box on the
+// taxon pages, and the order they are displayed.
+$attribute_facets = array(
+    'wfo-f-5', // life form
+    'wfo-f-10', // threat status
+    'wfo-f-2', // Country ISO
+    'wfo-f-8' // TDWG Level 3 
+);
+
+$map_facets = array(
+    'wfo-f-2', // Country ISO
+    'wfo-f-8' // TDWG Level 3 
+);
+
 
 // the facets cache
 $facets_cache = @$_SESSION['facets_cache'];
