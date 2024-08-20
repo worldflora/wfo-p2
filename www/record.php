@@ -199,10 +199,10 @@ require_once('header.php');
                             style="font-size: 70%; vertical-align: super;"><?php echo number_format(count($facets), 0) ?></span>
                     </div>
 
-                    <div id="map"></div>
+                    <div id="map" class="container-fluid" style="min-height: 300px"></div>
                     <script>
                     // the map itself
-                    const map = L.map('map').setView([33, 0], 1);
+                    const map = L.map('map').setView([33, 120], 1);
 
                     // the default base layer - streets 
                     const osm = L.tileLayer(
@@ -230,7 +230,7 @@ require_once('header.php');
                     <?php
 
         foreach($facets as $f_id => $f){
-            echo "let lg = L.layerGroup();\n";                            
+            echo "let lg = L.featureGroup();\n";                            
             foreach($f->facet_values as $fv){
                 $path = "data/{$f_id}/{$fv->code}.json";
                 if(file_exists($path)){
@@ -251,8 +251,8 @@ require_once('header.php');
 
                     var p = L.geoJSON(<?php echo $json ?>, {
                         style: {
-                            fillColor: 'green',
-                            fillOpacity: 0.7,
+                            fillColor: 'blue',
+                            fillOpacity: 0.5,
                             weight: 0
                         }
                     }).addTo(lg);
@@ -263,7 +263,13 @@ require_once('header.php');
                         span.setAttribute('data-wfoprov', '<?php echo $prov_json ?>');
                         myModal.show(span);
                     });
+                    //map.fitBounds(lg.getBounds());
 
+                    // this is a hack because the window size isn't known
+                    // until the page finishes loading.
+                    // setTimeout(function() {
+                    //    window.dispatchEvent(new Event("resize"));
+                    // }, 300);
 
                     <?php
                 }
@@ -591,7 +597,7 @@ function render_ancestors($ancestors, $disable_last = true){
                 echo "<a href=\"{$anc->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\">";
                 echo '<div class="row gx-1">';
                 echo '<div class="col-4 text-end" style="font-size:90%">' . $anc->getRank() . ':</div>';
-                echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() . '</div>';
+                echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() . ' '.  $anc->getChildCount() .'</div>';
                 echo '</div>'; // end row
                 echo "</a>";
             }

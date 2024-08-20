@@ -45,12 +45,12 @@ $visible_lines = count($docs);
 if($visible_lines > 10) $visible_lines = 10;
 
 echo '<div class="input-group" style="width: 90%; margin-bottom: 1em; margin-top: 0.1em;">';
-echo "<select class=\"form-control\" size=\"$visible_lines\"  onchange=\"window.location = this.value\">";
-
+echo "<select class=\"form-control\" size=\"$visible_lines\"  onclick=\"window.location = this.value\"  onkeydown=\"searchSuggestKeyDown(event)\">";
 foreach ($docs as $doc) {
     $record = new TaxonRecord($doc);
     echo "<option value=\"{$record->getWfoId()}\" >";
     echo $record->getFullNameStringPlain();
+    echo "&nbsp;[{$record->getRole()}&nbsp;:&nbsp;{$record->getRank()}]";
     echo '</option>';
 }
 

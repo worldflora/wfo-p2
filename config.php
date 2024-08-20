@@ -40,6 +40,21 @@ $map_facets = array(
     'wfo-f-8' // TDWG Level 3 
 );
 
+// these are the facets used 
+// in the search pages for filtering
+// in the order provided
+$search_facets = array(
+  "wfo-f-5", // Life form
+  "wfo-f-2", // Countries ISO
+  "wfo-f-8", // TDWG Countries
+  "wfo-f-10", // IUCN Statuses
+  "role_s", // note this is the SOLR index field name - not a facet
+  "rank_s", // note this is the SOLR index field name - not a facet
+  "placed_in_phylum_s", // note this is the SOLR index field name - not a facet
+  "placed_in_family_s", // note this is the SOLR index field name - not a facet
+  "placed_in_genus_s", // note this is the SOLR index field name - not a facet
+  "nomenclatural_status_s" // note this is the SOLR index field name - not a facet
+);
 
 // the facets cache
 $facets_cache = @$_SESSION['facets_cache'];
