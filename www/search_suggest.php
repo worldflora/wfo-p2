@@ -4,9 +4,9 @@
 
 // we are a standalone script so we have to include the config
 // and any other requirements
-require_once('../config.php');
 require_once('../includes/SolrIndex.php');
 require_once('../includes/TaxonRecord.php');
+require_once('../config.php');
 
 // render nothing if we haven't been passed a string
 if(!@$_GET['q']) exit;

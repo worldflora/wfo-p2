@@ -29,6 +29,10 @@ if (searchBox) {
         const val = e.target.value;
         const targetDiv = document.getElementById("search_suggest");
 
+        // we only do a suggestion if we are in name mode
+        const searchBoxSwitch = document.getElementById("search_box_switch_button");
+        if (searchBoxSwitch.value != 'name') return null;
+
         // simply call for ajax to update the suggestions
         // the logic will be handled in the php script
         fetch('search_suggest.php?q=' + encodeURIComponent(val))
@@ -41,10 +45,36 @@ if (searchBox) {
             .catch(function (error) {
                 // render nothing but report it in the console.
                 targetDiv.innerHTML = null;
-                console.log(error);
+                //console.log(error);
             });
     });
 }
+
+const searchBoxSwitch = document.getElementById("search_box_switch_button");
+const searchTypeInput = document.getElementById("search_type_input");
+if (searchBoxSwitch) {
+    searchBoxSwitch.addEventListener("click", (e) => {
+        console.log(e.target);
+        if (e.target.value == 'name') {
+            e.target.value = 'text';
+            e.target.innerHTML = 'Text:';
+            searchTypeInput.value = 'text';  // submitted with the form
+
+            // hide any suggested names
+            const targetDiv = document.getElementById("search_suggest");
+            targetDiv.innerHTML = null;
+
+        } else {
+            e.target.value = 'name';
+            e.target.innerHTML = 'Name:';
+            searchTypeInput.value = 'name'; // submitted with the form
+        }
+        document.getElementById("search_box").focus(); // hides the help buble
+        e.preventDefault();
+    });
+
+}
+
 
 // the search box is loaded dynamically so needs to
 // have events hard coded

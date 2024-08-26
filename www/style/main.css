@@ -6,13 +6,3 @@ h1 .wfo-name-authors {
 .card {
     margin-bottom: 1em;
 }
-
-/* Leaflet map height 
-#map {
-    width: 100px;
-    height: 100px;
-    min-height: 400px;
-    min-width: 800px;
-    display: block;
-}
-*/

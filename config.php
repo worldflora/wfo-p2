@@ -68,7 +68,7 @@ if(!$facets_cache || @$_GET['facet_cache_refresh'] == 'true'){
         'limit' => 10000
     );
   
-    $docs  = PlantList::getSolrDocs($query);
+    $docs  = SolrIndex::getSolrDocs($query);
     foreach($docs as $doc){
         $facets_cache[$doc->id] = json_decode($doc->json_t);
     }
@@ -91,7 +91,7 @@ if(!$sources_cache || @$_GET['sources_cache_refresh'] == 'true'){
         'limit' => 10000
     );
   
-    $docs  = PlantList::getSolrDocs($query);
+    $docs  = SolrIndex::getSolrDocs($query);
     foreach($docs as $doc){
         $sources_cache[$doc->id] = json_decode($doc->json_t);
     }

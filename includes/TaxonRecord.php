@@ -852,10 +852,6 @@ class TaxonRecord{
             }
 
 
-            
-            
-        
-
         }
 
         return $stats;
@@ -866,6 +862,8 @@ class TaxonRecord{
 
         $out = array();
 
+        if(!$this->solrDoc) return $out;
+        
         foreach($this->solrDoc as $prop => $val){
             $matches = array();
             if(preg_match('/^(wfo-f-[0-9]+)_s/', $prop, $matches)){

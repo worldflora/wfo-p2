@@ -74,18 +74,16 @@ $query = array(
     'facet' => (object)$facets
 );
 
-echo "<pre>";
-//print_r($query);
-echo '</pre>';
 
 $solr_response  = SolrIndex::getSolrResponse($query);
 if(isset($solr_response->response->docs)) $docs = $solr_response->response->docs;
 if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
-
-
 // OK let's get started on rendering the page
 require_once('header.php');
+
+//echo "<pre>"; print_r($query);echo "</pre>";
+
 ?>
 
 <div class="container-lg">
@@ -99,22 +97,26 @@ require_once('header.php');
                 <?php
                 
                     require_once('search_box.php');
-
+                    
+                    // always render a list
+                    echo '<div class="list-group  list-group-flush">';
                     if($docs){
-                        echo "<p><strong>Records: </strong>" . number_format($solr_response->response->numFound) . "</p>";
-                        echo "<ul>";
+                        echo "<p></p><p><strong>Records: </strong>" . number_format($solr_response->response->numFound) . "</p>";
+                       
+                            // each response
                             foreach($docs as $doc){
-                                echo "<li id=\"{$doc->wfo_id_s}\">";
-                                echo "<a href=\"/{$doc->wfo_id_s}\">";
-                                echo $doc->full_name_string_html_s;
-                                echo "</a> [";
-                                echo $doc->role_s;
-                                echo "]</li>";
+                                $record = new TaxonRecord($doc);
+                                echo "<a href=\"/{$record->getWfoId()}\" class=\"list-group-item  list-group-item-action\" >";
+                                echo '<span style="font-size: 80%;">';
+                                render_record_type_description($record, false   );
+                                echo '</span>';
+                                echo '<span class="fs-4">' . $record->getFullNameStringHtml() . '</span>';
+                                echo "</a>";
                             }
-                        echo "</ul>";
                     }else{
-                        echo "<p>Nothing found</p>";
+                        echo "<div class=\"list-group-item\" >Nothing found</div>";
                     }
+                    echo "</div>"; // end the list group
 
                     echo '<pre>';
                     //print_r($query);
@@ -139,6 +141,8 @@ require_once('header.php');
 
                         <?php
 
+
+    // render the facets
     foreach($facets_response as $f_name => $f){
 
         if($f_name == 'count') continue;

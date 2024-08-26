@@ -3,11 +3,11 @@
 $wfo = $path_parts[0];
 
 $record = new TaxonRecord($wfo . '-' . WFO_DEFAULT_VERSION); 
-
 $page_title = $record->getFullNameStringPlain();
 
 
 require_once('header.php');
+
 ?>
 
 <div class="container-lg">
@@ -22,54 +22,12 @@ require_once('header.php');
                 </div>
 
                 <?php
-    echo '<p style="margin-bottom: 0.5em;">';
-
-    // description of record type
-    switch ($record->getRole()) {
-        case 'accepted':
-            if(strpos($record->getFullNameStringPlain(), '×') !== false) $desc = "Accepted hybrid " . $record->getRank();
-            else $desc = "Accepted " . $record->getRank();
-            $colour = 'green';
-            break;
-        case 'synonym':
-            $desc = "Synonymous " . $record->getRank() . " name";
-            $colour = 'blue';
-            break;
-        case 'unplaced':
-            $desc = "Unplaced " . $record->getRank() . " name";
-            $colour = 'black';
-            break;
-        case 'deprecated':
-            $desc = "Deprecated " . $record->getRank() . " name";
-            $colour = 'red';
-            break;
-        default:
-            $desc = "";
-            $colour = 'black';
-            break;
-    }
     
-    echo '<span style="margin-bottom: 0px;">';
-    echo "<span class=\"fw-bold\" style=\"color: $colour; margin-bottom: 0px;\">$desc:</span>&nbsp;";
-
-    // WFO ID Linking
-    echo '<span
-            class="fw-bold"
-            data-bs-toggle="tooltip"
-            data-bs-placement="right"
-            title="Click to copy persistent URL to clipboard." 
-            onclick="navigator.clipboard.writeText(\'https://list.worldfloraonline.org/'. $record->getWfoId() .'\')" 
-            />';
-    echo $record->getWfoId();
-    echo '</span>';
-
-    echo '</p>'; // header p
+    render_record_type_description($record);
     
     // header
     echo "<h1 style=\" position: relative;\">{$record->getFullNameStringHtml()}";
-
-
-
+    
     echo "</h1>";
     echo "<p>{$record->getCitationMicro()}</p>";
     
@@ -505,6 +463,9 @@ function render_references($refs_all, $title, $help = ''){
 
     // filter out undesirables
     $refs = array();
+
+    if(!$refs_all) return $refs;
+
     foreach($refs_all as $ref){
         // we don't render the old plantlist links
         if(strpos($ref->uri, 'theplantlist.org')) continue;
@@ -597,7 +558,7 @@ function render_ancestors($ancestors, $disable_last = true){
                 echo "<a href=\"{$anc->getWfoId()}\" class=\"list-group-item  list-group-item-action $disabled\">";
                 echo '<div class="row gx-1">';
                 echo '<div class="col-4 text-end" style="font-size:90%">' . $anc->getRank() . ':</div>';
-                echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() . ' '.  $anc->getChildCount() .'</div>';
+                echo '<div class="col text-start fw-bold">' . $anc->getFullNameStringNoAuthorsHtml() .'</div>';
                 echo '</div>'; // end row
                 echo "</a>";
             }
