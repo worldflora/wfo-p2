@@ -23,14 +23,27 @@ if(isset($_REQUEST['timestamp'])){
 $terms = @$request['q'];
 if(!$terms) $terms = '';
 
-// we always do a search to load the facet fields
- // query by start of word if we have one
+// default to sorting on the name
+$sort = 'full_name_string_alpha_t_sort asc';
 
 if($terms){
-    $query_txt = ucfirst($terms); // all names start with an upper case letter
-    $query_txt = str_replace(' ', '\ ', $query_txt);
-    $query_txt = $query_txt . "*";
-    $query_txt = "full_name_string_alpha_s:$query_txt";
+
+    if(@$request['search_type'] && $request['search_type'] == 'text'){
+        // they are specifically requesting a text search.
+
+        $words = explode(' ', trim($terms));
+        $query_txt = '_text_:'. implode(' OR ', $words);
+        $sort = 'score desc';
+    }else{
+        // default to a name search
+        // query by start of word if we have one
+        $query_txt = ucfirst($terms); // all names start with an upper case letter
+        $query_txt = str_replace(' ', '\ ', $query_txt);
+        $query_txt = $query_txt . "*";
+        $query_txt = "full_name_string_alpha_s:$query_txt";
+    }
+
+
 }else{
     $query_txt = "*:*";
 }
@@ -53,6 +66,7 @@ foreach($search_facets as $fi){
     // add the field to facet on
     $facets[$fi] = (object)array(
             "type" => "terms",
+            'limit' => 10,
             "field" => $fi
     );
 
@@ -69,20 +83,30 @@ foreach($search_facets as $fi){
 $query = array(
     'query' => $query_txt,
     'filter' => $filters,
-    'sort' => 'full_name_string_alpha_t_sort asc',
+    'sort' => $sort,
     'limit' => 100,
     'facet' => (object)$facets
 );
 
-
-$solr_response  = SolrIndex::getSolrResponse($query);
-if(isset($solr_response->response->docs)) $docs = $solr_response->response->docs;
-if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
-
 // OK let's get started on rendering the page
 require_once('header.php');
 
+$solr_response  = SolrIndex::getSolrResponse($query);
+if(isset($solr_response->response->docs)) $docs = $solr_response->response->docs;
+
 //echo "<pre>"; print_r($query);echo "</pre>";
+
+// if we don't have any documents we run the query again with 
+// a blank search to get all the facets
+if(!$docs){
+    $query['query'] = "*:*";
+    $solr_response  = SolrIndex::getSolrResponse($query);
+}
+
+if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
+
+
+
 
 ?>
 

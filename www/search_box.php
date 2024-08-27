@@ -20,12 +20,12 @@
 
 <div class="form-group">
     <div class="input-group">
-        <button class="btn btn-outline-secondary" type="submit" id="search_box_switch_button"
-            name="search_box_switch_button" data-bs-toggle="tooltip" data-bs-placement="right"
-            title="Click to toggle between name and text searching."
+        <button class="btn btn-outline-secondary" id="search_box_switch_button" name="search_box_switch_button"
+            data-bs-toggle="tooltip" data-bs-placement="right" title="Click to toggle between name and text searching."
             value="<?php echo $search_type; ?>"><?php echo $search_type_label; ?></button>
         <input id="search_box" autofocus class="form-control" type="text" name="q" placeholder="Search..."
             value="<?php echo $q ?>" />
+
         <button class="btn btn-success" type="submit">Search</button>
     </div>
     <input type="hidden" name="search_type" id="search_type_input" value="<?php echo $search_type; ?>" />

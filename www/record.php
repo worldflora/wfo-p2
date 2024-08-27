@@ -148,6 +148,7 @@ require_once('header.php');
         // add each facet as a layer to the card
 
 ?>
+                <!-- Taxon Map based on facets this ta -->
                 <div class="card">
                     <div class="card-header">
                         <span data-bs-toggle="tooltip" data-bs-placement="top"
@@ -245,21 +246,172 @@ require_once('header.php');
                 </div>
                 <?php
 
-    } // end if we have a map to render
+    }else{// end if we have a taxon map to render
+
+        // we don't have a taxon map to render so do we want to render a choropleth map from a 
+        // facet search and link it to the search reasults?
+        if($record->getRank() == 'genus' || $record->getRank() == 'family'){
+
+            // do a search to get a facet with the country distributions in it
+            $filters = array();
+            $filters[] = 'classification_id_s:' . WFO_DEFAULT_VERSION;
+            $filters[] = 'role_s:accepted';
+            $filters[] = "placed_in_{$record->getRank()}_s:{$record->getNameString()}";
+
+            // facet on a field we have in the configuration file.
+            $facets = array();
+            $facets[$map_choropleth_facet] = (object)array(
+                    "type" => "terms",
+                    'limit' => 200,
+                    'mincount' => 1,
+                    "field" => $map_choropleth_facet . '_ss'
+            );
+            
+            $map_query = array(
+                'query' => '*:*', // get everything
+                'filter' => $filters,
+                'limit' => 0, // return no docs - just facets
+                'facet' => (object)$facets
+            );
+
+            $map_response = SolrIndex::getSolrResponse($map_query);
+            $areas = array();
 
 
-    /*
-
-                // if this facet is the country iso then we put a map in
-            if($f['id'] == 'wfo-f-2' && count($f['facet_values'])){
-                echo '<p>';
-
-                echo '</p>';
+            if(
+                isset($map_response->facets) // facets in the response
+                && isset($map_response->facets->{$map_choropleth_facet}->buckets)  // buckets in this facet
+                && $map_response->facets->{$map_choropleth_facet}->buckets) // some buckets
                 
-            }// is country iso
+            {
+                
+                $buckets = $map_response->facets->{$map_choropleth_facet}->buckets;
+                
+                // highest one comes first
+                $max = $buckets[0]->count;
+                $area_count = 0;
+                $facet_details = new FacetDetails($map_choropleth_facet);
+                foreach($buckets as $bucket){
+                    $areas[$bucket->val] = (object)array(
+                        'name' => $facet_details->getFacetValueName($bucket->val),
+                        'count' => $bucket->count,
+                        'code' => $facet_details->getFacetValueCode($bucket->val),
+                        'percent' => round($bucket->count/$max * 100)
+                    );
+                    if($bucket->count > 0 )$area_count++;
+                }// build the areas
 
-    */
 
+?>
+                <div class="card">
+                    <div class="card-header">
+                        <span data-bs-toggle="tooltip" data-bs-placement="top"
+                            title="Areas this <?php echo $record->getRank()  ?> is found in. Click the map to search for subtaxa by area.">Summary
+                            Map</span>
+                        &nbsp;
+                        <span class="badge rounded-pill text-bg-success"
+                            style="font-size: 70%; vertical-align: super;"><?php echo number_format($area_count, 0) ?></span>
+                    </div>
+
+                    <div id="map" class="container-fluid" style="min-height: 300px">
+
+                        <script>
+                        // function to get a map color
+                        function getChoroplethColors(d) {
+                            return d > 90 ? '#800026' :
+                                d > 80 ? '#BD0026' :
+                                d > 70 ? '#E31A1C' :
+                                d > 60 ? '#FC4E2A' :
+                                d > 50 ? '#FD8D3C' :
+                                d > 40 ? '#FEB24C' :
+                                d > 30 ? '#FED976' :
+                                d > 0 ? '#FFEDA0' :
+                                '#DDDDDD';
+                        }
+
+                        // the map itself
+                        const map = L.map('map').setView([33, 120], 1);
+
+                        // the default base layer - streets 
+                        const osm = L.tileLayer(
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 19,
+                                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                            }).addTo(map);
+
+                        <?php
+
+                    echo "let lg = L.featureGroup();\n";                            
+                    foreach($areas as $fv_id => $fv){
+                        $path = "data/{$map_choropleth_facet}/{$fv->code}.json";
+                        if(file_exists($path)){
+                            // the actual polygon
+                            $json = file_get_contents($path);
+
+                            // we add properties to the polygon that we use
+                            // for interaction in the map
+                            $data = json_decode($json);
+
+                            // density is used for the colour
+                            $data->properties->density = $fv->percent;
+                            
+                            // build a query string used for the onclick action
+                            $query_url = array(
+                                'q' => '',
+                                'search_type' => 'name',
+                                'timestamp' => time(),
+                                "placed_in_{$record->getRank()}_s[]" => $record->getNameString(),
+                                "{$map_choropleth_facet}_ss[]" => $fv_id
+                            );
+                            $data->properties->query_url = 'search?' . http_build_query($query_url);
+
+                            $data->properties->taxon_count = $fv->count;
+
+                            // turn it back into json for use in the javascript
+                            $json = json_encode($data);
+                    ?>
+                        var p = L.geoJSON(<?php echo $json ?>, {
+                            style: feature => {
+                                return {
+                                    fillColor: getChoroplethColors(feature.properties.density),
+                                    weight: 2,
+                                    opacity: 1,
+                                    color: 'white',
+                                    dashArray: '3',
+                                    fillOpacity: 0.7
+                                };
+                            },
+                            onEachFeature: (feature, layer) => {
+                                layer.on({
+                                    'click': e => {
+                                        window.location = e.target.feature.properties.query_url;
+                                    }
+                                });
+                                console.log(feature.properties);
+                                const tt = feature.properties.tags["name:en"] + ": " + feature.properties
+                                    .taxon_count + " taxa";
+                                layer.bindTooltip(tt)
+                                    .openTooltip();
+                            }
+                        }).addTo(lg);
+
+                        <?php
+                        } // file exists
+                    } // for each area
+ 
+                   echo "lg.addTo(map);\n";
+
+            ?>
+                        </script>
+                    </div>
+                </div>
+                <!--end of choropleth -->
+
+                <?php
+            }
+            }// end is genus or family for chloropleth map
+
+        }// end chloropleth not taxon map
 
 
     // references    

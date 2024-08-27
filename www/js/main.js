@@ -54,7 +54,12 @@ const searchBoxSwitch = document.getElementById("search_box_switch_button");
 const searchTypeInput = document.getElementById("search_type_input");
 if (searchBoxSwitch) {
     searchBoxSwitch.addEventListener("click", (e) => {
-        console.log(e.target);
+        console.log(e);
+
+        // for some reason this event capture enter in the
+        // input text box so we need a hack to ignore it.
+        if (searchBox === document.activeElement) return;
+
         if (e.target.value == 'name') {
             e.target.value = 'text';
             e.target.innerHTML = 'Text:';
@@ -95,4 +100,7 @@ function searchSuggestKeyDown(e) {
         e.preventDefault();
     }
 }
+
+// Map functions
+
 

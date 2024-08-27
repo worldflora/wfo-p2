@@ -40,6 +40,9 @@ $map_facets = array(
     'wfo-f-8' // TDWG Level 3 
 );
 
+// used to do the maps on family and genus pages
+$map_choropleth_facet = 'wfo-f-2'; // Country ISO
+
 // these are the facets used 
 // in the search pages for filtering
 // in the order provided
