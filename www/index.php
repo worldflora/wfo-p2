@@ -24,6 +24,8 @@ if(preg_match('/^wfo-[0-9]{10}/', $path_parts[0])){
     require_once('news.php');
 }elseif($path_parts[0] == 'contribute'){
     require_once('contribute.php');
+}elseif($path_parts[0] == 'csv'){
+    require_once('csv.php');
 }else{
     // all else fails render the home page
     require_once('home.php');

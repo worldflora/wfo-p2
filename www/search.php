@@ -66,7 +66,7 @@ foreach($search_facets as $fi){
     // add the field to facet on
     $facets[$fi] = (object)array(
             "type" => "terms",
-            'limit' => 10,
+            'limit' => 200,
             "field" => $fi
     );
 

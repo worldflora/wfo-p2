@@ -1,0 +1,8 @@
+
+RewriteEngine On
+
+#exclude subdirectories
+RewriteCond %{REQUEST_URI} !^/.+/ 
+
+#everything else goes to index.php
+RewriteRule !index\.php$ index.php [L]

@@ -19,6 +19,9 @@
 
     <link href="style/main.css" rel="stylesheet">
 
+    <!-- FIXME: This is whilst in dev to prevent Google or Bing indexing the wrong URL -->
+    <meta name="robots" content="noindex">
+
     <title><?php echo @$page_title ? $page_title : 'World Flora Online'; ?></title>
 </head>
 
