@@ -200,7 +200,7 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
        
         // body
         echo "<div id=\"$f_name\" class=\"accordion-collapse $collapse\" data-bs-parent=\"#accordionExample\">";
-        echo '<div class="accordion-body">';
+        echo '<div class="accordion-body" style="max-height: 20em; overflow: auto;">';
 
         foreach($f->buckets as $bucket){
 
