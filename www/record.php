@@ -188,8 +188,12 @@ require_once('header.php');
                     let overlayMaps = {};
                     <?php
 
+        // we need a unique var for each layer
+        $layer_count = 0;
         foreach($facets as $f_id => $f){
-            echo "let $f_id = L.featureGroup();\n";                            
+            $layer_count++;
+            $layer_var = 'lg' . $layer_count;
+            echo "let $layer_var = L.featureGroup();\n";                            
             foreach($f->facet_values as $fv){
                 $path = "data/{$f_id}/{$fv->code}.json";
                 if(file_exists($path)){
@@ -214,7 +218,7 @@ require_once('header.php');
                             fillOpacity: 0.5,
                             weight: 0
                         }
-                    }).addTo(<?php echo $f_id ?>);
+                    }).addTo(<?php echo $layer_var ?>);
                     p.openPopup();
                     p.on('click', function() {
                         const myModal = new bootstrap.Modal(document.getElementById('provModal'));
@@ -222,19 +226,12 @@ require_once('header.php');
                         span.setAttribute('data-wfoprov', '<?php echo $prov_json ?>');
                         myModal.show(span);
                     });
-                    //map.fitBounds(lg.getBounds());
-
-                    // this is a hack because the window size isn't known
-                    // until the page finishes loading.
-                    // setTimeout(function() {
-                    //    window.dispatchEvent(new Event("resize"));
-                    // }, 300);
 
                     <?php
                 }
             }
-            echo "lg.addTo(map);\n";
-            echo "overlayMaps['{$f->name}'] = $f_id;\n";
+            echo "$layer_var.addTo(map);\n";
+            echo "overlayMaps['{$f->name}'] = $layer_var;\n";
             
         } // end facet
 ?>
