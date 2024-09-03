@@ -1,0 +1,36 @@
+{
+    "type": "FeatureCollection",
+    "name": "SEL-Selvagens",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "LEVEL3_COD": "SEL",
+                "LEVEL3_NAM": "Selvagens"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            -15.8747196,
+                            30.1380501
+                        ],
+                        [
+                            -15.8530598,
+                            30.1372204
+                        ],
+                        [
+                            -15.86028,
+                            30.1536102
+                        ],
+                        [
+                            -15.8747196,
+                            30.1380501
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}
