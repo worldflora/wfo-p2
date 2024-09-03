@@ -22,7 +22,7 @@ require_once('header.php');
                 </div>
 
                 <?php
-    
+     
     render_record_type_description($record);
     
     // header
@@ -139,7 +139,7 @@ require_once('header.php');
     $facets = array(); // these are the facets to display - and in the correct order as defined in map_facets
     foreach($map_facets as $facet_id){ // map_facets is defined in the config.php
         if(isset($all_facets[$facet_id])) $facets[$facet_id] = $all_facets[$facet_id];
-    }
+    } 
 
     if($facets){
         // we have facets to render as a map interface
@@ -189,7 +189,7 @@ require_once('header.php');
                     <?php
 
         foreach($facets as $f_id => $f){
-            echo "let lg = L.featureGroup();\n";                            
+            echo "let $f_id = L.featureGroup();\n";                            
             foreach($f->facet_values as $fv){
                 $path = "data/{$f_id}/{$fv->code}.json";
                 if(file_exists($path)){
@@ -214,7 +214,7 @@ require_once('header.php');
                             fillOpacity: 0.5,
                             weight: 0
                         }
-                    }).addTo(lg);
+                    }).addTo(<?php echo $f_id ?>);
                     p.openPopup();
                     p.on('click', function() {
                         const myModal = new bootstrap.Modal(document.getElementById('provModal'));
@@ -234,7 +234,7 @@ require_once('header.php');
                 }
             }
             echo "lg.addTo(map);\n";
-            echo "overlayMaps['{$f->name}'] = lg;\n";
+            echo "overlayMaps['{$f->name}'] = $f_id;\n";
             
         } // end facet
 ?>
