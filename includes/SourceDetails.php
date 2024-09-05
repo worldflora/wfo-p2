@@ -18,7 +18,8 @@ class SourceDetails{
 
         // if we are passed just an interger then convert it to the id used
         // in solr
-        if(is_int((int)$this->sourceId)){
+        $int_val = filter_var($this->sourceId, FILTER_VALIDATE_INT);
+        if($int_val !== FALSE){
             $this->sourceId = 'wfo-fs-' . $this->sourceId;
         }
 
@@ -40,10 +41,38 @@ class SourceDetails{
 
     }
 
-    public function getLink(){
-        if($this->sourceCache) return $this->sourceCache->link_uri;
-        return null;
+    public function getLink($wfo_id = false){
+
+        // if there is nothing in the source link we return nothing
+        if(!$this->sourceCache || !$this->sourceCache->link_uri) return null;
+    
+        // if the source link is urn:harvest-uri then we substitute our
+        // own link based on the source ID. This will use the harvest uri csv data
+        if($this->sourceCache->link_uri == 'urn:harvest-uri'){
+            $uri = '/csv.php?source_id=' . $this->sourceId;
+        }else{
+            $uri = $this->sourceCache->link_uri;
+        }
+
+        // OK now we need to add in the $wfo_id as a parameter if it has been given
+        if($wfo_id){
+            if(strpos($uri, '?') !== false){
+                $uri .= '&wfo_id=' . $wfo_id;
+            }else{
+                $uri .= '?wfo_id=' . $wfo_id;
+            }
+        }
+
+        // finally return it
+        return $uri;
     }
+
+    public function getHarvestLink(){
+        if($this->sourceCache && $this->sourceCache->harvest_uri) return $this->sourceCache->harvest_uri;
+        else return null;
+    }   
+
+
 
 
 }

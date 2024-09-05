@@ -59,6 +59,9 @@ $search_facets = array(
   "nomenclatural_status_s" // note this is the SOLR index field name - not a facet
 );
 
+// used to render icons on the record page
+define('IUCN_THREAT_FACET_ID', 'wfo-f-10');
+
 // the facets cache
 $facets_cache = @$_SESSION['facets_cache'];
 

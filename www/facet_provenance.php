@@ -38,20 +38,20 @@ foreach($provs->facet_value->provenance as $prov){
     preg_match('/(wfo-[0-9]{10})-s-([0-9]+)-(.+)/', $prov, $matches);
 
     $source = new SourceDetails($matches[2]);
+    $record = new TaxonRecord($matches[1]);
     
-    if($source->getLink()){
+    $source_link = $source->getLink($record->getId());
+    if($source_link){
         echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Data Source ';
         echo $counter;
         echo ':</div><div class="col">';
-        echo "<em><a target=\"wfo-source\" href=\"{$source->getLink()}\">{$source->getName()}</a></em>";
+        echo "<em><a target=\"wfo-source\" href=\"{$source_link}\">{$source->getName()}</a></em>";
     }else{
         echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Data Source ';
         echo $counter;
         echo ':</div><div class="col">';
         echo "<em>{$source->getName()}</em>";
     }
-
-    $record = new TaxonRecord($matches[1]);
 
     switch ($matches[3]) {
         case 'direct':

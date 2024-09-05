@@ -65,6 +65,7 @@ require_once('header.php');
 
         // work through the facets
         foreach($facets as $f){
+
             echo '<li class="list-group-item  list-group-item-action">';
             echo "<strong>{$f->name}: </strong>";
             $spacer = '';
@@ -81,6 +82,7 @@ require_once('header.php');
                     'taxon_wfo' => $record->getWfoId(), 
                     'taxon_name' => $record->getFullNameStringHtml() 
                 );
+
                 $prov_json = urlencode(json_encode($prov_data));
 
                 // render the actual facet value.
