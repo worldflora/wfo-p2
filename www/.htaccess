@@ -1,4 +1,3 @@
-
 RewriteEngine On
 
 #exclude subdirectories
@@ -7,6 +6,8 @@ RewriteCond %{REQUEST_URI} !^/.+/
 # other files called by ajax
 RewriteCond %{REQUEST_URI} !^/search_suggest.php 
 RewriteCond %{REQUEST_URI} !^/facet_provenance.php 
+RewriteCond %{REQUEST_URI} !^/csv.php 
+RewriteCond %{REQUEST_URI} !^/data_cache.php 
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]

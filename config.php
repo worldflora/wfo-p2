@@ -62,10 +62,10 @@ $search_facets = array(
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 'wfo-f-10');
 
-// the facets cache
+// the facets cache 
 $facets_cache = @$_SESSION['facets_cache'];
 
-if(!$facets_cache || @$_GET['facet_cache_refresh'] == 'true'){
+if(!$facets_cache || @$_GET['facets_cache_refresh'] == 'true' || time() - $_SESSION['facets_cache_modified'] > 60*60*10){ // refreshes every 10 minutes
 
     $facets_cache = array();
 
@@ -80,6 +80,7 @@ if(!$facets_cache || @$_GET['facet_cache_refresh'] == 'true'){
     }
 
     $_SESSION['facets_cache'] = $facets_cache;
+    $_SESSION['facets_cache_modified'] = time();
 
 
 }
@@ -88,7 +89,7 @@ if(!$facets_cache || @$_GET['facet_cache_refresh'] == 'true'){
 // we do the same for sources of info
 $sources_cache = @$_SESSION['sources_cache'];
 
-if(!$sources_cache || @$_GET['sources_cache_refresh'] == 'true'){
+if(!$sources_cache || @$_GET['sources_cache_refresh'] == 'true' || time() - $_SESSION['sources_cache_modified'] > 60*60*10){
     
     $sources_cache = array();
 
@@ -103,6 +104,7 @@ if(!$sources_cache || @$_GET['sources_cache_refresh'] == 'true'){
     }
 
     $_SESSION['sources_cache'] = $sources_cache;
+    $_SESSION['sources_cache_modified'] = time();
 
 
 }

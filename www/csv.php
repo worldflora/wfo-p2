@@ -103,3 +103,6 @@ echo "<p>Data file last cached: " . date ("F d Y H:i:s.", filemtime($cached_file
 echo "<hr/>";
 ?>
 
+
+    </body>
+</html>
