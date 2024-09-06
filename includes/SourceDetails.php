@@ -30,6 +30,10 @@ class SourceDetails{
 
     }
 
+    public function getId(){
+        return $this->sourceId;
+    }
+
     public function getName(){
 
         // we have it cached from the index
