@@ -29,6 +29,9 @@ $record = new TaxonRecord($_GET['wfo_id']);
 $cached_file_dir = '../data/facet_source_cache/';
 $cached_file_path = $cached_file_dir . $source->getId() . '.csv';
 
+// make the dir if it doesn't exit
+@mkdir($cached_file_dir, 0777, true);
+
 // do we have one cached? If not then go get it
 if(!file_exists($cached_file_path) || time() - filemtime($cached_file_path) > 60*60*24){ // less than a day old - could be configured
     file_put_contents($cached_file_path, file_get_contents($source->getHarvestLink()));
