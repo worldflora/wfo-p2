@@ -6,3 +6,9 @@ h1 .wfo-name-authors {
 .card {
     margin-bottom: 1em;
 }
+
+#search_box:focus-visible{
+    outline: 0px solid black;
+    border-radius: 0px;
+    box-shadow: none;
+}

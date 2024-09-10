@@ -50,11 +50,13 @@ if (searchBox) {
     });
 }
 
+/*
+    Search box switching name/text
+*/
 const searchBoxSwitch = document.getElementById("search_box_switch_button");
 const searchTypeInput = document.getElementById("search_type_input");
 if (searchBoxSwitch) {
     searchBoxSwitch.addEventListener("click", (e) => {
-        console.log(e);
 
         // for some reason this event capture enter in the
         // input text box so we need a hack to ignore it.
@@ -76,6 +78,22 @@ if (searchBoxSwitch) {
         }
         document.getElementById("search_box").focus(); // hides the help buble
         e.preventDefault();
+    });
+
+}
+
+/*
+    Search box cancelling parameters
+*/
+const searchBoxCancel = document.getElementById("search_box_cancel_button");
+if(searchBoxCancel){
+
+    searchBoxCancel.addEventListener("click", (e) => {
+        console.log('cancel');
+        document.getElementById("search_box").value = "";
+        document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+        // we don't prevent default so this will
+        // submit the form once clear and therefore clear the search stored in the session.
     });
 
 }

@@ -249,7 +249,12 @@ require_once('header.php');
 
         // we don't have a taxon map to render so do we want to render a choropleth map from a 
         // facet search and link it to the search reasults?
-        if($record->getRank() == 'genus' || $record->getRank() == 'family'){
+       // if($record->getRank() == 'genus' || $record->getRank() == 'family'){
+        if( 
+            in_array(
+                $record->getRank(),
+                array('family','subfamily','genus', 'subgenus', 'section', 'subsection')
+            )){
 
             // do a search to get a facet with the country distributions in it
             $filters = array();
