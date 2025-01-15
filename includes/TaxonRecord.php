@@ -499,6 +499,47 @@ class TaxonRecord{
     }
 
     /**
+     * Returns all the text snippets in a 
+     * structure that is useful for endering
+     * by combining the 5 multivalue solr fields
+     * 
+     */
+    public function getTextSnippets(){
+
+        global $language_codes;
+
+        $index = new SolrIndex();
+
+        $snippets = array();
+
+        if(!@$this->solrDoc->snippet_text_categories_ss) return $snippets;
+
+        for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
+
+            // metadata simple call
+            $meta_id = 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[0];
+            $snippet_meta = $index->getSolrDoc($meta_id);
+            $snippet_full_meta = json_decode($snippet_meta->json_t);
+            $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
+            $source_meta = json_decode($source_meta->json_t);
+
+            $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
+                'id' => 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[$i],
+                'language_code' => $this->solrDoc->snippet_text_languages_ss[$i],
+                'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
+                'body' => $this->solrDoc->snippet_text_bodies_txt[$i],
+                'imported' => $snippet_meta->modified_dt,
+                'described_wfo_id' => $snippet_full_meta->wfo_id,
+                'source_name' => $source_meta->name,
+                'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
+                // FIXME - add name described under
+            );
+        }
+
+        return $snippets;
+    }
+
+    /**
      * Get the value of id
      */ 
     public function getId()
@@ -864,6 +905,8 @@ class TaxonRecord{
 
         if(!$this->solrDoc) return $out;
         
+        // work through the solr doc and find the properties
+        // that look like they are facet scores
         foreach($this->solrDoc as $prop => $val){
             $matches = array();
             if(preg_match('/^(wfo-f-[0-9]+)_s/', $prop, $matches)){
@@ -903,6 +946,7 @@ class TaxonRecord{
 
             foreach($f['facet_values'] as $fv_id => $fv){
                 $fob->facet_values[$fv_id] = (object)array(
+                    'id' => $fv_id,
                     'name' => $details->getFacetValueName($fv_id),
                     'link' => $details->getFacetValueLink($fv_id),
                     'code' => $details->getFacetValueCode($fv_id),

@@ -11,6 +11,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
 session_start();
 
 require_once('../../wfo_p2_secrets.php'); // things we don't put in github
+require_once('includes/language_codes.php');
 
 // Location of the solr server
 define('SOLR_QUERY_URI', $solr_query_uri); // from wfo_p2_secrets.php
@@ -18,7 +19,7 @@ define('SOLR_USER', $solr_user); // from wfo_p2_secrets.php
 define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 
 // This will normally be the most recent.
-define('WFO_DEFAULT_VERSION','2024-06');
+define('WFO_DEFAULT_VERSION','2024-12');
 
 /*
     Facet configuration
@@ -56,8 +57,27 @@ $search_facets = array(
   "placed_in_phylum_s", // note this is the SOLR index field name - not a facet
   "placed_in_family_s", // note this is the SOLR index field name - not a facet
   "placed_in_genus_s", // note this is the SOLR index field name - not a facet
-  "nomenclatural_status_s" // note this is the SOLR index field name - not a facet
+  "nomenclatural_status_s", // note this is the SOLR index field name - not a facet
+  "snippet_text_categories_ss",
+  "snippet_text_languages_ss"
 );
+
+$search_facets = array();
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5");
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2");
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8");
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-10_ss', 'facet_name' =>  "wfo-f-10");
+
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language');
+
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Name role');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "nomenclatural_status_s", 'label' => 'Nomenclatural status');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "rank_s", 'label' => 'Taxonomic rank');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_phylum_s", 'label' => 'Phylum');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_family_s", 'label' => 'Family');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_genus_s", 'label' => 'Genus');
+
 
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 'wfo-f-10');

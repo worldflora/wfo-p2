@@ -12,3 +12,7 @@ h1 .wfo-name-authors {
     border-radius: 0px;
     box-shadow: none;
 }
+
+.wfo-meta-row:hover{
+    background-color: lightgray;
+}

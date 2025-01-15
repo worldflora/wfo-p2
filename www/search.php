@@ -30,7 +30,6 @@ if($terms){
 
     if(@$request['search_type'] && $request['search_type'] == 'text'){
         // they are specifically requesting a text search.
-
         $words = explode(' ', trim($terms));
         $query_txt = '_text_:'. implode(' OR ', $words);
         $sort = 'score desc';
@@ -53,15 +52,14 @@ $filters = array();
 $filters[] = 'classification_id_s:' . WFO_DEFAULT_VERSION;
 $filters[] = '-role_s:deprecated';
 
-// we need to convert the 
-// facet ids given in the config 
-// into the field names - adding _ss
-for ($i=0; $i <  count($search_facets) ; $i++) { 
-    $search_facets[$i] = preg_match('/^wfo-f-[0-9]/',$search_facets[$i]) ? $search_facets[$i] . '_ss' : $search_facets[$i];
+// we need to convert the facet definitions into fields
+$search_facet_fields = array();
+foreach($search_facets as $sf){
+    $search_facet_fields[] = $sf->field_name;
 }
 
 $facets = array();
-foreach($search_facets as $fi){
+foreach($search_facet_fields as $fi){
 
     // add the field to facet on
     $facets[$fi] = (object)array(
@@ -104,9 +102,6 @@ if(!$docs){
 }
 
 if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
-
-
-
 
 ?>
 

@@ -49,26 +49,8 @@ class SourceDetails{
 
         // if there is nothing in the source link we return nothing
         if(!$this->sourceCache || !$this->sourceCache->link_uri) return null;
-    
-        // if the source link is urn:harvest-uri then we substitute our
-        // own link based on the source ID. This will use the harvest uri csv data
-        if($this->sourceCache->link_uri == 'urn:harvest-uri'){
-            $uri = '/csv.php?source_id=' . $this->sourceId;
-        }else{
-            $uri = $this->sourceCache->link_uri;
-        }
+        return $this->sourceCache->link_uri;
 
-        // OK now we need to add in the $wfo_id as a parameter if it has been given
-        if($wfo_id){
-            if(strpos($uri, '?') !== false){
-                $uri .= '&wfo_id=' . $wfo_id;
-            }else{
-                $uri .= '?wfo_id=' . $wfo_id;
-            }
-        }
-
-        // finally return it
-        return $uri;
     }
 
     public function getHarvestLink(){

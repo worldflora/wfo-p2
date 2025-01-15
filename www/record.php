@@ -2,7 +2,7 @@
 
 $wfo = $path_parts[0];
 
-$record = new TaxonRecord($wfo . '-' . WFO_DEFAULT_VERSION); 
+$record = new TaxonRecord($wfo . '-' . WFO_DEFAULT_VERSION);
 $page_title = $record->getFullNameStringPlain();
 
 
@@ -67,6 +67,7 @@ require_once('header.php');
         foreach($facets as $f){
 
             echo '<li class="list-group-item  list-group-item-action">';
+
             echo "<strong>{$f->name}: </strong>";
             $spacer = '';
 
@@ -77,16 +78,19 @@ require_once('header.php');
 
                 // package the provenance data up into a data attribute
                 $prov_data = (object)array(
+                    'kind' => 'facet',
                     'facet_name' => $f->name,
+                    'facet_id' => $f->id,
                     'facet_value' => $fv,
                     'taxon_wfo' => $record->getWfoId(), 
-                    'taxon_name' => $record->getFullNameStringHtml() 
+                    'taxon_name' => $record->getFullNameStringHtml()
+
                 );
 
                 $prov_json = urlencode(json_encode($prov_data));
 
                 // render the actual facet value.
-                echo '<span data-bs-toggle="modal" data-bs-target="#provModal" data-wfoprov="'. $prov_json .'" style="cursor: pointer;">';
+                echo '<span data-bs-toggle="modal" data-bs-target="#facetProvModal" data-wfoprov="'. $prov_json .'" style="cursor: pointer;">';
                 echo $fv->name;
                 // badge with the data source count 
                 echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format(count($fv->provenance), 0)  .'</span>';
@@ -103,17 +107,17 @@ require_once('header.php');
 
     }
 ?>
-                <!-- Modal for facet provenance -->
-                <div class="modal fade" id="provModal" tabindex="-1" aria-labelledby="provModalLabel"
+                <!-- Modal 1 for facet provenance -->
+                <div class="modal fade" id="facetProvModal" tabindex="-1" aria-labelledby="provModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="provModalLabel">Attribute Provenance</h1>
+                                <h1 class="modal-title fs-5" id="provModalLabel">Facet Provenance</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
-                            <div id="provModalContent">
+                            <div id="facetProvModalContent">
                             </div>
                             <div class="modal-footer">
                                 <button type="button" data-bs-dismiss="modal" aria-label="Close"
@@ -124,11 +128,45 @@ require_once('header.php');
                 </div>
 
                 <script>
-                document.getElementById('provModal').addEventListener('show.bs.modal', event => {
+                // modal dialogue - load content on show
+                document.getElementById('facetProvModal').addEventListener('show.bs.modal', event => {
 
-                    const modalContent = document.getElementById('provModalContent');
+                    const modalContent = document.getElementById('facetProvModalContent');
                     modalContent.innerHTML = 'Loading ...';
-                    fetch("facet_provenance.php?prov=" + event.relatedTarget.dataset.wfoprov)
+                    fetch("provenance_modal_facet.php?prov=" + event.relatedTarget.dataset.wfoprov)
+                        .then(response => response.text())
+                        .then(text => modalContent.innerHTML = text);
+
+                })
+                </script>
+
+                <!-- Modal 2 for data provenance -->
+                <div class="modal fade" id="dataProvModal" tabindex="-1" aria-labelledby="provModalLabel2"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="provModalLabel2">Data Provenance</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div id="dataProvModalContent">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" data-bs-dismiss="modal" aria-label="Close"
+                                    class="btn btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                // modal dialogue - load content on show
+                document.getElementById('dataProvModal').addEventListener('show.bs.modal', event => {
+
+                    const modalContent = document.getElementById('dataProvModalContent');
+                    modalContent.innerHTML = 'Loading ...';
+                    fetch("provenance_modal_data.php?prov=" + event.relatedTarget.dataset.wfoprov)
                         .then(response => response.text())
                         .then(text => modalContent.innerHTML = text);
 
@@ -205,6 +243,7 @@ require_once('header.php');
 
                     // package the provenance data up into a data attribute
                     $prov_data = (object)array(
+                        'kind' => 'facet',
                         'facet_name' => $f->name,
                         'facet_value' => $fv,
                         'taxon_wfo' => $record->getWfoId(), 
@@ -223,7 +262,7 @@ require_once('header.php');
                     }).addTo(<?php echo $layer_var ?>);
                     p.openPopup();
                     p.on('click', function() {
-                        const myModal = new bootstrap.Modal(document.getElementById('provModal'));
+                        const myModal = new bootstrap.Modal(document.getElementById('facetProvModal'));
                         const span = document.createElement('span');
                         span.setAttribute('data-wfoprov', '<?php echo $prov_json ?>');
                         myModal.show(span);
@@ -253,7 +292,7 @@ require_once('header.php');
         if( 
             in_array(
                 $record->getRank(),
-                array('family','subfamily','genus', 'subgenus', 'section', 'subsection')
+                array('family','genus')
             )){
 
             // do a search to get a facet with the country distributions in it
@@ -417,6 +456,7 @@ require_once('header.php');
 
         }// end chloropleth not taxon map
 
+    render_snippets($record->getTextSnippets(), $record->getWfoId());
 
     // references    
     render_references($record->getNomenclaturalReferences(), 'Nomenclatural Resources', "Links to information useful for understanding the nomenclature of this name.");
@@ -614,6 +654,99 @@ require_once('header.php');
 
 <?php
 require_once('footer.php');
+
+
+/**
+ * Called to render all the snippet texts
+ * but each category of snippet is then
+ * rendered as its own card in the interface
+ */
+function render_snippets($snippets, $current_wfo_id){
+
+    foreach($snippets as $category => $snips){
+        render_snippet_category($category, $snips, $current_wfo_id);
+    }
+
+   
+}
+
+// render one of the categories of snippet
+function render_snippet_category($category, $snippets, $current_wfo_id){
+
+    $title = ucfirst($category);
+
+    echo '<div class="card">';
+    echo '<div class="card-header">';
+    echo '<span
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="Text descriptions from published sources" >';
+    echo "Text: {$title}";
+
+    echo ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($snippets), 0)  .'</span> ';
+
+    echo '</span>';
+
+    echo '</div>'; // end header
+    echo '<div class="card-body">';
+    $done_one = false;
+    foreach($snippets as $snippet){
+
+        // separator line
+        if($done_one) echo "<hr/>";
+        else $done_one = true;
+
+        // the body
+        echo '<p>';
+        echo $snippet->body;
+        echo '</p>';
+
+        // the metadata
+
+        $prov_data = (object)array(
+            'kind' => 'snippet_source',
+            'source_id' => $snippet->source_id
+        );
+
+        $prov_json = urlencode(json_encode($prov_data));
+
+        echo '<p>';
+
+        echo 'From a treatment in "<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
+        echo  $snippet->source_name;
+        echo '</a>"';
+
+        if($snippet->described_wfo_id == $current_wfo_id){
+            echo ' describing a taxon with this name ';
+        }else{
+            echo ' describing ';
+            $syn = new TaxonRecord($snippet->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
+            echo $syn->getFullNameStringHtml();
+            echo ' which is a synonym of this taxon under the current classification.';
+        }
+
+        echo ' in ' . $snippet->language_label;
+        $prov_data = (object)array(
+            'kind' => 'snippet',
+            'source_id' => $snippet->id
+        );
+
+        $prov_json = urlencode(json_encode($prov_data));
+
+        echo ' <strong>Imported: </strong> ' . $snippet->imported;
+        echo '&nbsp;[<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
+        echo  'Imported provenance data.';
+        echo '</a>]';
+
+        echo '</p>';
+
+
+    }
+    echo "</div>";
+    echo '</div>'; // end card
+
+}
+
 
 function render_references($refs_all, $title, $help = ''){
 

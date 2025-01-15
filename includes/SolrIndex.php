@@ -80,6 +80,24 @@ class SolrIndex{
         return trim(substr($response, strpos($response, "\r\n\r\n")));
     }
 
+
+    public function getSolrDoc($id){
+
+        $id = trim($id);
+
+        // load it by id
+        $solr_query_uri = SOLR_QUERY_URI . '/get?id=' . trim($id);
+        $ch = $this->getCurlHandle($solr_query_uri);
+        $response = $this->runCurlRequest($ch);
+        if(isset($response->body)){
+            $body = json_decode($response->body);
+            if(isset($body->doc)){
+                return $body->doc;                
+            }
+        }
+        return null;
+    }
+
     /**
      * 
      * 
