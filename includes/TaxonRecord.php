@@ -454,6 +454,36 @@ class TaxonRecord{
 
     }
 
+    /**
+     * Returns the TEN and any editors of this 
+     * taxon in a uniform format
+     */
+    public function getExperts(){
+
+        $experts = array();
+
+        if(isset($this->solrDoc->ten_name_s)){
+            $experts[] = (object)array(
+                'name' => "<a target=\"taxonomic_expert\" href=\"{$this->solrDoc->ten_uri_s}\">{$this->solrDoc->ten_name_s}</a>",
+                'description' => $this->solrDoc->ten_comment_s
+            );
+        }
+
+        if(isset($this->solrDoc->editors_name_ss)){
+            for ($i=0; $i < count($this->solrDoc->editors_name_ss) ; $i++) { 
+                $experts[] = (object)array(
+                    'name' => "<a target=\"taxonomic_expert\"  aria-label=\"View ORCID record\" href=\"https://orcid.org/{$this->solrDoc->editors_orcid_ss[$i]}\">{$this->solrDoc->editors_name_ss[$i]}</a>"
+                    . " <a target=\"taxonomic_expert\"  aria-label=\"View ORCID record\" href=\"https://orcid.org/{$this->solrDoc->editors_orcid_ss[$i]}\"><img src=\"images/ORCID-iD_icon_unauth_24x24.png\" alt=\"ORCID iD\"/></a>",
+                    'description' => "" 
+                );
+            }
+
+        }
+
+        return $experts;
+
+    }
+
     public function loadTaxonRecords($query, $as_name = true){
 
         $records = array();

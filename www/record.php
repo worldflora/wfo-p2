@@ -638,7 +638,32 @@ require_once('header.php');
 
                             } // has more than one sibling
                         } // has parent
-                            
+
+                        // taxonomic experts (included TENs and then Editors)
+                        $experts = $record->getExperts();
+                        if($experts){
+                            echo '<div class="card" style="width: 100%">';
+                            echo '<div class="card-header">';
+                            echo '<span
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="left"
+                                    title="Individuals and networks of experts who curate the taxonomy of this taxon in WFO Plant List" >Taxonomic Experts</span>&nbsp;';
+                            echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($experts), 0)  . '</span>  </div>';
+                            echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
+
+                            foreach($experts as $expert){
+                                echo '<div class="list-group-item">';
+                                echo $expert->name;
+                                echo " ";
+                                echo $expert->description;
+                                echo '</div>';
+                            }
+
+                            echo '</div>'; // end list
+                            echo '</div>'; // end card
+
+                        }
+
                                       
                         ?>
                     </div> <!-- end col -->

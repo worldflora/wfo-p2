@@ -19,7 +19,7 @@ define('SOLR_USER', $solr_user); // from wfo_p2_secrets.php
 define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 
 // This will normally be the most recent.
-define('WFO_DEFAULT_VERSION','2024-12');
+define('WFO_DEFAULT_VERSION','9999-04');
 
 /*
     Facet configuration
