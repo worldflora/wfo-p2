@@ -547,10 +547,11 @@ class TaxonRecord{
         for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
 
             // metadata simple call
-            $meta_id = 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[0];
+            $meta_id = 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[$i];
             $snippet_meta = $index->getSolrDoc($meta_id);
             $snippet_full_meta = json_decode($snippet_meta->json_t);
             $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
+
             $source_meta = json_decode($source_meta->json_t);
 
             $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
@@ -562,9 +563,12 @@ class TaxonRecord{
                 'described_wfo_id' => $snippet_full_meta->wfo_id,
                 'source_name' => $source_meta->name,
                 'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
-                // FIXME - add name described under
             );
         }
+
+//        echo '<pre>';
+  //      print_r($snippets);
+    //    echo '</pre>';
 
         return $snippets;
     }

@@ -698,6 +698,8 @@ function render_snippets($snippets, $current_wfo_id){
 // render one of the categories of snippet
 function render_snippet_category($category, $snippets, $current_wfo_id){
 
+    //print_r($snippets);
+
     $title = ucfirst($category);
 
     echo '<div class="card">';
@@ -737,20 +739,18 @@ function render_snippet_category($category, $snippets, $current_wfo_id){
 
         echo '<p>';
 
-        echo 'From a treatment in "<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
-        echo  $snippet->source_name;
-        echo '</a>"';
+        echo 'From a treatment in <a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '"><em>'. $snippet->source_name .'</em></a>';
 
         if($snippet->described_wfo_id == $current_wfo_id){
             echo ' describing a taxon with this name ';
         }else{
             echo ' describing ';
             $syn = new TaxonRecord($snippet->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
-            echo $syn->getFullNameStringHtml();
-            echo ' which is a synonym of this taxon under the current classification.';
+            echo "<a href=\"{$syn->getWfoId()}\">{$syn->getFullNameStringHtml()}</a>";
+            echo ' (which is a synonym of this taxon under the current classification)';
         }
 
-        echo ' in ' . $snippet->language_label;
+        echo " in  $snippet->language_label. ";
         $prov_data = (object)array(
             'kind' => 'snippet',
             'source_id' => $snippet->id
@@ -760,7 +760,7 @@ function render_snippet_category($category, $snippets, $current_wfo_id){
 
         echo ' <strong>Imported: </strong> ' . $snippet->imported;
         echo '&nbsp;[<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
-        echo  'Imported provenance data.';
+        echo  'Data provenance';
         echo '</a>]';
 
         echo '</p>';
