@@ -465,7 +465,7 @@ class TaxonRecord{
         if(isset($this->solrDoc->ten_name_s)){
             $experts[] = (object)array(
                 'name' => "<a target=\"taxonomic_expert\" href=\"{$this->solrDoc->ten_uri_s}\">{$this->solrDoc->ten_name_s}</a>",
-                'description' => $this->solrDoc->ten_comment_s
+                'description' => @$this->solrDoc->ten_comment_s
             );
         }
 
