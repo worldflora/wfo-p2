@@ -16,3 +16,7 @@ h1 .wfo-name-authors {
 .wfo-meta-row:hover{
     background-color: lightgray;
 }
+
+.wfo-facet-value{
+    cursor: pointer;
+}

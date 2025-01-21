@@ -547,7 +547,11 @@ class TaxonRecord{
         for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
 
             // metadata simple call
-            $meta_id = 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[$i];
+            $meta_id = $this->solrDoc->snippet_text_ids_ss[$i];
+
+            // fix only while we migrate from integer to string id for snippet.
+            if(!preg_match('/^wfo-snippet-/', $meta_id)) $meta_id = 'wfo-snippet-' . $meta_id;
+            
             $snippet_meta = $index->getSolrDoc($meta_id);
             $snippet_full_meta = json_decode($snippet_meta->json_t);
             $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
@@ -555,7 +559,7 @@ class TaxonRecord{
             $source_meta = json_decode($source_meta->json_t);
 
             $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
-                'id' => 'wfo-snippet-' . $this->solrDoc->snippet_text_ids_ss[$i],
+                'id' => $this->solrDoc->snippet_text_ids_ss[$i],
                 'language_code' => $this->solrDoc->snippet_text_languages_ss[$i],
                 'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
                 'body' => $this->solrDoc->snippet_text_bodies_txt[$i],

@@ -13,6 +13,9 @@ session_start();
 require_once('../../wfo_p2_secrets.php'); // things we don't put in github
 require_once('includes/language_codes.php');
 
+// $system_message = null;
+if(!isset($system_message)) $system_message = null;
+
 // Location of the solr server
 define('SOLR_QUERY_URI', $solr_query_uri); // from wfo_p2_secrets.php
 define('SOLR_USER', $solr_user); // from wfo_p2_secrets.php
@@ -70,6 +73,7 @@ $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language');
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_sources_ss", 'label' => 'Text source');
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Name role');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "nomenclatural_status_s", 'label' => 'Nomenclatural status');
@@ -77,7 +81,7 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "rank_
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_phylum_s", 'label' => 'Phylum');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_family_s", 'label' => 'Family');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_genus_s", 'label' => 'Genus');
-
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-facet-sources_ss", 'label' => 'Facet data source');
 
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 'wfo-f-10');

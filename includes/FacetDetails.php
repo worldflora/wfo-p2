@@ -10,6 +10,7 @@ class FacetDetails{
     private $facetId = null;
     private $solrFieldName = null;
     private $facetCache = null;
+    private $index = null;
 
     public function __construct($facet_id){
 
@@ -25,6 +26,9 @@ class FacetDetails{
         if(isset($_SESSION['facets_cache']) && isset($_SESSION['facets_cache'][$this->facetId])){
             $this->facetCache = $_SESSION['facets_cache'][$this->facetId];
         }
+
+        // single version of the index link
+        $this->index = new SolrIndex();
 
     }
 
@@ -60,12 +64,24 @@ class FacetDetails{
 
     public function getFacetValueName($value_id){
 
+        global $language_codes;
+
         // if it is in the cache as a facet server defined thing return that
         if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->name;
 
+        // if the name is recognised as data source load it from the index
+        if(preg_match('/^wfo-(s|f)s-[0-9]+$/', $value_id)){
+
+            $doc = $this->index->getSolrDoc($value_id);
+            if($doc){
+                $data = json_decode($doc->json_t);
+                return $data->name;
+            }
+            return 'Data source: ' . $value_id;
+        }
+
         // if it is a two letter language code the return that - could have clashes but unlikely
         if(strlen($value_id) == 2){
-            require_once('../includes/language_codes.php');
             if(isset($language_codes[$value_id])) return $language_codes[$value_id];
         }
         

@@ -195,7 +195,8 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
        
         // body
         echo "<div id=\"$f_name\" class=\"accordion-collapse $collapse\" data-bs-parent=\"#accordionExample\">";
-        echo '<div class="accordion-body" style="max-height: 20em; overflow: auto;">';
+
+        echo '<div class="accordion-body list-group list-group-flush" style="padding-right: 0px; padding-top: 1em; max-height: 20em; overflow: auto;">';
 
         foreach($f->buckets as $bucket){
 
@@ -207,15 +208,19 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
             $count = number_format($bucket->count, 0);
 
-            echo '<div class="mb-3">';
-            echo '<input class="form-check-input"  type="checkbox"';
+            echo '<li class="list-group-item">';
+        
+            echo "<label class=\"form-check-label stretched-link text-wrap wfo-facet-value\" for=\"{$bucket->val}\">";
+            
+            echo '<input class="form-check-input me-1"  type="checkbox" ';
             echo "value=\"$bucket->val\" id=\"{$bucket->val}\" $checked name=\"{$f_name}[]\"";
             echo 'onchange="this.form.submit()"';
-            echo "/>";
-            echo "<label class=\"form-check-label\" for=\"{$bucket->val}\">&nbsp;";
+            echo "/>&nbsp;";
+
             echo $facet_details->getFacetValueName($bucket->val) . " - {$count}";
             echo "</label>";                
-            echo '</div>';
+  
+            echo '</li>';
 
         }
 

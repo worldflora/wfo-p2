@@ -49,6 +49,7 @@ echo "<select class=\"form-control\" size=\"$visible_lines\"  onclick=\"window.l
 foreach ($docs as $doc) {
     $record = new TaxonRecord($doc);
     echo "<option value=\"{$record->getWfoId()}\" >";
+    if($record->getRole() != 'accepted') echo '~ ';
     echo $record->getFullNameStringPlain();
     echo "&nbsp;[{$record->getRole()}&nbsp;:&nbsp;{$record->getRank()}]";
     echo '</option>';

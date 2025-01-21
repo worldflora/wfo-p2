@@ -26,6 +26,8 @@
 </head>
 
 <body>
+
+
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">WFO P2</a>
@@ -51,5 +53,14 @@
             </div>
         </div>
     </nav>
-    <main class="container-flex" style="margin-top: 80px;">
-        <!-- end header.php -->
+    <main class="container-flex" style="margin-top: 75px;">
+
+    <?php
+    if($system_message){
+        echo '<div class="container-lg">';
+        echo "<div class=\"alert alert-danger\" role=\"alert\"><strong>&nbsp;System Message:&nbsp;</strong>{$system_message}</div>";
+        echo '</div>';
+    }
+?>
+
+    <!-- end header.php -->
