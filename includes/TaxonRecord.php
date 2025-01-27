@@ -564,7 +564,7 @@ class TaxonRecord{
                 'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
                 'body' => $this->solrDoc->snippet_text_bodies_txt[$i],
                 'imported' => $snippet_meta->modified_dt,
-                'described_wfo_id' => $snippet_full_meta->wfo_id,
+                'described_wfo_id' => $snippet_meta->wfo_id_s,
                 'source_name' => $source_meta->name,
                 'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
             );
