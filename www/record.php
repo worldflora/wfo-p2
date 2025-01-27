@@ -688,34 +688,71 @@ require_once('footer.php');
  */
 function render_snippets($snippets, $current_wfo_id){
 
-    foreach($snippets as $category => $snips){
-        render_snippet_category($category, $snips, $current_wfo_id);
-    }
-
-   
-}
-
-// render one of the categories of snippet
-function render_snippet_category($category, $snippets, $current_wfo_id){
-
-    //print_r($snippets);
-
-    $title = ucfirst($category);
+    if(count($snippets) == 0 ) return;
 
     echo '<div class="card">';
     echo '<div class="card-header">';
-    echo '<span
+
+    // tabs in the header
+    echo '<ul class="nav nav-tabs card-header-tabs">';
+    //echo '<span class="nav-link disabled" >Text</span>';
+
+    $first = true;
+    foreach($snippets as $category => $snips){
+
+        echo '<li class="nav-item">';
+
+        // tool tip
+        echo '<span
         data-bs-toggle="tooltip"
         data-bs-placement="top"
-        title="Text descriptions from published sources" >';
-    echo "Text: {$title}";
+        title="'. ucfirst($category) .' text from published sources" >';
 
-    echo ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($snippets), 0)  .'</span> ';
+        // tab button
+        if($first){
+            echo '<button class="nav-link active" id="'. $category .'-tab" data-bs-toggle="tab" data-bs-target="#' . $category . '" type="button" role="tab" aria-controls="'. $category .'" aria-selected="true">';
+            $first = false;
+        }else{
+            echo '<button class="nav-link" id="'. $category .'-tab" data-bs-toggle="tab" data-bs-target="#' . $category . '" type="button" role="tab" aria-controls="'. $category .'" aria-selected="false">';
+        }
+        echo ucfirst($category);
+        echo ' <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($snips), 0)  .'</span> ';
+        echo '</button>';
+        
+        echo '</span>'; // end tooltip
 
-    echo '</span>';
-
+        echo '</li>';
+    }
+    echo '</ul>'; // tab list
+    
     echo '</div>'; // end header
-    echo '<div class="card-body">';
+
+    // body
+    echo '<div class="card-body tab-content" style="max-height: 40em; overflow: auto;">';
+
+    $first = true;
+    foreach($snippets as $category => $snips){
+        if($first){
+            echo '<div class="tab-pane fade show active" id="'. $category .'" role="tabpanel" aria-labelledby="home-tab">';
+            $first = false;
+        }else{
+            echo '<div class="tab-pane fade" id="'. $category .'" role="tabpanel" aria-labelledby="home-tab">';
+        }
+        render_snippet_category_body($category, $snips, $current_wfo_id);
+        echo '</div>';
+    }
+
+    echo "</div>"; // card body
+    echo '</div>'; // end card
+   
+}
+
+
+// render one of the categories of snippet
+function render_snippet_category_body($category, $snippets, $current_wfo_id){
+
+    //print_r($snippets);
+
     $done_one = false;
     foreach($snippets as $snippet){
 
@@ -767,8 +804,7 @@ function render_snippet_category($category, $snippets, $current_wfo_id){
 
 
     }
-    echo "</div>";
-    echo '</div>'; // end card
+
 
 }
 
