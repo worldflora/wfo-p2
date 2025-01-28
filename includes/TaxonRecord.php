@@ -553,21 +553,26 @@ class TaxonRecord{
             if(!preg_match('/^wfo-snippet-/', $meta_id)) $meta_id = 'wfo-snippet-' . $meta_id;
             
             $snippet_meta = $index->getSolrDoc($meta_id);
-            $snippet_full_meta = json_decode($snippet_meta->json_t);
-            $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
+            if($snippet_meta){
+                $snippet_full_meta = json_decode($snippet_meta->json_t);
+                $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
 
-            $source_meta = json_decode($source_meta->json_t);
+                if($source_meta){
+                    $source_meta = json_decode($source_meta->json_t);
+                    $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
+                        'id' => $this->solrDoc->snippet_text_ids_ss[$i],
+                        'language_code' => $this->solrDoc->snippet_text_languages_ss[$i],
+                        'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
+                        'body' => $this->solrDoc->snippet_text_bodies_txt[$i],
+                        'imported' => $snippet_meta->modified_dt,
+                        'described_wfo_id' => $snippet_meta->wfo_id_s,
+                        'source_name' => $source_meta->name,
+                        'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
+                    );
+                }
 
-            $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
-                'id' => $this->solrDoc->snippet_text_ids_ss[$i],
-                'language_code' => $this->solrDoc->snippet_text_languages_ss[$i],
-                'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
-                'body' => $this->solrDoc->snippet_text_bodies_txt[$i],
-                'imported' => $snippet_meta->modified_dt,
-                'described_wfo_id' => $snippet_meta->wfo_id_s,
-                'source_name' => $source_meta->name,
-                'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
-            );
+            }
+
         }
 
 //        echo '<pre>';
