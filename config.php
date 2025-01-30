@@ -36,6 +36,7 @@ define('WFO_DEFAULT_VERSION','9999-04');
 $attribute_facets = array(
     'wfo-f-5', // life form
     'wfo-f-10', // threat status
+    'wfo-f-11', // cites status
     'wfo-f-2', // Country ISO
     'wfo-f-8' // TDWG Level 3 
 );
