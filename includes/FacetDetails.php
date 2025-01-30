@@ -38,14 +38,12 @@ class FacetDetails{
 
         // we have it cached from the index
         if($this->facetCache) return $this->facetCache->name;
-
         
         // it isn't in the cache from the facet service
         // we must be looking at a locally define one based 
         // on a solr field
         foreach($search_facets as $sf){
             if($sf->field_name == $this->solrFieldName){
-                if($this->solrFieldName == 'wfo-f-11_ss') print_r($sf);
                 return $sf->label;
             }
         }
