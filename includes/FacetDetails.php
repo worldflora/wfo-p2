@@ -45,6 +45,7 @@ class FacetDetails{
         // on a solr field
         foreach($search_facets as $sf){
             if($sf->field_name == $this->solrFieldName){
+                if($this->solrFieldName == 'wfo-f-11_ss') print_r($sf);
                 return $sf->label;
             }
         }
