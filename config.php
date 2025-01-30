@@ -69,7 +69,8 @@ $search_facets = array();
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5");
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2");
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8");
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-10_ss', 'facet_name' =>  "wfo-f-10");
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-10_ss', 'facet_name' =>  "wfo-f-10"); // red list
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-11_ss', 'facet_name' =>  "wfo-f-11"); // CITES
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language');
