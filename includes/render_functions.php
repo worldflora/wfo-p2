@@ -82,7 +82,7 @@ function render_record_type_description($record, $link_wfo_id = true){
                     >';
                     // echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. CITES_APPENDIX_FACET_ID .'/' . $fv->code . '.png" alt="CITES icon"/>';
 
-                    echo "<span style=\"border:solid 1px blue; border-radius: 0.5em; padding: 0.5em\">";
+                    echo "<span style=\"border:solid 1px blue; border-radius: 0.5em; padding-left: 0.33em; padding-left: 0.33em; margin-left: 0.33em;\">";
                     echo str_replace('CITES_', '', $fv->code);
                     echo"</span>";
                     echo '</span>';
