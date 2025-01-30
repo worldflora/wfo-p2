@@ -90,7 +90,7 @@ define('IUCN_THREAT_FACET_ID', 'wfo-f-10');
 // the facets cache 
 $facets_cache = @$_SESSION['facets_cache'];
 
-if(!$facets_cache || @$_GET['facets_cache_refresh'] == 'true' || time() - $_SESSION['facets_cache_modified'] > 60*60*10){ // refreshes every 10 minutes
+//if(!$facets_cache || @$_GET['facets_cache_refresh'] == 'true' || time() - $_SESSION['facets_cache_modified'] > 60*60*10){ // refreshes every 10 minutes
 
     $facets_cache = array();
 
@@ -108,7 +108,7 @@ if(!$facets_cache || @$_GET['facets_cache_refresh'] == 'true' || time() - $_SESS
     $_SESSION['facets_cache_modified'] = time();
 
 
-}
+//}
 
 
 // we do the same for sources of info
