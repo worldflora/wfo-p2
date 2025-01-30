@@ -52,9 +52,11 @@ function render_record_type_description($record, $link_wfo_id = true){
 
 
   
-    // add an IUCN icon if we have an attribute for threat status
+    
     $facets = $record->getFacets();
     foreach($facets as $facet_id => $facet){
+        
+        // add an IUCN icon if we have an attribute for threat status
         if($facet_id == IUCN_THREAT_FACET_ID){ // from the config.php
             foreach($facet->facet_values as $fv_id => $fv){
                 if($fv->code){
@@ -63,7 +65,23 @@ function render_record_type_description($record, $link_wfo_id = true){
                     data-bs-placement="bottom"
                     title="IUCN Threat Status is '. $fv->name . '."
                     >';
-                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. IUCN_THREAT_FACET_ID .'/' . $fv->code . '.svg" alt="star"/>';
+                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. IUCN_THREAT_FACET_ID .'/' . $fv->code . '.svg" alt="IUCN icon"/>';
+                    echo '</span>';
+                }
+            }
+        }
+
+        // ditto for CITES
+        if($facet_id == CITES_APPENDIX_FACET_ID){ // from the config.php
+            foreach($facet->facet_values as $fv_id => $fv){
+                if($fv->code){
+                    echo '<span
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="bottom"
+                    title="CITES '. $fv->name . '."
+                    >';
+                    // logo location
+                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. CITES_APPENDIX_FACET_ID .'/' . $fv->code . '.png" alt="CITES icon"/>';
                     echo '</span>';
                 }
             }

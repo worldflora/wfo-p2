@@ -86,6 +86,7 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-f
 
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 'wfo-f-10');
+define('CITES_APPENDIX_FACET_ID', 'wfo-f-11');
 
 // the facets cache 
 $facets_cache = @$_SESSION['facets_cache'];
