@@ -14,8 +14,13 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Bootstrap CSS -->
+
+    <!-- this is how we load it from a CDN if we aren't building our own Bootstrap version
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    -->
+    
+    <link href="theme/css/custom.css" rel="stylesheet" >
 
     <link href="style/main.css" rel="stylesheet">
 
