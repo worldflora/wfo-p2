@@ -54,7 +54,7 @@ require_once('header.php');
         
         // we have facets to render as attribute box
 
-        echo '<div class="card bg-secondary-subtle">';
+        echo '<div class="card shadow-sm bg-secondary-subtle">';
         echo '<div class="card-header">';
          echo '<span
             data-bs-toggle="tooltip"
@@ -189,7 +189,7 @@ require_once('header.php');
 
 ?>
                 <!-- Taxon Map based on facets this ta -->
-                <div class="card  bg-secondary-subtle">
+                <div class="card  shadow-sm  bg-secondary-subtle">
                     <div class="card-header">
                         <span data-bs-toggle="tooltip" data-bs-placement="top"
                             title="Areas the taxon is found in. Click an area for provenance info.">Taxon Maps</span>
@@ -481,7 +481,7 @@ require_once('header.php');
 
                     <div class="row" style="width: 100%">
                         <div class="col">
-                            <div class="card bg-secondary-subtle" style="width: 100%">
+                            <div class="card shadow-sm bg-secondary-subtle" style="width: 100%">
                                 <?php
                             
                             // taxonomic placement
@@ -593,7 +593,7 @@ require_once('header.php');
                         // children
                         $kids = $record->getChildren();
                         if($kids){
-                            echo '<div class="card bg-secondary-subtle" style="width: 100%">';
+                            echo '<div class="card shadow-sm bg-secondary-subtle" style="width: 100%">';
                             echo '<div class="card-header">';
                              echo '<span
                                     data-bs-toggle="tooltip"
@@ -618,7 +618,7 @@ require_once('header.php');
                             $siblings = $parent->getChildren();
                             if(count($siblings) > 1){
 
-                                echo '<div class="card bg-secondary-subtle" style="width: 100%">';
+                                echo '<div class="card shadow-sm bg-secondary-subtle" style="width: 100%">';
                                 echo '<div class="card-header">';
                                 echo '<span
                                         data-bs-toggle="tooltip"
@@ -642,7 +642,7 @@ require_once('header.php');
                         // taxonomic experts (included TENs and then Editors)
                         $experts = $record->getExperts();
                         if($experts){
-                            echo '<div class="card bg-secondary-subtle" style="width: 100%">';
+                            echo '<div class="card shadow-sm bg-secondary-subtle" style="width: 100%">';
                             echo '<div class="card-header">';
                             echo '<span
                                     data-bs-toggle="tooltip"
@@ -826,7 +826,7 @@ function render_references($refs_all, $title, $help = ''){
     if(count($refs) == 0) return;
     
     // render the card
-    echo '<div class="card bg-secondary-subtle">';
+    echo '<div class="card shadow-sm bg-secondary-subtle">';
     echo '<div class="card-header">';
     echo '<span
         data-bs-toggle="tooltip"
@@ -869,25 +869,25 @@ function render_reference($ref){
     echo "<a href=\"{$ref->uri}\" class=\"list-group-item  list-group-item-action\" target=\"{$ref->kind}\">";
     echo '<div class="row">';
 
-    echo '<div class="col-1">'; 
+    echo '<div class="col-1 d-none d-md-block">'; 
     if($ref->thumbnailUri){
-        echo "<img src=\"$ref->thumbnailUri\" width=\"50px\" />";
+        echo "<img src=\"$ref->thumbnailUri\" style=\"max-width: 50px\" />";
     }else{
         switch ($ref->kind) {
             case 'database':
-                echo '<img src="../images/database.png" width="50px" />';
+                echo '<img src="../images/database.png" style="max-width: 50px" />';
                 break;
             case 'person':
-                echo '<img src="../images/person.png" width="50px" style="margin-top: 0.5em"/>';
+                echo '<img src="../images/person.png" style="max-width: 50px; margin-top: 0.5em"/>';
                 break;
             case 'literature':
-                echo '<img src="../images/literature.png" width="50px" style="margin-top: 0.5em"/>';
+                echo '<img src="../images/literature.png" style="max-width: 50px; margin-top: 0.5em"/>';
                 break;
             case 'specimen':
-                echo '<img src="../images/literature.png" width="50px" style="margin-top: 0.5em"/>';
+                echo '<img src="../images/literature.png" style="max-width: 50px; margin-top: 0.5em"/>';
                 break;
             default:
-                echo '<div width="50px" >&nbsp;</div>';
+                echo '<div style=\"max-width: 50px\"  >&nbsp;</div>';
                 break;
         }
     }
@@ -919,7 +919,7 @@ function render_name_list($names, $record, $title, $help){
 
     if(!$names) return;
 
-    echo '<div class="card bg-secondary-subtle">';
+    echo '<div class="card shadow-sm bg-secondary-subtle">';
     echo '<div class="card-header">';
     echo '<span
             data-bs-toggle="tooltip"
