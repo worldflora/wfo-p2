@@ -1,0 +1,3 @@
+[submodule "www/theme"]
+	path = www/theme
+	url = https://github.com/rogerhyam/wfo-p2-theme.git
