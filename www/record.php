@@ -54,7 +54,7 @@ require_once('header.php');
         
         // we have facets to render as attribute box
 
-        echo '<div class="card">';
+        echo '<div class="card bg-secondary-subtle">';
         echo '<div class="card-header">';
          echo '<span
             data-bs-toggle="tooltip"
@@ -189,7 +189,7 @@ require_once('header.php');
 
 ?>
                 <!-- Taxon Map based on facets this ta -->
-                <div class="card">
+                <div class="card  bg-secondary-subtle">
                     <div class="card-header">
                         <span data-bs-toggle="tooltip" data-bs-placement="top"
                             title="Areas the taxon is found in. Click an area for provenance info.">Taxon Maps</span>
@@ -481,7 +481,7 @@ require_once('header.php');
 
                     <div class="row" style="width: 100%">
                         <div class="col">
-                            <div class="card" style="width: 100%">
+                            <div class="card bg-secondary-subtle" style="width: 100%">
                                 <?php
                             
                             // taxonomic placement
@@ -593,7 +593,7 @@ require_once('header.php');
                         // children
                         $kids = $record->getChildren();
                         if($kids){
-                            echo '<div class="card" style="width: 100%">';
+                            echo '<div class="card bg-secondary-subtle" style="width: 100%">';
                             echo '<div class="card-header">';
                              echo '<span
                                     data-bs-toggle="tooltip"
@@ -618,7 +618,7 @@ require_once('header.php');
                             $siblings = $parent->getChildren();
                             if(count($siblings) > 1){
 
-                                echo '<div class="card" style="width: 100%">';
+                                echo '<div class="card bg-secondary-subtle" style="width: 100%">';
                                 echo '<div class="card-header">';
                                 echo '<span
                                         data-bs-toggle="tooltip"
@@ -642,7 +642,7 @@ require_once('header.php');
                         // taxonomic experts (included TENs and then Editors)
                         $experts = $record->getExperts();
                         if($experts){
-                            echo '<div class="card" style="width: 100%">';
+                            echo '<div class="card bg-secondary-subtle" style="width: 100%">';
                             echo '<div class="card-header">';
                             echo '<span
                                     data-bs-toggle="tooltip"
@@ -691,7 +691,7 @@ function render_snippets($snippets, $current_wfo_id){
     if(count($snippets) == 0 ) return;
 
     echo '<div class="card">';
-    echo '<div class="card-header">';
+    echo '<div class="card-header bg-secondary-subtle">';
 
     // tabs in the header
     echo '<ul class="nav nav-tabs card-header-tabs">';
@@ -826,7 +826,7 @@ function render_references($refs_all, $title, $help = ''){
     if(count($refs) == 0) return;
     
     // render the card
-    echo '<div class="card">';
+    echo '<div class="card bg-secondary-subtle">';
     echo '<div class="card-header">';
     echo '<span
         data-bs-toggle="tooltip"
@@ -919,7 +919,7 @@ function render_name_list($names, $record, $title, $help){
 
     if(!$names) return;
 
-    echo '<div class="card">';
+    echo '<div class="card bg-secondary-subtle">';
     echo '<div class="card-header">';
     echo '<span
             data-bs-toggle="tooltip"
