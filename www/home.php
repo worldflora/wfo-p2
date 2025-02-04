@@ -167,7 +167,7 @@ require_once('header.php');
             </div> <!-- end carousel -->
 
 
-            <p style="padding: 0.5em; margin-top: 2em; margin-left: 20%; margin-right: 20%; font-size: 120%; border: solid 1px black;">
+            <p style="padding: 0.5em; margin-top: 4em; margin-left: 20%; margin-right: 20%; font-size: 120%; border: solid 1px black;">
                     This is a mock-up of a new WFO data portal for evaluation purposes only.
                     <br/>
                     <strong>The data here may not be correct at this stage.</strong>
