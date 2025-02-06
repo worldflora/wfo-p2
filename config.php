@@ -37,6 +37,7 @@ $attribute_facets = array(
     'wfo-f-5', // life form
     'wfo-f-10', // threat status
     'wfo-f-11', // cites status
+    'wfo-f-12', // functional group
     'wfo-f-2', // Country ISO
     'wfo-f-8' // TDWG Level 3 
 );
@@ -52,6 +53,7 @@ $map_choropleth_facet = 'wfo-f-2'; // Country ISO
 // these are the facets used 
 // in the search pages for filtering
 // in the order provided
+/*
 $search_facets = array(
   "wfo-f-5", // Life form
   "wfo-f-2", // Countries ISO
@@ -66,6 +68,7 @@ $search_facets = array(
   "snippet_text_categories_ss",
   "snippet_text_languages_ss"
 );
+*/
 
 $search_facets = array();
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5");
@@ -73,6 +76,7 @@ $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8");
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-10_ss', 'facet_name' =>  "wfo-f-10"); // red list
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-11_ss', 'facet_name' =>  "wfo-f-11"); // CITES
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-12_ss', 'facet_name' =>  "wfo-f-12"); // Functional group
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category');
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language');
