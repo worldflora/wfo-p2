@@ -1,6 +1,6 @@
 <?php
 
-$facets_cache = @$_SESSION['facets_cache'];
+require_once('../config.php');
 
 if($facets_cache){
  echo "<pre>";

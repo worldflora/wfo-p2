@@ -4,14 +4,17 @@ require_once('../config.php');
 require_once('../includes/SolrIndex.php');
 require_once('../includes/TaxonRecord.php');
 require_once('../includes/SourceDetails.php');
+require_once('../includes/FacetDetails.php');
 
 $provs = json_decode($_GET['prov']);
+$facet_details = new FacetDetails($provs->facet_id);
 
 echo '<ul class="list-group  list-group-flush" >';
 
 // Rendering the metadata for a facet score
 // this can come from multiple sources and each of those could have
 // scored it as different names.
+
 
 echo '<li class="list-group-item wfo-meta-row" >';
 echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Taxon:</div><div class="col">' . $provs->taxon_name . '</div><div>';
@@ -26,12 +29,18 @@ if($provs->facet_value->link){
     $facet_value_name = $provs->facet_value->name;
 }
 
-echo '<div class="row gx-1"><div class="col-2 text-end fw-bold">Attribute:</div><div class="col">'."{$provs->facet_name} - {$facet_value_name}".'</div><div>';
+echo '<div class="row gx-1">';
+echo '<div class="col-2 text-end fw-bold">Attribute:</div>';
+echo '<div class="col">';
+echo "<div>{$provs->facet_name} - {$facet_value_name}</div>";
+//echo "<div>{$facet_details->getFacetDescription()}</div>";
+echo "<div>{$facet_details->getFacetValueDescription($provs->facet_value->id)}</div>";
+echo '</div><div>';
 echo '</li>';
 
 // echo "<pre>";
-// print_r($provs);
-//    echo "</pre>";
+ //print_r($provs);
+ // echo "</pre>";
     
 
 // now we render the data sources
@@ -83,11 +92,11 @@ foreach($provs->facet_value->provenance as $prov){
             break;
         case 'synonym':
             echo '&nbsp;- <a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $score_provs_json . '" style="cursor: pointer;">scored the synonym</a>';
-            echo "&nbsp;<a target=\"wfo-plantlist\" href=\"https://list.worldfloraonline.org/{$record->getId()}\">{$record->getFullNameStringHtml()}</a>.";
+            echo "&nbsp;<a target=\"wfo-plantlist\" href=\"{$record->getId()}\">{$record->getFullNameStringHtml()}</a>.";
             break;
         case 'ancestor':
             echo '&nbsp;- <a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $score_provs_json . '" style="cursor: pointer;">scored the ancestor</a>';
-            echo "&nbsp;<a target=\"wfo-plantlist\" href=\"https://list.worldfloraonline.org/{$record->getId()}\">{$record->getFullNameStringHtml()}</a>.";
+            echo "&nbsp;<a target=\"wfo-plantlist\" href=\"{$record->getId()}\">{$record->getFullNameStringHtml()}</a>.";
             break;
         default:
             $phrase = 'unrecognised';

@@ -61,6 +61,14 @@ class FacetDetails{
 
     }
 
+    public function getFacetDescription(){
+
+        // we have it cached from the index
+        if($this->facetCache) return $this->facetCache->description;
+        else return null;
+
+    }
+
     public function getFacetValueName($value_id){
 
         global $language_codes;
@@ -86,6 +94,14 @@ class FacetDetails{
         
         // give up an return the value itself
         return $value_id;
+    }
+
+    public function getFacetValueDescription($value_id){
+
+        // if it is in the cache as a facet server defined thing return that
+        if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->description;
+        else return null;
+
     }
 
 
