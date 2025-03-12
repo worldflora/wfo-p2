@@ -1,6 +1,6 @@
 # WFO Portal V2.
 
-This is a mockup of how a version 2 of the WFO portal could work.
+This is a mockup of how a version 2 of the WFO portal could work. We are currently taking it forward as a potential replacement for the main portal.
 
 ## Design principles
 
