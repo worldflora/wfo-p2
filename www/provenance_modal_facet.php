@@ -23,8 +23,8 @@ echo '</li>';
 echo '<li class="list-group-item gx-1 wfo-meta-row" >';
 
 // the facet value link provides a description of the facet value
-if($provs->facet_value->link){
-    $facet_value_name = "<a target=\"attributes\" href=\"{$provs->facet_value->link}\">{$provs->facet_value->name}</a>";
+if($facet_details->getFacetValueLink($provs->facet_value->id)){
+    $facet_value_name = "<a target=\"attributes\" href=\"{$facet_details->getFacetValueLink($provs->facet_value->id)}\">{$provs->facet_value->name}</a>";
 }else{
     $facet_value_name = $provs->facet_value->name;
 }
