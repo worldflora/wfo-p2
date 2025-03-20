@@ -200,6 +200,9 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
         foreach($f->buckets as $bucket){
 
+            // for locally defined facets we can exclude particular values
+            if($facet_details->excludeFacetValue($bucket->val)) continue;
+
             if(@$request[$f_name] && in_array($bucket->val, $request[$f_name])){
                 $checked = 'checked';
             }else{

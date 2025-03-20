@@ -184,4 +184,5 @@ $language_codes = [
 	"za" => "Zhuang; Chuang",
 	"zh" => "Chinese",
 	"zu" => "Zulu",
+	"zz" => "No Language"
 ];

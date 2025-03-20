@@ -29,7 +29,16 @@ require_once('header.php');
     echo "<h1 style=\" position: relative;\">{$record->getFullNameStringHtml()}";
     
     echo "</h1>";
-    echo "<p>{$record->getCitationMicro()}</p>";
+    echo "<p>{$record->getCitationMicro()}<br/>";
+
+    // we load summary stats async because it needs another index call
+    echo '<span id="taxonStatsSpan">&nbsp;</span>';
+    echo '<script>';
+    echo "\tconst placeholder = document.getElementById('taxonStatsSpan');\n";
+    echo "\tfetch('widget_taxon_stats.php?wfo_id={$record->getWfoId()}&path={$record->getNameDescendentPath()}&name_string={$record->getNameString()}&rank_string={$record->getRank()}').then(response => response.text()).then(text => placeholder.innerHTML = text)";        
+    echo '</script>';
+
+    echo "</p>"; // end of micro citation
     
     // link to accepted name
     if($record->getRole() == 'synonym'){
@@ -455,6 +464,15 @@ require_once('header.php');
             }// end is genus or family for chloropleth map
 
         }// end chloropleth not taxon map
+
+
+    // Load the tools associated but do it assync because it will
+    // require another faceting search or two.
+    echo '<div id="toolsCard">&nbsp;</div>';
+    echo '<script>';
+    echo "\tconst tc = document.getElementById('toolsCard');\n";
+    echo "\tfetch('widget_taxon_link_outs.php?wfo_id={$record->getWfoId()}').then(response => response.text()).then(text => tc.innerHTML = text)";        
+    echo '</script>';
 
     render_snippets($record->getTextSnippets(), $record->getWfoId());
 

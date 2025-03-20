@@ -49,6 +49,10 @@ class TaxonRecord{
 
     private ?String $wfoPath = null;
 
+    // we hold a list of the snippet metadata
+    // so we only have to call for it once
+    private ?Array $snippetMetadata = null;
+
     /**
      * Create a new wrapper around a SOLR doc
      */
@@ -542,44 +546,173 @@ class TaxonRecord{
 
         $snippets = array();
 
+        // we don't have any snippets in the object
         if(!@$this->solrDoc->snippet_text_categories_ss) return $snippets;
 
+        // have we loaded the snippet metadata yet?
+        if(!$this->snippetMetadata) $this->loadSnippetMetadata();
+
+        // work through the snippets in this record
+        for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
+
+            // we don't return categories of snippets that have been overridden e.g. link-outs 
+            if(in_array($this->solrDoc->snippet_text_categories_ss[$i], OVERRIDDEN_SNIPPET_CATEGORIES)) continue;
+
+            $snippet_id = $this->solrDoc->snippet_text_ids_ss[$i];
+
+            // add each one arranged by text category
+            $snippet = array();
+            $snippet['id'] = $snippet_id;
+            $snippet['language_code'] = $this->solrDoc->snippet_text_languages_ss[$i];
+            $snippet['language_label'] = $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]];
+            $snippet['body'] = $this->solrDoc->snippet_text_bodies_txt[$i];
+
+
+            // safely add metadata - may have failed to be indexed or delayed or something
+            if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){
+
+                $snippet['imported'] = $this->snippetMetadata[$snippet_id]->snippet->modified_dt;
+                $snippet['described_wfo_id'] = $this->snippetMetadata[$snippet_id]->snippet->wfo_id_s;
+                $snippet['source_id'] = 'wfo-ss-' . $this->snippetMetadata[$snippet_id]->snippet->source_id_s;
+                
+                if(isset($this->snippetMetadata[$snippet_id]->source_full)){
+                    $snippet['source_name'] = $this->snippetMetadata[$snippet_id]->source_full->name;
+                }
+                
+            }else{
+                $snippet['imported'] = 'not set';
+                $snippet['described_wfo_id'] = 'not set';
+                $snippet['source_id'] = 'not set';
+                $snippet['source_name'] = 'not set';
+            }
+
+            // finally put it in as an object
+            $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)$snippet;
+
+        }
+
+
+        return $snippets;
+    }
+
+    /**
+     * Returns all the linkout snippets
+     * for this record. Similar to text snippets
+     * but different fields for use in the UI
+     * 
+     */
+    public function getLinkOuts(){
+        
+        $index = new SolrIndex();
+
+        $link_outs = array();
+
+        // we don't have any snippets in the object
+        if(!@$this->solrDoc->snippet_text_categories_ss) return $link_outs;
+
+        // have we loaded the snippet metadata yet?
+        if(!$this->snippetMetadata) $this->loadSnippetMetadata();
+
+        // work through the snippets in this record
+        for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
+
+            // we are only interested in link-out snippets
+            if($this->solrDoc->snippet_text_categories_ss[$i] != 'link-out') continue;
+
+            $snippet_id = $this->solrDoc->snippet_text_ids_ss[$i];
+
+     
+
+            // add each one arranged by text category
+            $lo = array();
+            $lo['id'] = $snippet_id;
+            $lo['uri'] = $this->solrDoc->snippet_text_bodies_txt[$i];
+
+
+            // safely add metadata - may have failed to be indexed or delayed or something
+            if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){
+
+               // print_r($this->snippetMetadata);
+
+                $lo['imported'] = $this->snippetMetadata[$snippet_id]->snippet->modified_dt;
+                $lo['described_wfo_id'] = $this->snippetMetadata[$snippet_id]->snippet->wfo_id_s;
+                $lo['source_id'] = 'wfo-ss-' . $this->snippetMetadata[$snippet_id]->snippet->source_id_s;
+                
+                if(isset($this->snippetMetadata[$snippet_id]->source_full)){
+                    $lo['source_name'] = $this->snippetMetadata[$snippet_id]->source_full->name;
+                }
+                
+            }else{
+                $lo['imported'] = 'not set';
+                $lo['described_wfo_id'] = 'not set';
+                $lo['source_id'] = 'not set';
+                $lo['source_name'] = 'not set';
+            }
+
+            // finally put it in as an object
+            $link_outs[$this->solrDoc->snippet_text_categories_ss[$i]] = (object)$lo;
+
+        }
+
+        return $link_outs;
+
+    }
+
+    /**
+     * Various places use metadata about text snippets
+     * we only want to load these once and we do it here
+     * 
+     */
+    private function loadSnippetMetadata(){
+
+        // we don't have any snippets in the object so don't load any metadata
+        if(!@$this->solrDoc->snippet_text_categories_ss){
+            $this->snippetMetadata = (object)array();
+            return;
+        }else{
+            // initialise it
+            $this->snippetMetadata = array();
+        }
+
+        // an index to call
+        $index = new SolrIndex();
+
+        /*
+            efficiency note: We could reduce the number of index calls by pooling the 
+            IDs for snippets and sources and then making two or even just one call for the 
+            objects - but this would make the function much more complex at this stage of dev.
+        */
         for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
 
             // metadata simple call
             $meta_id = $this->solrDoc->snippet_text_ids_ss[$i];
 
-            // fix only while we migrate from integer to string id for snippet.
-            if(!preg_match('/^wfo-snippet-/', $meta_id)) $meta_id = 'wfo-snippet-' . $meta_id;
-            
             $snippet_meta = $index->getSolrDoc($meta_id);
             if($snippet_meta){
-                $snippet_full_meta = json_decode($snippet_meta->json_t);
-                $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
 
+                // add the snippet data
+                $this->snippetMetadata[$meta_id] = array();
+                $this->snippetMetadata[$meta_id]['snippet'] = $snippet_meta;
+                $this->snippetMetadata[$meta_id]['snippet_full'] = json_decode($snippet_meta->json_t);
+
+                // add the source metadata as well if we have it
+                $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
                 if($source_meta){
-                    $source_meta = json_decode($source_meta->json_t);
-                    $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)array(
-                        'id' => $this->solrDoc->snippet_text_ids_ss[$i],
-                        'language_code' => $this->solrDoc->snippet_text_languages_ss[$i],
-                        'language_label' => $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]],
-                        'body' => $this->solrDoc->snippet_text_bodies_txt[$i],
-                        'imported' => $snippet_meta->modified_dt,
-                        'described_wfo_id' => $snippet_meta->wfo_id_s,
-                        'source_name' => $source_meta->name,
-                        'source_id' => 'wfo-ss-' . $snippet_meta->source_id_s
-                    );
+                    $this->snippetMetadata[$meta_id]['source'] = $source_meta;
+                    $this->snippetMetadata[$meta_id]['source_full'] = json_decode($source_meta->json_t);
                 }
 
+                // convert it to an object for easy of use
+                $this->snippetMetadata[$meta_id] = (object)$this->snippetMetadata[$meta_id];
+
+            }else{
+
+                // Oh know we have failed to load metadata. Still add a item so the reciever can deal with it
+                $this->snippetMetadata[$meta_id] = null;
             }
 
         }
 
-//        echo '<pre>';
-  //      print_r($snippets);
-    //    echo '</pre>';
-
-        return $snippets;
     }
 
     /**
@@ -1001,6 +1134,16 @@ class TaxonRecord{
         }
 
         return $out;
+    }
+
+    /**
+     * Used when we call for the contents 
+     * make up of the taxon
+     */
+    public function getNameDescendentPath(){
+        if(!isset($this->solrDoc)) return null;
+        if(!isset($this->solrDoc->name_descendent_path)) return null;
+        return $this->solrDoc->name_descendent_path;
     }
 
 }

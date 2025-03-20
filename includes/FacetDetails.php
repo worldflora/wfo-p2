@@ -69,6 +69,30 @@ class FacetDetails{
 
     }
 
+    public function excludeFacetValue($value_id){
+
+        global $search_facets;
+
+        // we can only exclude locally defined solr facets (from the config file)
+        if(!$this->facetCache){
+            // it isn't in the cache from the facet service
+            // we must be looking at a locally define one based on solr field
+            // work through them to find ourselves
+            foreach($search_facets as $sf){
+                if($sf->field_name == $this->solrFieldName){
+                    // found it ourselves
+                    // is the value listed in our exclude list
+                    if(in_array($value_id, $sf->exclude))return true;
+                }
+            }
+
+        }
+
+        // didn't find an exclude flag so it isn't excluded
+        return false;
+
+    }
+
     public function getFacetValueName($value_id){
 
         global $language_codes;
