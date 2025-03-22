@@ -61,7 +61,8 @@ define('OVERRIDDEN_SNIPPET_CATEGORIES', array(
 // These are the data source to display summary stats for
 // in the tools (link-out) card
 define('LINK_OUT_DATA_SOURCE_IDS', array(
-    'wfo-ss-1783' // PlantNet link-out
+    'wfo-ss-1783', // PlantNet link-out
+    'wfo-ss-1784' // NCBI Taxonomy
     )
 );
 
