@@ -621,8 +621,6 @@ class TaxonRecord{
 
             $snippet_id = $this->solrDoc->snippet_text_ids_ss[$i];
 
-     
-
             // add each one arranged by text category
             $lo = array();
             $lo['id'] = $snippet_id;

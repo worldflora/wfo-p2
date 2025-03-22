@@ -355,7 +355,7 @@ require_once('header.php');
 
 
 ?>
-                <div class="card">
+                <div class="card shadow-sm bg-secondary-subtle">
                     <div class="card-header">
                         <span data-bs-toggle="tooltip" data-bs-placement="top"
                             title="Areas this <?php echo $record->getRank()  ?> is found in. Click the map to search for subtaxa by area.">Summary

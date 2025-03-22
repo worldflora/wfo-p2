@@ -21,18 +21,25 @@ $link_outs = $record->getLinkOuts();
 foreach ($link_outs as $link_out) {
 
     $content_count++;
-
-    echo '<a href="'. $link_out->uri .'" target="tool" class="list-group-item  list-group-item-action">';
-    echo "<strong>{$link_out->source_name}: </strong>";
+   
+    echo '<div class="list-group-item  list-group-item-action">';
+   
+    // the data source as a link to the modal
+    $prov_data = (object)array(
+        'kind' => 'snippet_source',
+        'source_id' => $link_out->source_id
+    );
+    $prov_json = urlencode(json_encode($prov_data));
+    echo "<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#dataProvModal\" data-wfoprov=\"{$prov_json}\"><strong>{$link_out->source_name}:</strong></a>&nbsp;";
 
     if($link_out->described_wfo_id == $record->getWfoId()){
-        echo "Features the taxon <strong>{$record->getFullNameStringHtml()}</strong>";
+        echo "Features the taxon <a href=\"{$link_out->uri}\" target=\"tool\">{$record->getFullNameStringHtml()}</a>";
     }else{
         $syn = new TaxonRecord($link_out->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
-        echo "Features <strong>{$syn->getFullNameStringHtml()}</strong> which is a synonym of {$record->getFullNameStringHtml()}.";
+        echo "Features <a href=\"{$link_out->uri}\" target=\"tool\">{$syn->getFullNameStringHtml()}</a> which is a synonym of {$record->getFullNameStringHtml()}.";
     }
 
-    echo '</a>';
+    echo '</div>';
 }
 
 
@@ -73,6 +80,13 @@ if($ranks_table[$record->getRank()]['faceted']){
             $index = new SolrIndex();
     
             foreach(LINK_OUT_DATA_SOURCE_IDS as $ds_id){
+
+                // build a link to the datasource provenance
+                $prov_data = (object)array(
+                    'kind' => 'snippet_source',
+                    'source_id' => $ds_id
+                );
+                $prov_json = urlencode(json_encode($prov_data)); 
     
                 // if we got a response and it is greater than zero write it out
                 if(isset($response->facets->$ds_id) && $response->facets->$ds_id->count){
@@ -100,10 +114,13 @@ if($ranks_table[$record->getRank()]['faceted']){
                     );
                     $query_url = 'search?' . http_build_query($query_url);
 
-                    echo '<a href="'. $query_url .'" class="list-group-item list-group-item-action">';
-                    echo "<strong>{$data_source->name} </strong> covers {$percent}%, $count of the $total subtaxa, of {$record->getFullNameStringHtml()}.";
+                    echo '<div class="list-group-item list-group-item-action">';
+
+                    echo "<strong><a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#dataProvModal\" data-wfoprov=\"{$prov_json}\">{$data_source->name}</a>:</strong>&nbsp;";
+
+                    echo "covers {$percent}%, <a href=\"{$query_url}\">$count of the $total subtaxa</a>, of {$record->getFullNameStringHtml()}";
     
-                    echo '</a>';   
+                    echo '</div>';   
     
     
                 }
