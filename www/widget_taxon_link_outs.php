@@ -13,31 +13,14 @@ if(!$wfo_id || !preg_match('/^wfo-[0-9]{10}$/', $wfo_id)) exit;
 $record = new TaxonRecord($wfo_id);
 
 // we don't output till we know we have content to display
-$have_content = false;
+$content_count = 0;
 ob_start();
-
-?>
-
-<div class="card shadow-sm bg-secondary-subtle">
-
-<div class="card-header">
-
-<span
-    data-bs-toggle="tooltip"
-    data-bs-placement="top"
-    title="A summary of the subtaxa within this taxon" >
-Tools
-</span>
-</div>
-<div class="list-group  list-group-flush">
-
-<?php
 
 $link_outs = $record->getLinkOuts();
 
 foreach ($link_outs as $link_out) {
 
-    $have_content = true;
+    $content_count++;
 
     echo '<a href="'. $link_out->uri .'" target="tool" class="list-group-item  list-group-item-action">';
     echo "<strong>{$link_out->source_name}: </strong>";
@@ -85,10 +68,6 @@ if($ranks_table[$record->getRank()]['faceted']){
     
         $response = SolrIndex::getSolrResponse($query);
     
-    //    echo '<pre>';
-    //    print_r($response);
-    //    echo '</pre>';
-    
         if(isset($response->facets) && $response->facets){
     
             $index = new SolrIndex();
@@ -98,7 +77,7 @@ if($ranks_table[$record->getRank()]['faceted']){
                 // if we got a response and it is greater than zero write it out
                 if(isset($response->facets->$ds_id) && $response->facets->$ds_id->count){
     
-                    $have_content = true;
+                    $content_count++;
     
                     $count = $response->facets->$ds_id->count;
                     $percent = $count/$response->response->numFound  * 100;
@@ -137,21 +116,25 @@ if($ranks_table[$record->getRank()]['faceted']){
 
 } // is faceted rank
 
-
-
-?>
-
-    
-</div>
-</div>
-
-
-<?php
-
-// if we haven't created meaningful content then
-// throw away the template text
-if(!$have_content){
-    ob_clean();
+// return a json object of the content
+// so we can render it nicely
+if($content_count > 0){
+    $json = json_encode((object)array(
+        'count' => $content_count,
+        'body' => ob_get_contents()
+    ));
+}else{
+    $json = json_encode((object)array(
+        'count' => 0,
+        'body' => ''
+    ));
 }
+ob_clean();
+
+
+header('Content-Type: application/json');
+echo $json;
+exit;
+
 
 ?>

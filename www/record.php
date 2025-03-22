@@ -468,11 +468,43 @@ require_once('header.php');
 
     // Load the tools associated but do it assync because it will
     // require another faceting search or two.
-    echo '<div id="toolsCard">&nbsp;</div>';
-    echo '<script>';
-    echo "\tconst tc = document.getElementById('toolsCard');\n";
-    echo "\tfetch('widget_taxon_link_outs.php?wfo_id={$record->getWfoId()}').then(response => response.text()).then(text => tc.innerHTML = text)";        
-    echo '</script>';
+?>
+    <div class="card shadow-sm bg-secondary-subtle banana" id="toolsCard">
+    <div class="card-header">
+        <span
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="External tools with data on this taxon" >
+        Tools
+        </span>
+        <span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;" id="toolsCardBadge"></span>
+        </div>
+        <div class="list-group  list-group-flush" id="toolsCardContent">
+    Loading ...
+    </div>
+    </div>
+    <script>;
+        const tc = document.getElementById('toolsCard');
+        const tcc = document.getElementById('toolsCardContent');
+        const tcb = document.getElementById('toolsCardBadge');
+        fetch('widget_taxon_link_outs.php?wfo_id=<?php echo $record->getWfoId() ?>')
+            .then(response => response.json())
+            .then(json => {
+                    if(json.count > 0){
+                        tc.classList.remove('d-none');
+                        tc.classList.add('d-block');
+                        tcc.innerHTML = json.body;
+                        tcb.innerHTML = json.count;
+                    }else{
+                        tc.classList.add('d-none');
+                        tcc.innerHTML = '';                         
+                    }
+                }
+            );        
+    </script>
+<?php
+
+
 
     render_snippets($record->getTextSnippets(), $record->getWfoId());
 
