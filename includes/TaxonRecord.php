@@ -648,7 +648,7 @@ class TaxonRecord{
             }
 
             // finally put it in as an object
-            $link_outs[$this->solrDoc->snippet_text_categories_ss[$i]] = (object)$lo;
+            $link_outs[] = (object)$lo;
 
         }
 

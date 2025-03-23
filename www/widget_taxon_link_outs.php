@@ -30,7 +30,11 @@ foreach ($link_outs as $link_out) {
         'source_id' => $link_out->source_id
     );
     $prov_json = urlencode(json_encode($prov_data));
-    echo "<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#dataProvModal\" data-wfoprov=\"{$prov_json}\"><strong>{$link_out->source_name}:</strong></a>&nbsp;";
+
+    if(isset($link_out->source_name)) $sname = $link_out->source_name;
+    else $sname = 'Source';
+
+    echo "<a href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#dataProvModal\" data-wfoprov=\"{$prov_json}\"><strong>{$sname}:</strong></a>&nbsp;";
 
     if($link_out->described_wfo_id == $record->getWfoId()){
         echo "Features the taxon <a href=\"{$link_out->uri}\" target=\"tool\">{$record->getFullNameStringHtml()}</a>";
