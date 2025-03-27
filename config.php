@@ -25,6 +25,13 @@ define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 // This will normally be the most recent.
 define('WFO_DEFAULT_VERSION','9999-04');
 
+// The limit on the size of lists that can be downloaded
+define('LIST_DOWNLOAD_LIMIT', 50000); // maximum records
+define('LIST_DOWNLOAD_DIR', 'downloads/' ); // end in a slash
+define('LIST_DOWNLOAD_DIR_MAX_SIZE', 100 ); // maximum size in megabytes
+define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files, minutes
+
+
 /*
     Facet configuration
     Which facets are displayed on taxon pages and in the faceted searching

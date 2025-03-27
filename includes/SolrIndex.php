@@ -81,14 +81,14 @@ class SolrIndex{
     }
 
 
-    public function getSolrDoc($id){
+    public static function getSolrDoc($id){
 
         $id = trim($id);
 
         // load it by id
         $solr_query_uri = SOLR_QUERY_URI . '/get?id=' . trim($id);
-        $ch = $this->getCurlHandle($solr_query_uri);
-        $response = $this->runCurlRequest($ch);
+        $ch = SolrIndex::getCurlHandle($solr_query_uri);
+        $response = SolrIndex::runCurlRequest($ch);
         if(isset($response->body)){
             $body = json_decode($response->body);
             if(isset($body->doc)){

@@ -20,3 +20,12 @@ h1 .wfo-name-authors {
 .wfo-facet-value{
     cursor: pointer;
 }
+
+.btn-primary {
+    color: #fff; 
+}  
+
+.btn-primary:hover {
+   color: rgba(255,255,255,0.8);    
+}  
+

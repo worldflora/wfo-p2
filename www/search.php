@@ -19,6 +19,17 @@ if(isset($_REQUEST['timestamp'])){
     $request = @$_SESSION['search_request'];
 }
 
+// we need to make sure they weren't in the middle of generating 
+// a download file. If they were then we destroy the session and
+// delete associated data files
+if(isset($_SESSION['exporter'])){
+    $exporter = unserialize($_SESSION['exporter']);
+    unset($exporter);
+    unset($_SESSION['exporter']);
+}
+
+
+
 // get what they are searching for in the main search box
 $terms = @$request['q'];
 if(!$terms) $terms = '';
@@ -101,6 +112,11 @@ if(!$docs){
     $solr_response  = SolrIndex::getSolrResponse($query);
 }
 
+// we save the last solr query in the session so we can use
+// it for downloads - different from saving the search_request which
+// is used to build a query and can be linked to.
+$_SESSION['last_solr_query']  = $query;
+
 if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
 ?>
@@ -120,8 +136,24 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                     // always render a list
                     echo '<div class="list-group  list-group-flush">';
                     if($docs){
-                        echo "<p></p><p><strong>Records: </strong>" . number_format($solr_response->response->numFound) . "</p>";
-                       
+                        echo "<p></p>"; // spacer
+                        
+                        // record count
+                        echo "<p><strong>Records: </strong>" . number_format($solr_response->response->numFound);
+                        
+                        echo "";
+
+                        // list download option
+                        if($solr_response->response->numFound <= LIST_DOWNLOAD_LIMIT){
+                            echo '&nbsp;-&nbsp;Download checklist as ';
+                            echo ' <a href="#" data-bs-toggle="modal" data-bs-target="#listDownloadModal" data-wfo-format="html" >html</a> or ';
+                            echo ' <a href="#" data-bs-toggle="modal" data-bs-target="#listDownloadModal" data-wfo-format="csv ">csv</a>.';
+                            
+                        }else{
+                            echo "<span style=\"color: rgba(0, 0, 0, 0.33);\">&nbsp;-&nbsp;Download list when less than ". number_format(LIST_DOWNLOAD_LIMIT, 0) . "</span>";
+                        }
+                        echo"</p>";
+                        
                             // each response
                             foreach($docs as $doc){
                                 $record = new TaxonRecord($doc);
@@ -145,9 +177,26 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                     echo '</pre>';                
                 
                 ?>
-
-
             </div>
+
+            <!--  Download progress modal -->
+            <div class="modal fade" id="listDownloadModal" tabindex="-1" aria-labelledby="listDownloadModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="listDownloadModalLabel">Download checklist</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="listDownloadModalContent">
+                    Working ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="listDownloadModalButton" data-bs-dismiss="modal">Stop</button>
+                </div>
+                </div>
+            </div>
+            </div>
+            <!--  End of Download progress modal -->
             <div class="col-4 bg-light offcanvas-lg offcanvas-end " style="padding: 0px;" tabindex="-1"
                 id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
                 <div class="offcanvas-header">
