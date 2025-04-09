@@ -149,13 +149,15 @@ function generateListDownload(format){
     })
 }
 
-// When we show the modal we start the process that then
-// polls until it is finished
-document.getElementById('listDownloadModal').addEventListener('show.bs.modal', event => {
-    generateListDownload(event.relatedTarget.dataset.wfoFormat);
-})
+if(document.getElementById('listDownloadModal')){
+    // When we show the modal we start the process that then
+    // polls until it is finished
+    document.getElementById('listDownloadModal').addEventListener('show.bs.modal', event => {
+        generateListDownload(event.relatedTarget.dataset.wfoFormat);
+    })
 
-// If they close the modal we stop everything by reloading the page.
-document.getElementById('listDownloadModal').addEventListener('hide.bs.modal', event => {
-    window.location = "search";
-})
+    // If they close the modal we stop everything by reloading the page.
+    document.getElementById('listDownloadModal').addEventListener('hide.bs.modal', event => {
+        window.location = "search";
+    })
+}

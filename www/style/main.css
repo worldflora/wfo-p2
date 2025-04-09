@@ -29,3 +29,15 @@ h1 .wfo-name-authors {
    color: rgba(255,255,255,0.8);    
 }  
 
+.wfo-image-thumbnail{
+    float: left;
+}
+
+#imageModal .modal-body a{
+    color: white;
+}
+
+#imageModal .modal-body a:hover{
+    color: gray;
+}
+

@@ -182,6 +182,98 @@ require_once('header.php');
                 })
                 </script>
 
+                <!-- Modal 3 for images -->
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">Image modal</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center" style="background-color: black; color: white;">
+                        
+                        <div class="row d-flex align-items-center">
+                            <div id="imageModalPrevious" class="col text-start align-middle"><a href="#">&lt; Previous</a></div>
+                            <div id="imageModalContent" class="col text-center"></div>
+                            <div id="imageModalNext" class="col text-end align-middle" ><a href="#" >Next &gt;</a></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <div id="imageModalDownloads" class="mr-auto" style="position: relative; z-index: 10;"></div>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                    </div>
+                </div>
+                </div>
+
+
+                <script>
+                        // modal dialogue - load content on show
+                        document.getElementById('imageModal').addEventListener('show.bs.modal', event => {
+                            imageDialoguePopulate(event.relatedTarget.id);
+                        });
+
+                        // add a listener to the previous arrow - arrow will have the id of the target image set in it
+                        document.getElementById('imageModalPrevious').getElementsByTagName("a")[0].addEventListener('click', event => {
+                            imageDialoguePopulate(event.target.dataset.wfoprev);
+                            event.preventDefault();
+                        });
+
+                        // add a listener to the next arrow - arrow will have the id of the target image set in it
+                        document.getElementById('imageModalNext').getElementsByTagName("a")[0].addEventListener('click', event => {
+                            imageDialoguePopulate(event.target.dataset.wfonext);
+                            event.preventDefault();
+                        });
+
+                        function imageDialoguePopulate(imgId){
+
+                            const targetImg = document.getElementById(imgId);
+
+                            const modalContent = document.getElementById('imageModalContent');
+                            const imageModalLabel = document.getElementById('imageModalLabel');
+                            const imageModalDownloads = document.getElementById('imageModalDownloads');
+
+                            fetch("image_modal.php?prov=" + targetImg.dataset.wfoprov)
+                                .then(response => response.json())
+                                .then(json => {
+
+                                    modalContent.innerHTML = json.body;
+                                    imageModalLabel.innerHTML = json.title;
+                                    imageModalDownloads.innerHTML = json.downloads;
+
+                                    const prevDiv = document.getElementById('imageModalPrevious');
+                                    const prevAnchor = prevDiv.getElementsByTagName("a")[0];
+                                    const nextDiv = document.getElementById('imageModalNext');
+                                    const nextAnchor = nextDiv.getElementsByTagName("a")[0];
+
+                                    // do we have previous images
+                                    if(targetImg.parentNode.previousSibling){
+                                        prevDiv.style.visibility = 'visible'; // show the previous link
+                                        prevAnchor.dataset.wfoprev = targetImg.dataset.wfoprev; // set the id of the previous image on the arrow dom
+                                    }else{
+                                        // remove the event listener
+                                        prevDiv.style.visibility = 'hidden';
+                                        prevAnchor.dataset.wfoprev = null;
+                                    }
+
+                                    // do we have next images
+                                    if(targetImg.parentNode.nextSibling){
+                                        nextDiv.style.visibility = 'visible'; // show the previous link
+                                        nextAnchor.dataset.wfonext = targetImg.dataset.wfonext; // set the id of the next image on the anchor
+                                    }else{
+                                        nextDiv.style.visibility = 'hidden';
+                                        nextAnchor.dataset.wfonext = null;
+                                    }
+
+                                    console.log(targetImg.parentNode.nextSibling);
+
+                                });
+
+                        }
+
+
+                </script>
+
                 <?php
 
     // mapping card
@@ -505,6 +597,7 @@ require_once('header.php');
 <?php
 
 
+    render_images($record->getTextSnippets(), $record);
 
     render_snippets($record->getTextSnippets(), $record->getWfoId());
 
@@ -732,6 +825,96 @@ require_once('footer.php');
 
 
 /**
+ * Called to render images.
+ * 
+ * 
+ */
+function render_images($snippets, $record){
+
+    $current_wfo_id = $record->getWfoId();
+
+    // no snippets nothing to render
+    if(count($snippets) == 0 ) return;
+
+    // work through to separate out the image snippets only
+    // no image snippets then nothing to render
+    if(!isset($snippets['image-jpeg']) || count($snippets['image-jpeg']) == 0) return;
+
+    // the only snippets we are intereseted in here are the images ones
+    $snippets = $snippets['image-jpeg'];
+
+    echo '<div class="card">';
+    echo '<div class="card-header bg-secondary-subtle">';
+    echo '<span data-bs-toggle="tooltip" data-bs-placement="top" title="Validated images of this taxon" >Images</span>';
+    echo '&nbsp;<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($snippets), 0)  . '</span>';
+    echo '</div>'; // FIXME - images help bubble and count badge
+
+    // body
+    echo '<div class="card-body tab-content" style="max-height: 40em; overflow: auto;">';
+
+    for ($i=0; $i < count($snippets) ; $i++) { 
+
+        $snippet = $snippets[$i];
+
+        $image_id = md5($snippet->body);
+        
+        // IIIF Image API standard URI format
+        // e.g. https://wfo-image-cache.rbge.info/server/wfo/b767e21e9a5b7b4b1a8fce47fb0256f6/full/,150/0/default.jpg
+        
+        $image_uri_small = IMAGE_CACHE_URI . 'server/wfo/'. $image_id . '/full/,'. IMAGE_CACHE_SIZES[0] . '/0/default.jpg';
+
+
+        // set up the provenance data that will be passed to the modal if they click on the image
+        $prov_data = (object)array(
+            'kind' => 'image_display',
+            'source_id' => $snippet->source_id,
+            'snippet_id' =>  $snippet->id,
+            'image_id' => $image_id
+        );
+  
+        $alt_txt = "An image of ";  
+        if($snippet->described_wfo_id == $current_wfo_id){
+            $alt_txt .= ' a taxon with this name. ';
+            $prov_data->taxon_name = $record->getFullNameStringHtml();
+        }else{
+            $alt_txt .= ' a taxon with the name ';
+            $syn = new TaxonRecord($snippet->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
+            $alt_txt .= $syn->getFullNameStringPlain();
+            $alt_txt .= ' (which is a synonym of this taxon under the current classification).';
+            $prov_data->taxon_name =  "<a href=\"{$syn->getWfoId()}\">{$syn->getFullNameStringHtml()}</a> synonym of {$record->getFullNameStringHtml()}</a>";
+        }
+
+        $alt_txt .= " The images is from $snippet->source_name.\nClick for more information.";
+        $alt_escaped = htmlspecialchars($alt_txt, ENT_QUOTES, 'UTF-8');
+
+        $prov_json = urlencode(json_encode($prov_data));
+
+        echo "<div class=\"float-start img-thumbnail\">";
+
+        // keep track of the image ids for paging
+        if($i > 0) $prev_id = 'wfo-image-' . $i - 1;
+        else $prev_id = '';
+
+        if($i < count($snippets)) $next_id = 'wfo-image-' . $i + 1;
+        else $next_id = '';
+
+        echo "<img id=\"wfo-image-{$i}\"src=\"$image_uri_small\" data-bs-toggle=\"modal\" data-bs-target=\"#imageModal\" data-wfonext=\"{$next_id}\" data-wfoprev=\"{$prev_id}\" data-wfoprov=\"{$prov_json}\" alt=\"{$alt_escaped}\"  />";
+        echo "</div>";
+
+    }
+
+   // echo '<pre>';
+   // print_r($snippets);
+   // echo '</pre>';
+
+    echo "</div>"; // card body
+    echo '</div>'; // end card
+
+    // we are rendering images so we need an image dialogue to pop up
+   
+}
+
+/**
  * Called to render all the snippet texts
  * but each category of snippet is then
  * rendered as its own card in the interface
@@ -749,6 +932,8 @@ function render_snippets($snippets, $current_wfo_id){
 
     $first = true;
     foreach($snippets as $category => $snips){
+
+        if($category == 'image-jpeg') continue;
 
         echo '<li class="nav-item">';
 
@@ -815,8 +1000,7 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
         echo $snippet->body;
         echo '</p>';
 
-        // the metadata
-
+        // Link to the source of the original CSV file - the data source
         $prov_data = (object)array(
             'kind' => 'snippet_source',
             'source_id' => $snippet->source_id
@@ -838,6 +1022,8 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
         }
 
         echo " in  $snippet->language_label. ";
+
+        // link to the snippet object - row in the original csv file
         $prov_data = (object)array(
             'kind' => 'snippet',
             'source_id' => $snippet->id

@@ -73,6 +73,13 @@ define('LINK_OUT_DATA_SOURCE_IDS', array(
     )
 );
 
+// how do images work? We call the images server for them
+define('IMAGE_CACHE_URI', 'https://wfo-image-cache.rbge.info/'); // end in slash
+
+// The default heights that are used
+// The basic image cache only supports specific sizes
+// but a more sophisticated cache might do them dynamically.
+define('IMAGE_CACHE_SIZES', array('150', '500', '1000')); // in size order small, medium, large
 
 // these are the facets used in the search pages for filtering
 // in the order provided
