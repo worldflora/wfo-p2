@@ -193,12 +193,14 @@ require_once('header.php');
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center" style="background-color: black; color: white;">
-                        
-                        <div class="row d-flex align-items-center">
-                            <div id="imageModalPrevious" class="col text-start align-middle"><a href="#">&lt; Previous</a></div>
-                            <div id="imageModalContent" class="col text-center"></div>
+
+                        <div id="imageModalContent" class="col text-center"></div>
+        
+                            <div class="row d-flex align-items-center" style="height: 100%">
+                                <div id="imageModalPrevious" class="col text-start align-middle"><a href="#">&lt; Previous</a></div>
                             <div id="imageModalNext" class="col text-end align-middle" ><a href="#" >Next &gt;</a></div>
                         </div>
+    
                     </div>
                     <div class="modal-footer justify-content-between">
                         <div id="imageModalDownloads" class="mr-auto" style="position: relative; z-index: 10;"></div>
