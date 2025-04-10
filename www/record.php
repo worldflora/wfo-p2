@@ -51,6 +51,8 @@ require_once('header.php');
     // Synonyms
     render_name_list($record->getSynonyms(), $record, "Synonyms", "Other names that are placed in this taxon but that are not the formally accepted name of this taxon.");
 
+    render_images($record->getTextSnippets(), $record);
+
     // attributes (facets)
     $all_facets = $record->getFacets();
     $facets = array(); // these are the facets to display - and in the correct order as defined in attribute_facets
@@ -596,8 +598,6 @@ require_once('header.php');
     </script>
 <?php
 
-
-    render_images($record->getTextSnippets(), $record);
 
     render_snippets($record->getTextSnippets(), $record->getWfoId());
 
