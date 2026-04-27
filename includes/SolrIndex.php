@@ -98,14 +98,13 @@ class SolrIndex{
         return null;
     }
 
-    /**
-     * 
-     * 
-     */
     public static function getSolrDocs($query){
         $data = SolrIndex::getSolrResponse($query);
         if(isset($data->response->docs)) return $data->response->docs;
-        else return null;
+        else{
+            print_r($data);
+            return null;
+        } 
     }
 
     public static function getSolrResponse($query){
@@ -160,6 +159,18 @@ class SolrIndex{
 
             return $response->facets->classifications->buckets[0]->val;
 
+    }
+
+    public function saveSolrDocs($solr_docs, $commit = true){
+        $solr_query_uri = SOLR_QUERY_URI . '/update?commit='. ($commit ? 'true': 'false');
+        $response = $this->curlPostJson($solr_query_uri, json_encode($solr_docs));
+        return $response;
+    }
+
+    public function deleteSolrDocs($query, $commit = true){
+        $solr_query_uri = SOLR_QUERY_URI . '/update?commit='. ($commit ? 'true': 'false');
+        $response = $this->curlPostJson($solr_query_uri, json_encode($query));
+        return $response;
     }
 
 }

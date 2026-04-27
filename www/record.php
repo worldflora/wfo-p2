@@ -5,7 +5,6 @@ $wfo = $path_parts[0];
 $record = new TaxonRecord($wfo . '-' . WFO_DEFAULT_VERSION);
 $page_title = $record->getFullNameStringPlain();
 
-
 require_once('header.php');
 
 ?>

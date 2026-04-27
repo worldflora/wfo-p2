@@ -540,7 +540,7 @@ class TaxonRecord{
      */
     public function getTextSnippets(){
 
-        global $language_codes;
+        global $language_codes_alpha3;
 
         $index = new SolrIndex();
 
@@ -564,9 +564,8 @@ class TaxonRecord{
             $snippet = array();
             $snippet['id'] = $snippet_id;
             $snippet['language_code'] = $this->solrDoc->snippet_text_languages_ss[$i];
-            $snippet['language_label'] = $language_codes[$this->solrDoc->snippet_text_languages_ss[$i]];
+            $snippet['language_label'] = $language_codes_alpha3[$this->solrDoc->snippet_text_languages_ss[$i]]['eng'];
             $snippet['body'] = $this->solrDoc->snippet_text_bodies_txt[$i];
-
 
             // safely add metadata - may have failed to be indexed or delayed or something
             if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){

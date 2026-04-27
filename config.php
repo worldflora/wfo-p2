@@ -6,7 +6,7 @@
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+error_reporting(E_ALL & ~E_DEPRECATED   );
 //error_reporting(E_ALL);
 session_start();
 
@@ -17,13 +17,16 @@ require_once('includes/SolrIndex.php');
 // $system_message = null;
 if(!isset($system_message)) $system_message = null;
 
+// an api key for downloading backups and things we don't want generally open
+define('PORTAL_BEARER_TOKEN', $api_bearer_token);
+
 // Location of the solr server
 define('SOLR_QUERY_URI', $solr_query_uri); // from wfo_p2_secrets.php
 define('SOLR_USER', $solr_user); // from wfo_p2_secrets.php
 define('SOLR_PASSWORD', $solr_password); // from wfo_p2_secrets.php
 
 // This will normally be the most recent.
-define('WFO_DEFAULT_VERSION','9999-04');
+define('WFO_DEFAULT_VERSION', $classification_version);
 
 // The limit on the size of lists that can be downloaded
 define('LIST_DOWNLOAD_LIMIT', 50000); // maximum records

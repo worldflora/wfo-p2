@@ -72,7 +72,7 @@
     <main class="container-flex" style="margin-top: 150px;">
 
     <?php
-    if($system_message){
+    if(isset($system_message) && $system_message){
         echo '<div class="container-lg">';
         echo "<div class=\"alert alert-danger\" role=\"alert\"><strong>&nbsp;System Message:&nbsp;</strong>{$system_message}</div>";
         echo '</div>';

@@ -95,7 +95,7 @@ class FacetDetails{
 
     public function getFacetValueName($value_id){
 
-        global $language_codes;
+        global $language_codes_alpha3;
 
         // if it is in the cache as a facet server defined thing return that
         if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->name;
@@ -112,8 +112,8 @@ class FacetDetails{
         }
 
         // if it is a two letter language code the return that - could have clashes but unlikely
-        if(strlen($value_id) == 2){
-            if(isset($language_codes[$value_id])) return $language_codes[$value_id];
+        if(strlen($value_id) == 3){
+            if(isset($language_codes_alpha3[$value_id])) return $language_codes_alpha3[$value_id]['eng'];
         }
         
         // give up an return the value itself
