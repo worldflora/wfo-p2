@@ -446,7 +446,18 @@ class TaxonRecord{
                 $ref['label'] = isset($this->solrDoc->reference_labels_ss[$i]) ? $this->solrDoc->reference_labels_ss[$i] : null;
 
                 // optional values
+
+
                 $ref['thumbnailUri'] = isset($this->solrDoc->reference_thumbnail_uris_ss[$i]) && $this->solrDoc->reference_thumbnail_uris_ss[$i] != '-' ? $this->solrDoc->reference_thumbnail_uris_ss[$i] : null;
+                
+                /*
+                wikidata thumbnail hack.
+                They started only providing some thumbnail sizes but we have hard coded 200px thumbnails into indexes before a certain date.
+                Therfore we preg_replace in those ones.
+                https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Acta_Horti_berg._-_1905_-_tafl._139._-_Jacques_Gay.jpg/200px-Acta_Horti_berg._-_1905_-_tafl._139._-_Jacques_Gay.jpg
+                */
+                if(preg_match('/wikimedia\.org/', $ref['thumbnailUri'])) $ref['thumbnailUri'] = preg_replace('/\/200px-/', '/330px-', $ref['thumbnailUri']);
+                
                 $ref['comment'] = isset($this->solrDoc->reference_comments_ss[$i]) && $this->solrDoc->reference_comments_ss[$i] != '-' ? $this->solrDoc->reference_comments_ss[$i] : null;
 
                 $references[] = (object)$ref;
