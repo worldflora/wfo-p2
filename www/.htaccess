@@ -12,6 +12,7 @@ RewriteCond %{REQUEST_URI} !^/list_download.php
 RewriteCond %{REQUEST_URI} !^/widget_(.+)\.php$ 
 RewriteCond %{REQUEST_URI} !^/csv.php 
 RewriteCond %{REQUEST_URI} !^/data_cache.php 
+RewriteCond %{REQUEST_URI} !^/api.php
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]

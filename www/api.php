@@ -167,7 +167,7 @@ function update_single_taxon_values($values){
     }
 
     // flag when we indexed it
-    $solr_doc->fyllo_last_indexed_i = time();
+    $solr_doc->fyllo_last_indexed_d = time();
 
     // return ok + the completed document for saving
     return (object)array(
@@ -190,7 +190,7 @@ function get_page_of_taxon_graphs($page_size, $classification){
         'query' => "role_s:accepted",
         'filter' => ['classification_id_s:' . $classification ],
         'fields' => ['wfo_id_s'],
-        'sort' => 'fyllo_last_indexed_i ASC', // empty values will come first
+        'sort' => 'fyllo_last_indexed_d ASC, id ASC', // empty values will come first
         'limit' => $page_size
     );
 
