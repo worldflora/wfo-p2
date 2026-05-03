@@ -44,17 +44,16 @@ define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files,
 // these are the facets displayed in the attributes box on the
 // taxon pages, and the order they are displayed.
 $attribute_facets = array(
-    'wfo-f-5', // life form
-    'wfo-f-10', // threat status
-    'wfo-f-11', // cites status
-    'wfo-f-12', // functional group
-    'wfo-f-2', // Country ISO
-    'wfo-f-8' // TDWG Level 3 
+    'wfo-f-8', // habit
+    "wfo-f-7", // IUCN Red
+    "wfo-f-2", // CITES
+    'wfo-f-9' // global zone
+
 );
 
 $map_facets = array(
-    'wfo-f-2', // Country ISO
-    'wfo-f-8' // TDWG Level 3 
+    'wfo-f-1', // Country ISO
+    'wfo-f-5', // TDWG Level 3 
 );
 
 // used to do the maps on family and genus pages
@@ -90,17 +89,13 @@ define('IMAGE_CACHE_SIZES', array('150', '500', '1000')); // in size order small
 
 $search_facets = array();
 
-/*
-old numbers
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5");
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2");
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8");
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-10_ss', 'facet_name' =>  "wfo-f-10"); // red list
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-11_ss', 'facet_name' =>  "wfo-f-11"); // CITES
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-12_ss', 'facet_name' =>  "wfo-f-12"); // Functional group
-*/
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-1_ss', 'facet_name' =>  "wfo-f-1"); // country ISO codes
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5"); // TDWG Level 3
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-9_ss', 'facet_name' =>  "wfo-f-9"); // Global Zones
 
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-1_ss', 'facet_name' =>  "wfo-f-1");
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2"); // CITES
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-7_ss', 'facet_name' =>  "wfo-f-7"); // IUCN Red List
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8"); // Habit (growth form)
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
@@ -118,8 +113,8 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "place
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-facet-sources_ss", 'label' => 'Facet data source', 'exclude' => array());
 
 // used to render icons on the record page
-define('IUCN_THREAT_FACET_ID', 'wfo-f-10');
-define('CITES_APPENDIX_FACET_ID', 'wfo-f-11');
+define('IUCN_THREAT_FACET_ID', 'wfo-f-7');
+define('CITES_APPENDIX_FACET_ID', 'wfo-f-2');
 
 
 // the facets cache 
