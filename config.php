@@ -89,13 +89,12 @@ define('IMAGE_CACHE_SIZES', array('150', '500', '1000')); // in size order small
 
 $search_facets = array();
 
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8"); // Habit (growth form)
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-7_ss', 'facet_name' =>  "wfo-f-7"); // IUCN Red List
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2"); // CITES
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-9_ss', 'facet_name' =>  "wfo-f-9"); // Global Zones
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-1_ss', 'facet_name' =>  "wfo-f-1"); // country ISO codes
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5"); // TDWG Level 3
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-9_ss', 'facet_name' =>  "wfo-f-9"); // Global Zones
-
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2"); // CITES
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-7_ss', 'facet_name' =>  "wfo-f-7"); // IUCN Red List
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8"); // Habit (growth form)
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
