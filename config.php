@@ -100,6 +100,7 @@ $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo
 $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-12_ss', 'facet_name' =>  "wfo-f-12"); // Functional group
 */
 
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-1_ss', 'facet_name' =>  "wfo-f-1");
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
