@@ -34,7 +34,6 @@ define('LIST_DOWNLOAD_DIR', 'downloads/' ); // end in a slash
 define('LIST_DOWNLOAD_DIR_MAX_SIZE', 100 ); // maximum size in megabytes
 define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files, minutes
 
-
 /*
     Facet configuration
     Which facets are displayed on taxon pages and in the faceted searching
@@ -57,7 +56,7 @@ $map_facets = array(
 );
 
 // used to do the maps on family and genus pages
-$map_choropleth_facet = 'wfo-f-2'; // Country ISO
+$map_choropleth_facet = 'wfo-f-1'; // Country ISO
 
 // Text snippets are used for different classes of data, not just blocks of text
 // in these cases we don't want to render them in places where the user will
@@ -114,7 +113,6 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-f
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 'wfo-f-7');
 define('CITES_APPENDIX_FACET_ID', 'wfo-f-2');
-
 
 // the facets cache 
 $facets_cache = @$_SESSION['facets_cache'];
