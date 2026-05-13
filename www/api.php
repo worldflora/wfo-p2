@@ -324,7 +324,7 @@ function get_last_modified($kind){
         'query' => "*:*",
         'filter' => ["kind_s:$kind"],
         'fields' => ['last_modified_d'],
-        'sort' => 'last_modified_d ASC',
+        'sort' => 'last_modified_d DESC',
         'limit' => 1
     );
     $docs = $solr->getSolrDocs($query);
