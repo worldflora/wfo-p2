@@ -580,8 +580,8 @@ class TaxonRecord{
 
             // safely add metadata - may have failed to be indexed or delayed or something
             if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){
-
-                $snippet['imported'] = $this->snippetMetadata[$snippet_id]->snippet->modified_dt;
+                $mod = new DateTime('@' . intval($this->snippetMetadata[$snippet_id]->snippet->last_modified_d));
+                $snippet['imported'] = $mod->format('Y-m-d H:i:s');
                 $snippet['described_wfo_id'] = $this->snippetMetadata[$snippet_id]->snippet->wfo_id_s;
                 $snippet['source_id'] = 'wfo-ss-' . $this->snippetMetadata[$snippet_id]->snippet->source_id_s;
                 
@@ -640,9 +640,8 @@ class TaxonRecord{
             // safely add metadata - may have failed to be indexed or delayed or something
             if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){
 
-               // print_r($this->snippetMetadata);
-
-                $lo['imported'] = $this->snippetMetadata[$snippet_id]->snippet->modified_dt;
+                $mod = new DateTime('@' . intval($this->snippetMetadata[$snippet_id]->snippet->last_modified_d));
+                $lo['imported'] = $mod->format('Y-m-d H:i:s');
                 $lo['described_wfo_id'] = $this->snippetMetadata[$snippet_id]->snippet->wfo_id_s;
                 $lo['source_id'] = 'wfo-ss-' . $this->snippetMetadata[$snippet_id]->snippet->source_id_s;
                 
