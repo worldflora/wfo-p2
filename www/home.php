@@ -67,16 +67,18 @@ require_once('header.php');
 
     $solr_response  = SolrIndex::getSolrResponse($query);
 
-
     $names = number_format($solr_response->facets->count, 0);
     
     $taxa_with_text =  number_format($solr_response->facets->snippet_text_bodies_txt->count, 0);
 
-    $accepted_taxa = null;
-    $synonyms = null;
-    $unplaced = null;
-    $deprecated = null;
+    $accepted_taxa = 0;
+    $accepted_genera = 0;
+    $accepted_families = 0;
+    $synonyms = 0;
+    $unplaced = 0;
+    $deprecated = 0;
     foreach($solr_response->facets->role_s->buckets as $role){
+
 
         if($role->val  == 'accepted'){
             $accepted_taxa = number_format($role->count);
@@ -99,7 +101,7 @@ require_once('header.php');
 
     $country_count = number_format(count($solr_response->facets->{$map_choropleth_facet}->buckets, 0 ));
 
-    echo "<p><strong>$names scientific names representing $accepted_taxa taxa - $accepted_species species in $accepted_genera genera and $accepted_families families from $country_count countries.</strong></p>";
+    echo "<p><strong>$names scientific names representing {$accepted_taxa} taxa - $accepted_species species in $accepted_genera genera and $accepted_families families from $country_count countries.</strong></p>";
 
    // print_r($solr_response->facets->snippet_text_bodies_txt);
 
@@ -166,7 +168,14 @@ require_once('header.php');
 
             </div> <!-- end carousel -->
 
+            <p></p>
+            <p></p>
+            <p></p>
 
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+            <p>&nbsp;</p>
+<!--
             <p style="padding: 0.5em; margin-top: 4em; margin-left: 20%; margin-right: 20%; font-size: 120%; border: solid 1px black;">
                     This is a mock-up of a new WFO data portal for evaluation purposes only.
                     <br/>
@@ -174,7 +183,7 @@ require_once('header.php');
                     <br/>
                     The current official portal is available <a href="https://www.worldfloraonline.org">here</a>.
                 </p>
-
+-->
             </div><!-- centering -->
 
 

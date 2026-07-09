@@ -167,7 +167,8 @@ function update_single_taxon_values($values){
     }
 
     // flag when we indexed it
-    $solr_doc->fyllo_last_indexed_d = time();
+    $solr_doc->fyllo_last_indexed_d = time(); // as a double 
+    $solr_doc->fyllo_last_indexed_dt = (new DateTimeImmutable())->format('Y-m-d\TH:i:s\Z'); // as a date object string
 
     // return ok + the completed document for saving
     return (object)array(
