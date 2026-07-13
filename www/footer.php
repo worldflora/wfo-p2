@@ -16,7 +16,7 @@
             <li class="nav-item"><a href="#" class="nav-link" style="color: gray;">Terms of Use</a></li>
             <li class="nav-item"><a href="#" class="nav-link" style="color: gray;">Privacy</a></li>
             <li class="nav-item"><button href="#" class="nav-link" style="color: gray;">Social Media</button></li>
-            <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#classification_modal">Version</button></li>
+            <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#classification_modal">Index State</button></li>
         </ul>
   </div>
 </footer>
@@ -62,11 +62,11 @@
 </div>
 
 <!-- Data version -->
-<div class="modal fade" id="classification_modal" tabindex="-1" aria-labelledby="classification_modal_label" aria-hidden="true">
+<div class="modal fade modal-xl" id="classification_modal" tabindex="-1" aria-labelledby="classification_modal_label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="classification_modal_label">Data Version</h1>
+        <h1 class="modal-title fs-5" id="classification_modal_label">Index State</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="classification_modal_body">
@@ -84,7 +84,8 @@
     myModalEl.addEventListener('show.bs.modal', function (event) {
            const modalContent = document.getElementById('classification_modal_body');
             modalContent.innerHTML = 'Loading ...';
-            fetch("footer_modal_version.php")
+            // we pass the wfo id if there is one
+            fetch("footer_modal_version.php?wfo=<?php if(isset($wfo)){echo $wfo;} else { echo ''; } ?>")
                 .then(response => response.text())
                 .then(text => modalContent.innerHTML = text);
     });

@@ -49,9 +49,9 @@ class TaxonRecord{
 
     private ?String $wfoPath = null;
 
-    // we hold a list of the snippet metadata
+    // we hold a list of the sources metadata
     // so we only have to call for it once
-    private ?Array $snippetMetadata = null;
+    private ?Array $sources = array();
 
     /**
      * Create a new wrapper around a SOLR doc
@@ -553,15 +553,10 @@ class TaxonRecord{
 
         global $language_codes_alpha3;
 
-        $index = new SolrIndex();
-
         $snippets = array();
 
         // we don't have any snippets in the object
         if(!@$this->solrDoc->snippet_text_categories_ss) return $snippets;
-
-        // have we loaded the snippet metadata yet?
-        if(!$this->snippetMetadata) $this->loadSnippetMetadata();
 
         // work through the snippets in this record
         for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
@@ -577,30 +572,15 @@ class TaxonRecord{
             $snippet['language_code'] = $this->solrDoc->snippet_text_languages_ss[$i];
             $snippet['language_label'] = $language_codes_alpha3[$this->solrDoc->snippet_text_languages_ss[$i]]['eng'];
             $snippet['body'] = $this->solrDoc->snippet_text_bodies_txt[$i];
-
-            // safely add metadata - may have failed to be indexed or delayed or something
-            if(isset($this->snippetMetadata[$snippet_id]) && $this->snippetMetadata[$snippet_id] != null){
-                $mod = new DateTime('@' . intval($this->snippetMetadata[$snippet_id]->snippet->last_modified_d));
-                $snippet['imported'] = $mod->format('Y-m-d H:i:s');
-                $snippet['described_wfo_id'] = $this->snippetMetadata[$snippet_id]->snippet->wfo_id_s;
-                $snippet['source_id'] = 'wfo-ss-' . $this->snippetMetadata[$snippet_id]->snippet->source_id_s;
-                
-                if(isset($this->snippetMetadata[$snippet_id]->source_full)){
-                    $snippet['source_name'] = $this->snippetMetadata[$snippet_id]->source_full->name;
-                }
-                
-            }else{
-                $snippet['imported'] = 'not set';
-                $snippet['described_wfo_id'] = 'not set';
-                $snippet['source_id'] = 'not set';
-                $snippet['source_name'] = 'not set';
-            }
+            $snippet['imported'] = $this->solrDoc->snippet_text_modified_txt[$i];
+            $snippet['described_wfo_id'] = $this->solrDoc->snippet_text_name_ids_ss[$i];
+            $snippet['source_id'] = 'wfo-ss-' . $this->solrDoc->snippet_text_sources_ss[$i];
+            $snippet['source_name'] = $this->getSourceName($this->solrDoc->snippet_text_sources_ss[$i]);
 
             // finally put it in as an object
             $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)$snippet;
 
         }
-
 
         return $snippets;
     }
@@ -619,9 +599,6 @@ class TaxonRecord{
 
         // we don't have any snippets in the object
         if(!@$this->solrDoc->snippet_text_categories_ss) return $link_outs;
-
-        // have we loaded the snippet metadata yet?
-        if(!$this->snippetMetadata) $this->loadSnippetMetadata();
 
         // work through the snippets in this record
         for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
@@ -665,62 +642,24 @@ class TaxonRecord{
 
     }
 
-    /**
-     * Various places use metadata about text snippets
-     * we only want to load these once and we do it here
-     * 
-     */
-    private function loadSnippetMetadata(){
+    private function getSourceName($source_id){
 
-        // we don't have any snippets in the object so don't load any metadata
-        if(!@$this->solrDoc->snippet_text_categories_ss){
-            $this->snippetMetadata = (object)array();
-            return;
-        }else{
-            // initialise it
-            $this->snippetMetadata = array();
+        // try and load it if we don't have it
+        if(!isset($this->sources[$source_id])){
+            $index = new SolrIndex();
+            $source = $index->getSolrDoc($source_id);
+            if($source) $this->sources[$source_id] = json_decode($source->json_t);
         }
-
-        // an index to call
-        $index = new SolrIndex();
-
-        /*
-            efficiency note: We could reduce the number of index calls by pooling the 
-            IDs for snippets and sources and then making two or even just one call for the 
-            objects - but this would make the function much more complex at this stage of dev.
-        */
-        for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
-
-            // metadata simple call
-            $meta_id = $this->solrDoc->snippet_text_ids_ss[$i];
-
-            $snippet_meta = $index->getSolrDoc($meta_id);
-            if($snippet_meta){
-
-                // add the snippet data
-                $this->snippetMetadata[$meta_id] = array();
-                $this->snippetMetadata[$meta_id]['snippet'] = $snippet_meta;
-                $this->snippetMetadata[$meta_id]['snippet_full'] = json_decode($snippet_meta->json_t);
-
-                // add the source metadata as well if we have it
-                $source_meta = $index->getSolrDoc( 'wfo-ss-' . $snippet_meta->source_id_s);
-                if($source_meta){
-                    $this->snippetMetadata[$meta_id]['source'] = $source_meta;
-                    $this->snippetMetadata[$meta_id]['source_full'] = json_decode($source_meta->json_t);
-                }
-
-                // convert it to an object for easy of use
-                $this->snippetMetadata[$meta_id] = (object)$this->snippetMetadata[$meta_id];
-
-            }else{
-
-                // Oh know we have failed to load metadata. Still add a item so the reciever can deal with it
-                $this->snippetMetadata[$meta_id] = null;
-            }
-
+        
+        // if we do have it now
+        if(isset($this->sources[$source_id])){
+            return $this->sources[$source_id]->name;
+        }else{
+            return "Source '{$source_id}' not indexed";
         }
 
     }
+
 
     /**
      * Get the value of id

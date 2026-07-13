@@ -17,5 +17,3 @@ This is a mockup of how a version 2 of the WFO portal could work. We are current
    2. PHP page rendering layer. This is kept as simple as possible so that layer three can be outsourced and updated easily.
    3. Bootstrap CSS for branding. Modularised as much as possible.
 
-
-
