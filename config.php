@@ -51,8 +51,8 @@ $attribute_facets = array(
 );
 
 $map_facets = array(
-    'wfo-f-1', // Country ISO
-    'wfo-f-5', // TDWG Level 3 
+    1, // Country ISO
+    5, // TDWG Level 3 
 );
 
 // used to do the maps on family and genus pages

@@ -348,6 +348,10 @@ require_once('header.php');
         if(isset($all_facets[$facet_id])) $facets[$facet_id] = $all_facets[$facet_id];
     } 
 
+  //  echo '<pre>';
+ //   print_r($facets);
+ //   echo '</pre>';
+
     if($facets){
         // we have facets to render as a map interface
         // we make a card
@@ -390,7 +394,6 @@ require_once('header.php');
                         "Open Topology": openTopoMap
                     };
 
-
                     // labels for the layer control overlays
                     let overlayMaps = {};
                     <?php
@@ -402,7 +405,7 @@ require_once('header.php');
             $layer_var = 'lg' . $layer_count;
             echo "let $layer_var = L.featureGroup();\n";                            
             foreach($f->facet_values as $fv){
-                $path = "data/{$f_id}/{$fv->code}.json";
+                $path = "data/{$f_id}/{$fv->facet_value_code}.json";
                 if(file_exists($path)){
 
                     // the actual polygon
@@ -411,7 +414,7 @@ require_once('header.php');
                     // package the provenance data up into a data attribute
                     $prov_data = (object)array(
                         'kind' => 'facet',
-                        'facet_name' => $f->name,
+                        'facet_name' => $f->facet_name,
                         'facet_value' => $fv,
                         'taxon_wfo' => $record->getWfoId(), 
                         'taxon_name' => $record->getFullNameStringHtml() 
@@ -439,7 +442,7 @@ require_once('header.php');
                 }
             }
             echo "$layer_var.addTo(map);\n";
-            echo "overlayMaps['{$f->name}'] = $layer_var;\n";
+            echo "overlayMaps['{$f->facet_name}'] = $layer_var;\n";
             
         } // end facet
 ?>

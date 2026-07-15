@@ -1036,9 +1036,9 @@ class TaxonRecord{
         $in = json_decode($this->solrDoc->facets_metadata_t);
         foreach ($in as $facet) {
 
-      //  echo '<pre>';
-      //  print_r($facet);
-      //  echo '</pre>';
+    //   echo '<pre>';
+     //   print_r($facet);
+    //    echo '</pre>';
 
             // have we got the facet yet?
             if(!isset($out[$facet->facet_id])){
@@ -1054,6 +1054,7 @@ class TaxonRecord{
                 $out[$facet->facet_id]->facet_values[$facet->facet_value_id] = (object)array(
                     'facet_value_id' => $facet->facet_value_id,
                     'facet_value_name' => $facet->facet_value_name,
+                    'facet_value_code' => $facet->facet_value_code,
                     'sources' => array()
                 );
             }
