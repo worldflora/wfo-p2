@@ -102,7 +102,8 @@ require_once('header.php');
                 $prov_json = urlencode(json_encode($prov_data));
 
                 // render the actual facet value.
-                echo '<span data-bs-toggle="modal"'
+                echo '<span ';
+                echo ' data-bs-toggle="modal"';
                 echo ' data-bs-target="#facetProvModal"';
                 echo " data-facet-id=\"{$f->facet_id}\" ";
                 echo " data-facet-value-id=\"{$fv->facet_value_id}\" ";
@@ -168,13 +169,16 @@ require_once('header.php');
                         <div class="row gx-1">
                             <div class="col-2 text-end fw-bold wfo-ds-row">Source&nbsp;<span>n</span>:</div>
                             <div class="col"><em>source_name</em>
-                                <br/>scored <strong>method</strong><span></span>
+                                <br/>scored <strong>method</strong><span>Loading ... </span>
                                 &nbsp;[<a 
                                     href="#"
                                     data-dismiss="modal"
                                     data-bs-toggle="modal"
                                     data-bs-target="#dataProvModal"
-                                    data-wfoprov="dd"
+                                    data-facet-id=""
+                                    data-facet-value-id=""
+                                    data-source-id=""
+                                    data-taxon-name=""
                                     style="cursor: pointer;">metadata</a>]
                             </div>
                             
@@ -192,7 +196,6 @@ require_once('header.php');
                     // load data from json in page
                     const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
                     const facet = facetMetadata[dataset.facetId];
-                    console.log(facet);
                     const facetValue = facet.facet_values[dataset.facetValueId];
                     
                     // write in the data
@@ -210,15 +213,13 @@ require_once('header.php');
                     let count = 1;
                     for(const sourceId in facetValue.sources){
                         
-                        let source = facetValue.sources[sourceId]
+                        let source = facetValue.sources[sourceId];
 
                         const clone = document.importNode(template.content, true);
                     
                         // the count of the source
                         clone.querySelector("li div div span").innerHTML = count;
                         count++;
-                        
-                        console.log(source);
 
                         // source name
                         clone.querySelector("li div div em").innerHTML = source.source_name;
@@ -233,6 +234,12 @@ require_once('header.php');
                          if (source.scored_via == 'ancestor'){
                             clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
                         }
+
+                        // add the values to the model launch button
+                        clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-id', facet.facet_id);
+                        clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-value-id', facetValue.facet_value_id);
+                        clone.querySelector("li div:nth-child(2) a").setAttribute('data-source-id', source.source_id);
+                        clone.querySelector("li div:nth-child(2) a").setAttribute('data-taxon-name', dataset.taxonName);
                         
                         // add an id to the name span so we can ajax update it
                         const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
@@ -259,28 +266,79 @@ require_once('header.php');
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="provModalLabel2">Data Provenance</h1>
+                                <h1 class="modal-title fs-5" id="provModalLabel2">Row level metadata</h1>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
                             <div id="dataProvModalContent">
+                                <ul class="list-group  list-group-flush" ></ul>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" data-bs-dismiss="modal" aria-label="Close"
-                                    class="btn btn-primary">Close</button>
+                                 <button
+                                    type="button"
+                                    aria-label="Close"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#facetProvModal"
+                                    class="btn btn-primary"
+                                    style="cursor: pointer;"
+                                    >&#8678; Back</button>
+                                <button 
+                                    type="button"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                    class="btn btn-primary"
+                                    >Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <template id="datasourceMetadataRow">
+                    <li class="list-group-item wfo-meta-row" >
+                        <div class="row gx-1">
+                            <div class="col-3 text-end fw-bold"></div>
+                            <div class="col"></div>
+                        </div>
+                    </li>
+                </template>
 
                 <script>
                 // modal dialogue - load content on show
                 document.getElementById('dataProvModal').addEventListener('show.bs.modal', event => {
-                    const modalContent = document.getElementById('dataProvModalContent');
+                    
+                    // data passed from click event
+                    const dataset = event.relatedTarget.dataset;
+
+                    // load data from json in page
+                    const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
+                    const facet = facetMetadata[dataset.facetId];
+                    const facetValue = facet.facet_values[dataset.facetValueId];
+                    let source = facetValue.sources[dataset.sourceId]
+
+                    // where we will put it
+                    const listGroup = document.querySelector("#dataProvModal ul");
+                    const template = document.querySelector("#datasourceMetadataRow");
+
+                    // remove any old ones first
+                    listGroup.querySelectorAll(".wfo-meta-row").forEach(li => {li.remove()});
+
+                    for(const key in source.score_metadata){
+                        let val = source.score_metadata[key];
+
+                        const clone = document.importNode(template.content, true);
+
+                        clone.querySelector("li div div:nth-child(1)").innerHTML = key + ": ";
+
+                        if(URL.canParse(val)){
+                            clone.querySelector("li div div:nth-child(2)").innerHTML = `<a href="${val}" target="meta-link">${val}<a>`;
+                        }else{
+                            clone.querySelector("li div div:nth-child(2)").innerHTML = val;
+                        }
+
+                        listGroup.appendChild(clone);
+                    }
+
                 })
                 </script>
-
-
 
                 <?php
 
@@ -539,7 +597,6 @@ require_once('header.php');
                                         window.location = e.target.feature.properties.query_url;
                                     }
                                 });
-                                console.log(feature.properties);
                                 const tt = feature.properties.tags["name:en"] + ": " + feature.properties
                                     .taxon_count + " taxa";
                                 layer.bindTooltip(tt)
@@ -646,7 +703,7 @@ require_once('header.php');
                                 echo '<span
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="left"
-                                    title="The position of the taxon within the classification." >Placement</span>&nbsp;';
+                                    title="The position of the taxon within the classification." >Classification</span>&nbsp;';
                             }
                             
                             
@@ -747,7 +804,7 @@ require_once('header.php');
                              echo '<span
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="left"
-                                    title="Direct descendants of this taxon." >Child Taxa</span>&nbsp;';
+                                    title="Direct descendants of this taxon." >Subtaxa</span>&nbsp;';
                             echo '<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($kids), 0)  . '</span>  </div>';
                             echo '<div class="list-group  list-group-flush" style="max-height: 20em; overflow: auto;">';
 

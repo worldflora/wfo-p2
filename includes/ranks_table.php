@@ -201,6 +201,7 @@ $ranks_table = array(
     ),
   
     "convar" => array(
+      "faceted" => false,
       "children" => array(), // permissible ranks for child taxa
       "abbreviation" => "convar.", // official abbreviation
       "plural" => "Convars",
