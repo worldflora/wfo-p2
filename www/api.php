@@ -114,6 +114,8 @@ function update_taxon_values($request_data){
   $solr = new SolrIndex();
   $out->solr_response = $solr->saveSolrDocs($solr_docs, true);
 
+
+
   return $out;
 
 }

@@ -59,6 +59,9 @@ require_once('header.php');
         if(isset($all_facets[$facet_id])) $facets[] = $all_facets[$facet_id];
     }
 
+    echo '<pre>';
+  //  print_r($facets);
+    echo '</pre>';
     
     if($facets){
         
@@ -78,7 +81,7 @@ require_once('header.php');
 
             echo '<li class="list-group-item  list-group-item-action">';
 
-            echo "<strong>{$f->name}: </strong>";
+            echo "<strong>{$f->facet_name}: </strong>";
             $spacer = '';
 
             // work through the facet values
@@ -89,21 +92,24 @@ require_once('header.php');
                 // package the provenance data up into a data attribute
                 $prov_data = (object)array(
                     'kind' => 'facet',
-                    'facet_name' => $f->name,
-                    'facet_id' => $f->id,
+                    'facet_name' => $f->facet_name,
+                    'facet_id' => $f->facet_id,
                     'facet_value' => $fv,
                     'taxon_wfo' => $record->getWfoId(), 
                     'taxon_name' => $record->getFullNameStringHtml()
-
                 );
 
                 $prov_json = urlencode(json_encode($prov_data));
 
                 // render the actual facet value.
-                echo '<span data-bs-toggle="modal" data-bs-target="#facetProvModal" data-wfoprov="'. $prov_json .'" style="cursor: pointer;">';
-                echo $fv->name;
+                echo '<span data-bs-toggle="modal"'
+                echo ' data-bs-target="#facetProvModal"';
+                echo " data-facet-id=\"{$f->facet_id}\" ";
+                echo " data-facet-value-id=\"{$fv->facet_value_id}\" ";
+                echo ' data-taxon-name="'. base64_encode($record->getFullNameStringHtml()) .'" >';
+                echo $fv->facet_value_name;
                 // badge with the data source count 
-                echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format(count($fv->provenance), 0)  .'</span>';
+                echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format(count($fv->sources), 0)  .'</span>';
                 echo '</span>';
                             
             } // end facet value
@@ -112,10 +118,16 @@ require_once('header.php');
     
         } // end facet
 
-       echo '</ul>'; // end list group
-       echo '</div>'; // end card
+        echo '</ul>'; // end list group
+        echo '</div>'; // end card
 
-    }
+        // we just bung the facet metadata in the html and we can then use it in javascript for the popup
+        echo '<script type="application/json" id="facetsMetadata">';
+        echo json_encode($all_facets, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        echo '</script>';
+
+
+    } // having facets
 ?>
                 <!-- Modal 1 for facet provenance -->
                 <div class="modal fade" id="facetProvModal" tabindex="-1" aria-labelledby="provModalLabel"
@@ -128,6 +140,21 @@ require_once('header.php');
                                     aria-label="Close"></button>
                             </div>
                             <div id="facetProvModalContent">
+                                <ul class="list-group  list-group-flush" >
+                                    <li class="list-group-item wfo-meta-row" >
+                                        <div class="row gx-1">
+                                            <div class="col-2 text-end fw-bold">Taxon:</div>
+                                            <div class="col" id="facetModalTaxonName">Taxon Name</div>
+                                        <div>
+                                    </li>
+                                    <li class="list-group-item gx-1 wfo-meta-row" >
+                                        <div class="row gx-1">
+                                        <div class="col-2 text-end fw-bold">Attribute:</div>
+                                        <div class="col">
+                                            <div><span id="facetModalFacetName">facet_name</span> - <span  id="facetModalFacetValueName" >facet_value_name</span></div>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" data-bs-dismiss="modal" aria-label="Close"
@@ -136,17 +163,93 @@ require_once('header.php');
                         </div>
                     </div>
                 </div>
+                <template id="datasourceRow">
+                    <li class="list-group-item gx-1 wfo-ds-row" >
+                        <div class="row gx-1">
+                            <div class="col-2 text-end fw-bold wfo-ds-row">Source&nbsp;<span>n</span>:</div>
+                            <div class="col"><em>source_name</em>
+                                <br/>scored <strong>method</strong><span></span>
+                                &nbsp;[<a 
+                                    href="#"
+                                    data-dismiss="modal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#dataProvModal"
+                                    data-wfoprov="dd"
+                                    style="cursor: pointer;">metadata</a>]
+                            </div>
+                            
+                        </div>
+                    </li>
+                </template>
 
                 <script>
                 // modal dialogue - load content on show
                 document.getElementById('facetProvModal').addEventListener('show.bs.modal', event => {
 
-                    const modalContent = document.getElementById('facetProvModalContent');
-                    modalContent.innerHTML = 'Loading ...';
-                    fetch("provenance_modal_facet.php?prov=" + event.relatedTarget.dataset.wfoprov)
-                        .then(response => response.text())
-                        .then(text => modalContent.innerHTML = text);
+                    // data passed from click event
+                    const dataset = event.relatedTarget.dataset;
 
+                    // load data from json in page
+                    const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
+                    const facet = facetMetadata[dataset.facetId];
+                    console.log(facet);
+                    const facetValue = facet.facet_values[dataset.facetValueId];
+                    
+                    // write in the data
+                    document.getElementById('facetModalTaxonName').innerHTML = atob(dataset.taxonName);
+                    document.getElementById('facetModalFacetName').innerHTML = facet.facet_name;
+                    document.getElementById('facetModalFacetValueName').innerHTML = facetValue.facet_value_name;
+
+                    const listGroup = document.querySelector("#facetProvModalContent ul");
+                    const template = document.querySelector("#datasourceRow");
+
+                    // remove any old ones first
+                    listGroup.querySelectorAll(".wfo-ds-row").forEach(li => {li.remove()});
+
+                    // insert a li for each source
+                    let count = 1;
+                    for(const sourceId in facetValue.sources){
+                        
+                        let source = facetValue.sources[sourceId]
+
+                        const clone = document.importNode(template.content, true);
+                    
+                        // the count of the source
+                        clone.querySelector("li div div span").innerHTML = count;
+                        count++;
+                        
+                        console.log(source);
+
+                        // source name
+                        clone.querySelector("li div div em").innerHTML = source.source_name;
+
+                        // method of scoring
+                        if (source.scored_via == 'direct'){
+                            clone.querySelector("li div div strong").innerHTML = 'directly to: ';
+                        }
+                        if (source.scored_via == 'synonym'){                            
+                            clone.querySelector("li div div strong").innerHTML = 'the synonym: ';
+                        }
+                         if (source.scored_via == 'ancestor'){
+                            clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
+                        }
+                        
+                        // add an id to the name span so we can ajax update it
+                        const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
+                        clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
+
+                        // set up an ajax call to populate that cell
+                        fetch("link_to_name.php?id=" + source.scored_wfo_id)
+                            .then(response => response.text())
+                            .then((text) => {
+                                document.querySelector("#" + rando).innerHTML = text
+                            });
+
+                        listGroup.appendChild(clone);
+
+                    
+                    }
+ 
                 })
                 </script>
 
@@ -173,109 +276,11 @@ require_once('header.php');
                 <script>
                 // modal dialogue - load content on show
                 document.getElementById('dataProvModal').addEventListener('show.bs.modal', event => {
-
                     const modalContent = document.getElementById('dataProvModalContent');
-                    modalContent.innerHTML = 'Loading ...';
-                    fetch("provenance_modal_data.php?prov=" + event.relatedTarget.dataset.wfoprov)
-                        .then(response => response.text())
-                        .then(text => modalContent.innerHTML = text);
-
                 })
                 </script>
 
-                <!-- Modal 3 for images -->
-                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="imageModalLabel">Image modal</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center" style="background-color: black; color: white;">
 
-                        <div id="imageModalContent" class="col text-center"></div>
-        
-                            <div class="row d-flex align-items-center" style="height: 100%">
-                                <div id="imageModalPrevious" class="col text-start align-middle"><a href="#">&lt; Previous</a></div>
-                            <div id="imageModalNext" class="col text-end align-middle" ><a href="#" >Next &gt;</a></div>
-                        </div>
-    
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <div id="imageModalDownloads" class="mr-auto" style="position: relative; z-index: 10;"></div>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                    </div>
-                </div>
-                </div>
-
-
-                <script>
-                        // modal dialogue - load content on show
-                        document.getElementById('imageModal').addEventListener('show.bs.modal', event => {
-                            imageDialoguePopulate(event.relatedTarget.id);
-                        });
-
-                        // add a listener to the previous arrow - arrow will have the id of the target image set in it
-                        document.getElementById('imageModalPrevious').getElementsByTagName("a")[0].addEventListener('click', event => {
-                            imageDialoguePopulate(event.target.dataset.wfoprev);
-                            event.preventDefault();
-                        });
-
-                        // add a listener to the next arrow - arrow will have the id of the target image set in it
-                        document.getElementById('imageModalNext').getElementsByTagName("a")[0].addEventListener('click', event => {
-                            imageDialoguePopulate(event.target.dataset.wfonext);
-                            event.preventDefault();
-                        });
-
-                        function imageDialoguePopulate(imgId){
-
-                            const targetImg = document.getElementById(imgId);
-
-                            const modalContent = document.getElementById('imageModalContent');
-                            const imageModalLabel = document.getElementById('imageModalLabel');
-                            const imageModalDownloads = document.getElementById('imageModalDownloads');
-
-                            fetch("image_modal.php?prov=" + targetImg.dataset.wfoprov)
-                                .then(response => response.json())
-                                .then(json => {
-
-                                    modalContent.innerHTML = json.body;
-                                    imageModalLabel.innerHTML = json.title;
-                                    imageModalDownloads.innerHTML = json.downloads;
-
-                                    const prevDiv = document.getElementById('imageModalPrevious');
-                                    const prevAnchor = prevDiv.getElementsByTagName("a")[0];
-                                    const nextDiv = document.getElementById('imageModalNext');
-                                    const nextAnchor = nextDiv.getElementsByTagName("a")[0];
-
-                                    // do we have previous images
-                                    if(targetImg.parentNode.previousSibling){
-                                        prevDiv.style.visibility = 'visible'; // show the previous link
-                                        prevAnchor.dataset.wfoprev = targetImg.dataset.wfoprev; // set the id of the previous image on the arrow dom
-                                    }else{
-                                        // remove the event listener
-                                        prevDiv.style.visibility = 'hidden';
-                                        prevAnchor.dataset.wfoprev = null;
-                                    }
-
-                                    // do we have next images
-                                    if(targetImg.parentNode.nextSibling){
-                                        nextDiv.style.visibility = 'visible'; // show the previous link
-                                        nextAnchor.dataset.wfonext = targetImg.dataset.wfonext; // set the id of the next image on the anchor
-                                    }else{
-                                        nextDiv.style.visibility = 'hidden';
-                                        nextAnchor.dataset.wfonext = null;
-                                    }
-
-                                    console.log(targetImg.parentNode.nextSibling);
-
-                                });
-
-                        }
-
-
-                </script>
 
                 <?php
 
@@ -890,23 +895,7 @@ function render_images($snippets, $record){
 
         $prov_json = urlencode(json_encode($prov_data));
 
-        echo "<div class=\"float-start img-thumbnail\">";
-
-        // keep track of the image ids for paging
-        if($i > 0) $prev_id = 'wfo-image-' . $i - 1;
-        else $prev_id = '';
-
-        if($i < count($snippets)) $next_id = 'wfo-image-' . $i + 1;
-        else $next_id = '';
-
-        echo "<img id=\"wfo-image-{$i}\"src=\"$image_uri_small\" data-bs-toggle=\"modal\" data-bs-target=\"#imageModal\" data-wfonext=\"{$next_id}\" data-wfoprev=\"{$prev_id}\" data-wfoprov=\"{$prov_json}\" alt=\"{$alt_escaped}\"  />";
-        echo "</div>";
-
     }
-
-   // echo '<pre>';
-   // print_r($snippets);
-   // echo '</pre>';
 
     echo "</div>"; // card body
     echo '</div>'; // end card

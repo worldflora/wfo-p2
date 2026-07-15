@@ -10,11 +10,9 @@ $provs = json_decode($_GET['prov']);
 echo '<ul class="list-group  list-group-flush" >';
 
 
-// rendering a solr metadata document from the index
-// this is a generic thing 
-
-$index = new SolrIndex();
-$meta = $index->getSolrDoc($provs->source_id);
+echo '<pre>';
+print_r($provs);
+echo '</pre>';
 
 if($meta){
     $meta = json_decode($meta->json_t);

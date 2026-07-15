@@ -572,7 +572,7 @@ class TaxonRecord{
             $snippet['language_code'] = $this->solrDoc->snippet_text_languages_ss[$i];
             $snippet['language_label'] = $language_codes_alpha3[$this->solrDoc->snippet_text_languages_ss[$i]]['eng'];
             $snippet['body'] = $this->solrDoc->snippet_text_bodies_txt[$i];
-            $snippet['imported'] = $this->solrDoc->snippet_text_modified_txt[$i];
+            $snippet['imported'] = $this->solrDoc->snippet_text_imported_ss[$i];
             $snippet['described_wfo_id'] = $this->solrDoc->snippet_text_name_ids_ss[$i];
             $snippet['source_id'] = 'wfo-ss-' . $this->solrDoc->snippet_text_sources_ss[$i];
             $snippet['source_name'] = $this->getSourceName($this->solrDoc->snippet_text_sources_ss[$i]);
@@ -990,7 +990,7 @@ class TaxonRecord{
                 );
                 $response = SolrIndex::getSolrResponse($query);
 
-                error_log(print_r($response, true));
+                //error_log(print_r($response, true));
 
                 // put int he total;
                 $stats[] = new TaxonConceptStat("role-unplaced", "Total names with role:'unplaced'", $response->facets->count);
@@ -1025,58 +1025,50 @@ class TaxonRecord{
 
         $out = array();
 
-        if(!$this->solrDoc) return $out;
-        
-        // work through the solr doc and find the properties
-        // that look like they are facet scores
-        foreach($this->solrDoc as $prop => $val){
-            $matches = array();
-            if(preg_match('/^(wfo-f-[0-9]+)_s/', $prop, $matches)){
+        if(!$this->solrDoc) return $out; // we haven't been initialised
 
-                // set up the facet
-                $prop_prefix = $matches[1];
-                $out[$prop_prefix] = array();
-                $out[$prop_prefix]['facet_values'] = array();
+        if(!isset($this->solrDoc->facet_values_ss)) return $out;// we have no facets
 
-                // add the values
-                foreach ($this->solrDoc->{$prop} as $fv) {
-                    $out[$prop_prefix]['facet_values'][$fv] = array();
-                    $out[$prop_prefix]['facet_values'][$fv]['provenance'] = array();
+        if(!isset($this->solrDoc->facets_metadata_t)) return $out; // do nothing for no facets
 
-                    // and their provenance 
-                    $prov_prop = $fv . '_provenance_ss';
-                    foreach($this->solrDoc->{$prov_prop} as $prov){
-                        $out[$prop_prefix]['facet_values'][$fv]['provenance'][]  = $prov;
-                    }
+        // we can just return the facet metadata as it is a superset of a the data in the other
+        // fields we facet on
+        $in = json_decode($this->solrDoc->facets_metadata_t);
+        foreach ($in as $facet) {
 
-                }
-                
-            }
-        } // fin building the structure
+      //  echo '<pre>';
+      //  print_r($facet);
+      //  echo '</pre>';
 
-        // if we've not been indexed then we are empty
-        if(!$out) return $out;
-
-        foreach($out as $f_id => $f){
-            $details = new FacetDetails($f_id);
-
-            $fob = (object)array(
-                'id' => $f_id,
-                'name' => $details->getFacetName(),
-                'facet_values' => array()
-            );
-
-            foreach($f['facet_values'] as $fv_id => $fv){
-                $fob->facet_values[$fv_id] = (object)array(
-                    'id' => $fv_id,
-                    'name' => $details->getFacetValueName($fv_id),
-                    'link' => $details->getFacetValueLink($fv_id),
-                    'code' => $details->getFacetValueCode($fv_id),
-                    'provenance' => $fv['provenance']
+            // have we got the facet yet?
+            if(!isset($out[$facet->facet_id])){
+                $out[$facet->facet_id] = (object)array(
+                    'facet_id' => $facet->facet_id,
+                    'facet_name' => $facet->facet_name,
+                    'facet_values' => array()
                 );
             }
-            $out[$f_id] = $fob;
-            
+
+            // have we got the value 
+            if(!isset($out[$facet->facet_id]->facet_values[$facet->facet_value_id])){
+                $out[$facet->facet_id]->facet_values[$facet->facet_value_id] = (object)array(
+                    'facet_value_id' => $facet->facet_value_id,
+                    'facet_value_name' => $facet->facet_value_name,
+                    'sources' => array()
+                );
+            }
+
+            // have we got the source for this value's presence?
+            if(!isset($out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id])){
+                $out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id] = (object)array(
+                    'source_id' => $facet->source_id,
+                    'source_name' => $facet->source_name,
+                    'scored_wfo_id' => $facet->wfo_id,
+                    'scored_via' => $facet->scored_via,
+                    'score_metadata' => $facet->score_meta_data
+                );
+            }
+        
         }
 
         return $out;

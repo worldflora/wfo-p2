@@ -43,10 +43,10 @@ define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files,
 // these are the facets displayed in the attributes box on the
 // taxon pages, and the order they are displayed.
 $attribute_facets = array(
-    'wfo-f-8', // habit
-    "wfo-f-7", // IUCN Red
-    "wfo-f-2", // CITES
-    'wfo-f-9' // global zone
+    8, // habit
+    7, // IUCN Red
+    2, // CITES
+    9 // global zone
 
 );
 
