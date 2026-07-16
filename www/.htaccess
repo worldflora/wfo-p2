@@ -5,8 +5,6 @@ RewriteCond %{REQUEST_URI} !^/.+/
 
 # other files called by ajax
 RewriteCond %{REQUEST_URI} !^/search_suggest.php 
-RewriteCond %{REQUEST_URI} !^/provenance_modal_data.php 
-RewriteCond %{REQUEST_URI} !^/provenance_modal_facet.php 
 RewriteCond %{REQUEST_URI} !^/image_modal.php 
 RewriteCond %{REQUEST_URI} !^/list_download.php 
 RewriteCond %{REQUEST_URI} !^/widget_(.+)\.php$ 
@@ -14,6 +12,7 @@ RewriteCond %{REQUEST_URI} !^/csv.php
 RewriteCond %{REQUEST_URI} !^/data_cache.php 
 RewriteCond %{REQUEST_URI} !^/api.php
 RewriteCond %{REQUEST_URI} !^/ini.php
+RewriteCond %{REQUEST_URI} !^/link_to_name.php
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]
