@@ -556,29 +556,28 @@ class TaxonRecord{
         $snippets = array();
 
         // we don't have any snippets in the object
-        if(!@$this->solrDoc->snippet_text_categories_ss) return $snippets;
+        if(!@$this->solrDoc->snippet_categories_ss) return $snippets;
 
         // work through the snippets in this record
-        for ($i=0; $i < count($this->solrDoc->snippet_text_categories_ss); $i++) { 
+        for ($i=0; $i < count($this->solrDoc->snippet_categories_ss); $i++) { 
 
             // we don't return categories of snippets that have been overridden e.g. link-outs 
-            if(in_array($this->solrDoc->snippet_text_categories_ss[$i], OVERRIDDEN_SNIPPET_CATEGORIES)) continue;
-
-            $snippet_id = $this->solrDoc->snippet_text_ids_ss[$i];
+            if(in_array($this->solrDoc->snippet_categories_ss[$i], OVERRIDDEN_SNIPPET_CATEGORIES)) continue;
 
             // add each one arranged by text category
             $snippet = array();
-            $snippet['id'] = $snippet_id;
-            $snippet['language_code'] = $this->solrDoc->snippet_text_languages_ss[$i];
-            $snippet['language_label'] = $language_codes_alpha3[$this->solrDoc->snippet_text_languages_ss[$i]]['eng'];
-            $snippet['body'] = $this->solrDoc->snippet_text_bodies_txt[$i];
-            $snippet['imported'] = $this->solrDoc->snippet_text_imported_ss[$i];
-            $snippet['described_wfo_id'] = $this->solrDoc->snippet_text_name_ids_ss[$i];
-            $snippet['source_id'] = 'wfo-ss-' . $this->solrDoc->snippet_text_sources_ss[$i];
-            $snippet['source_name'] = $this->getSourceName($this->solrDoc->snippet_text_sources_ss[$i]);
+            $snippet['metadata'] = json_decode($this->solrDoc->snippet_bodies_metadata_txt[$i]);
+
+            $snippet['language_code'] = $this->solrDoc->snippet_languages_ss[$i];
+            $snippet['language_label'] = $language_codes_alpha3[$this->solrDoc->snippet_languages_ss[$i]]['eng'];
+            $snippet['body'] = $this->solrDoc->snippet_bodies_txt[$i];
+            $snippet['imported'] = $this->solrDoc->snippet_imported_ss[$i];
+            $snippet['described_wfo_id'] = $this->solrDoc->snippet_name_ids_ss[$i];
+            $snippet['source_id'] =  $snippet['metadata']->source_id;
+            $snippet['source_name'] = $snippet['metadata']->source_name;
 
             // finally put it in as an object
-            $snippets[$this->solrDoc->snippet_text_categories_ss[$i]][] = (object)$snippet;
+            $snippets[$this->solrDoc->snippet_categories_ss[$i]][] = (object)$snippet;
 
         }
 

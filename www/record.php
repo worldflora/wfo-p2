@@ -50,8 +50,6 @@ require_once('header.php');
     // Synonyms
     render_name_list($record->getSynonyms(), $record, "Synonyms", "Other names that are placed in this taxon but that are not the formally accepted name of this taxon.");
 
-    render_images($record->getTextSnippets(), $record);
-
     // attributes (facets)
     $all_facets = $record->getFacets();
     $facets = array(); // these are the facets to display - and in the correct order as defined in attribute_facets
@@ -102,6 +100,7 @@ require_once('header.php');
                 $prov_json = urlencode(json_encode($prov_data));
 
                 // render the actual facet value.
+                // with link to open modal dialogue
                 echo '<span ';
                 echo ' data-bs-toggle="modal"';
                 echo ' data-bs-target="#facetProvModal"';
@@ -193,6 +192,10 @@ require_once('header.php');
                     // data passed from click event
                     const dataset = event.relatedTarget.dataset;
 
+                    // if we haven't got a facet value we are being called by the back button
+                    // so don't change existing values
+                    if (!dataset.facetValueId) return;
+
                     // load data from json in page
                     const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
                     const facet = facetMetadata[dataset.facetId];
@@ -275,6 +278,7 @@ require_once('header.php');
                             </div>
                             <div class="modal-footer">
                                  <button
+                                    id="dataProvModalBackButton"
                                     type="button"
                                     aria-label="Close"
                                     data-bs-toggle="modal"
@@ -308,11 +312,32 @@ require_once('header.php');
                     // data passed from click event
                     const dataset = event.relatedTarget.dataset;
 
-                    // load data from json in page
-                    const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
-                    const facet = facetMetadata[dataset.facetId];
-                    const facetValue = facet.facet_values[dataset.facetValueId];
-                    let source = facetValue.sources[dataset.sourceId]
+                    // we can be called from a facet or from a snippet
+
+                    let row_metadata = null;
+                    if(dataset.facetId){
+                        // were are rendering a facet metadat row which we pull from
+                        // the big json object in the page
+                        const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
+                        const facet = facetMetadata[dataset.facetId];
+                        const facetValue = facet.facet_values[dataset.facetValueId];
+                        let source = facetValue.sources[dataset.sourceId];
+                        row_metadata = source.score_metadata;
+
+                        // make sure the backbutton is visible
+                        document.querySelector("#dataProvModalBackButton").hidden = false;
+                    }else{
+                        // we are rendering a snippet and the json is in the 
+                        // refering element
+                        const json = event.relatedTarget.parentElement.querySelector("script").innerHTML;
+                        const meta = JSON.parse(json);
+                        console.log(meta);
+                        row_metadata = meta.row_metadata;
+
+                        // FIXME: Hide the back button because we will have got here directly
+                        document.querySelector("#dataProvModalBackButton").hidden = true;
+                    }
+
 
                     // where we will put it
                     const listGroup = document.querySelector("#dataProvModal ul");
@@ -321,8 +346,8 @@ require_once('header.php');
                     // remove any old ones first
                     listGroup.querySelectorAll(".wfo-meta-row").forEach(li => {li.remove()});
 
-                    for(const key in source.score_metadata){
-                        let val = source.score_metadata[key];
+                    for(const key in row_metadata){
+                        let val = row_metadata[key];
 
                         const clone = document.importNode(template.content, true);
 
@@ -411,16 +436,6 @@ require_once('header.php');
                     // the actual polygon
                     $json = file_get_contents($path);
 
-                    // package the provenance data up into a data attribute
-                    $prov_data = (object)array(
-                        'kind' => 'facet',
-                        'facet_name' => $f->facet_name,
-                        'facet_value' => $fv,
-                        'taxon_wfo' => $record->getWfoId(), 
-                        'taxon_name' => $record->getFullNameStringHtml() 
-                    );
-                    $prov_json = urlencode(json_encode($prov_data));
-
                     ?>
 
                     var p = L.geoJSON(<?php echo $json ?>, {
@@ -434,7 +449,11 @@ require_once('header.php');
                     p.on('click', function() {
                         const myModal = new bootstrap.Modal(document.getElementById('facetProvModal'));
                         const span = document.createElement('span');
-                        span.setAttribute('data-wfoprov', '<?php echo $prov_json ?>');
+                        
+                        span.setAttribute('data-facet-id', '<?php echo $f->facet_id ?>');
+                        span.setAttribute('data-facet-value-id', '<?php echo $fv->facet_value_id ?>');
+                        span.setAttribute('data-taxon-name', '<?php echo base64_encode($record->getFullNameStringHtml()) ?>');
+
                         myModal.show(span);
                     });
 
@@ -889,87 +908,16 @@ require_once('header.php');
 <?php
 require_once('footer.php');
 
-
-/**
- * Called to render images.
- * 
- * 
- */
-function render_images($snippets, $record){
-
-    $current_wfo_id = $record->getWfoId();
-
-    // no snippets nothing to render
-    if(count($snippets) == 0 ) return;
-
-    // work through to separate out the image snippets only
-    // no image snippets then nothing to render
-    if(!isset($snippets['image-jpeg']) || count($snippets['image-jpeg']) == 0) return;
-
-    // the only snippets we are intereseted in here are the images ones
-    $snippets = $snippets['image-jpeg'];
-
-    echo '<div class="card">';
-    echo '<div class="card-header bg-secondary-subtle">';
-    echo '<span data-bs-toggle="tooltip" data-bs-placement="top" title="Validated images of this taxon" >Images</span>';
-    echo '&nbsp;<span class="badge rounded-pill text-bg-success" style="font-size: 70%; vertical-align: super;">'. number_format(count($snippets), 0)  . '</span>';
-    echo '</div>'; // FIXME - images help bubble and count badge
-
-    // body
-    echo '<div class="card-body tab-content" style="max-height: 40em; overflow: auto;">';
-
-    for ($i=0; $i < count($snippets) ; $i++) { 
-
-        $snippet = $snippets[$i];
-
-        $image_id = md5($snippet->body);
-        
-        // IIIF Image API standard URI format
-        // e.g. https://wfo-image-cache.rbge.info/server/wfo/b767e21e9a5b7b4b1a8fce47fb0256f6/full/,150/0/default.jpg
-        
-        $image_uri_small = IMAGE_CACHE_URI . 'server/wfo/'. $image_id . '/full/,'. IMAGE_CACHE_SIZES[0] . '/0/default.jpg';
-
-
-        // set up the provenance data that will be passed to the modal if they click on the image
-        $prov_data = (object)array(
-            'kind' => 'image_display',
-            'source_id' => $snippet->source_id,
-            'snippet_id' =>  $snippet->id,
-            'image_id' => $image_id
-        );
-  
-        $alt_txt = "An image of ";  
-        if($snippet->described_wfo_id == $current_wfo_id){
-            $alt_txt .= ' a taxon with this name. ';
-            $prov_data->taxon_name = $record->getFullNameStringHtml();
-        }else{
-            $alt_txt .= ' a taxon with the name ';
-            $syn = new TaxonRecord($snippet->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
-            $alt_txt .= $syn->getFullNameStringPlain();
-            $alt_txt .= ' (which is a synonym of this taxon under the current classification).';
-            $prov_data->taxon_name =  "<a href=\"{$syn->getWfoId()}\">{$syn->getFullNameStringHtml()}</a> synonym of {$record->getFullNameStringHtml()}</a>";
-        }
-
-        $alt_txt .= " The images is from $snippet->source_name.\nClick for more information.";
-        $alt_escaped = htmlspecialchars($alt_txt, ENT_QUOTES, 'UTF-8');
-
-        $prov_json = urlencode(json_encode($prov_data));
-
-    }
-
-    echo "</div>"; // card body
-    echo '</div>'; // end card
-
-    // we are rendering images so we need an image dialogue to pop up
-   
-}
-
 /**
  * Called to render all the snippet texts
  * but each category of snippet is then
  * rendered as its own card in the interface
  */
 function render_snippets($snippets, $current_wfo_id){
+
+//    echo '<pre>';
+//    print_r($snippets);
+//    echo '</pre>';
 
     if(count($snippets) == 0 ) return;
 
@@ -1060,7 +1008,7 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 
         echo '<p>';
 
-        echo 'From a treatment in <a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '"><em>'. $snippet->source_name .'</em></a>';
+        echo 'From a treatment in <em>'. $snippet->source_name .'</em>';
 
         if($snippet->described_wfo_id == $current_wfo_id){
             echo ' describing a taxon with this name ';
@@ -1073,18 +1021,17 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 
         echo " in  $snippet->language_label. ";
 
-        // link to the snippet object - row in the original csv file
-        $prov_data = (object)array(
-            'kind' => 'snippet',
-            'source_id' => $snippet->id
-        );
-
-        $prov_json = urlencode(json_encode($prov_data));
 
         echo ' <strong>Imported: </strong> ' . $snippet->imported;
         echo '&nbsp;[<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
         echo  'Data provenance';
         echo '</a>]';
+
+        // write the snippet metadata in as a string
+        // we will fetch and render it in the modal if it is launched
+        echo '<script type="application/json">';
+        echo json_encode($snippet->metadata, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+        echo '</script>';
 
         echo '</p>';
 
