@@ -7,24 +7,32 @@
  */
 class FacetDetails{
 
-    private $facetId = null;
+    private $facetSolrDocId = null;
     private $solrFieldName = null;
     private $facetCache = null;
     private $index = null;
 
     public function __construct($facet_id){
 
-        if( preg_match('/_ss$/', $facet_id) || preg_match('/_s$/', $facet_id) ){
-            $this->solrFieldName = $facet_id;
-        }
- 
-        // convert solr index fields to facet ids
-        $this->facetId = preg_replace('/_ss$/', '',$facet_id);
-        $this->facetId = preg_replace('/_s$/', '',$this->facetId);
+        // the facet_id is either a solr field name or 
+        // it is a prefixed field on the facet_values_ss field
 
-        // we used the cached values if they exist
-        if(isset($_SESSION['facets_cache']) && isset($_SESSION['facets_cache'][$this->facetId])){
-            $this->facetCache = $_SESSION['facets_cache'][$this->facetId];
+        $matches = array();
+        if( preg_match('/^([0-9]+)-facet_values_ss$/', $facet_id, $matches)){
+            
+            // there should be a solr doc describing the facet (that may be cached)
+            $this->solrFieldName = 'facet_values_ss';
+            $this->facetSolrDocId = "wfo-f-{$matches[1]}";
+
+            // we used the cached values if they exist
+            if(isset($_SESSION['facets_cache']) && isset($_SESSION['facets_cache'][$this->facetSolrDocId])){
+                $this->facetCache = $_SESSION['facets_cache'][$this->facetSolrDocId];
+            }
+        }else{
+            // there isn't a solr doc describing the facet (from fyllo)
+            // it is all described in the config.php $search_facets
+            $this->solrFieldName = $facet_id;
+            $this->facetSolrDocId = null;
         }
 
         // single version of the index link
@@ -98,7 +106,14 @@ class FacetDetails{
         global $language_codes_alpha3;
 
         // if it is in the cache as a facet server defined thing return that
-        if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->name;
+        //if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->name;
+
+        // If it is a dynamic facet (in the facet_values_ss field with a prefix) then we regex it
+        // it is of the format facet_id-facet_value_id ~ Label
+        $matches = array();
+        if(preg_match('/^[0-9]+-[0-9]+ ~ (.+)$/', $value_id, $matches)){
+            return $matches[1];
+        }
 
         // if the name is recognised as data source load it from the index
         if(preg_match('/^wfo-(s|f)s-[0-9]+$/', $value_id)){

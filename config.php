@@ -88,16 +88,17 @@ define('IMAGE_CACHE_SIZES', array('150', '500', '1000')); // in size order small
 
 $search_facets = array();
 
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-8_ss', 'facet_name' =>  "wfo-f-8"); // Habit (growth form)
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-7_ss', 'facet_name' =>  "wfo-f-7"); // IUCN Red List
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-2_ss', 'facet_name' =>  "wfo-f-2"); // CITES
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-9_ss', 'facet_name' =>  "wfo-f-9"); // Global Zones
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-1_ss', 'facet_name' =>  "wfo-f-1"); // country ISO codes
-$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' => 'wfo-f-5_ss', 'facet_name' =>  "wfo-f-5"); // TDWG Level 3
+// dynamic facets are all in the same field and separated by prefixes
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '8-'); // Habit (growth form)
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '7-'); // IUCN Red List
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '2-'); // CITES
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '9-'); // Global Zones
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '1-'); // country ISO codes
+$search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "facet_values_ss", 'facet_prefix' => '5-'); // TDWG Level 3
 
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_text_sources_ss", 'label' => 'Data source', 'exclude' => array());
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_sources_ss", 'label' => 'Data source', 'exclude' => array());
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Name role', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "nomenclatural_status_s", 'label' => 'Nomenclatural status', 'exclude' => array());
@@ -117,6 +118,7 @@ define('CITES_APPENDIX_FACET_ID', 'wfo-f-2');
 // the facets cache 
 $facets_cache = @$_SESSION['facets_cache'];
 
+// FIXME - THIS SHOULD ONLY REFRESH OCCASSIONALLY?
 //if(!$facets_cache || @$_GET['facets_cache_refresh'] == 'true' || time() - $_SESSION['facets_cache_modified'] > 60*60*10){ // refreshes every 10 minutes
 
     $facets_cache = array();
@@ -130,6 +132,10 @@ $facets_cache = @$_SESSION['facets_cache'];
     foreach($docs as $doc){
         $facets_cache[$doc->id] = json_decode($doc->json_t);
     }
+
+    //echo '<pre>';
+    //print_r($facets_cache);
+    //echo '</pre>';
 
     $_SESSION['facets_cache'] = $facets_cache;
     $_SESSION['facets_cache_modified'] = time();

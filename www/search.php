@@ -63,27 +63,43 @@ $filters = array();
 $filters[] = 'classification_id_s:' . WFO_DEFAULT_VERSION;
 $filters[] = '-role_s:deprecated';
 
-// we need to convert the facet definitions into fields
-$search_facet_fields = array();
-foreach($search_facets as $sf){
-    $search_facet_fields[] = $sf->field_name;
-}
 
 $facets = array();
-foreach($search_facet_fields as $fi){
 
-    // add the field to facet on
-    $facets[$fi] = (object)array(
-            "type" => "terms",
-            'limit' => 200,
-            "field" => $fi
-    );
+// search_facets is defined in the configue file
+foreach($search_facets as $fi){
+
+    // vanilla query
+    $facet_q = (object)array(
+                "type" => "terms",
+                'limit' => 200,
+                "field" => $fi->field_name
+        );
+
+    // the name of the facetting query is based on the field
+    $faceting_id = $fi->field_name;
+    
+    // do we have a prefix?
+    if(isset($fi->facet_prefix)){
+
+        // we have a prefix to add
+        $facet_q->prefix = $fi->facet_prefix;
+
+        // we also add it to the name to differentiate between 
+        // multiple facets on same field
+        $faceting_id = $fi->facet_prefix . $fi->field_name;
+
+    }
+
+    // add the facet query to the query
+    $facets[$faceting_id] = $facet_q;
 
     // if we have a value for the facet
+    // in the request then we filter on that
     // then add a filter for that facet
-    if(isset($request[$fi])){
-        foreach($request[$fi] as $v){
-            $filters[] =  $fi . ':' . $v;
+    if(isset($request[$faceting_id])){
+        foreach($request[$faceting_id] as $v){
+            $filters[] =  "{$fi->field_name}:\"{$v}\"";
         }
     }
 }
@@ -103,7 +119,7 @@ require_once('header.php');
 $solr_response  = SolrIndex::getSolrResponse($query);
 if(isset($solr_response->response->docs)) $docs = $solr_response->response->docs;
 
-//echo "<pre>"; print_r($query);echo "</pre>";
+//echo "<pre>"; print_r($solr_response);echo "</pre>";
 
 // if we don't have any documents we run the query again with 
 // a blank search to get all the facets
@@ -111,6 +127,8 @@ if(!$docs){
     $query['query'] = "*:*";
     $solr_response  = SolrIndex::getSolrResponse($query);
 }
+
+
 
 // we save the last solr query in the session so we can use
 // it for downloads - different from saving the search_request which
