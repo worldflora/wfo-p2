@@ -2,7 +2,7 @@
 
 $page_title = "WFO: News";
 
-require_once('header.php');
+require_once('../fragments/header.php');
 ?>
 
 <div class="container" style="margin-top: 4%;">
@@ -24,5 +24,5 @@ require_once('header.php');
 </div>
 
 <?php
-require_once('footer.php');
+require_once('../fragments/footer.php');
 ?>

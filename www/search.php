@@ -114,7 +114,7 @@ $query = array(
 );
 
 // OK let's get started on rendering the page
-require_once('header.php');
+require_once('../fragments/header.php');
 
 $solr_response  = SolrIndex::getSolrResponse($query);
 if(isset($solr_response->response->docs)) $docs = $solr_response->response->docs;
@@ -315,5 +315,5 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 </div>
 
 <?php
-require_once('footer.php');
+require_once('../fragments/footer.php');
 ?>

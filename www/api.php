@@ -402,7 +402,7 @@ function delete_metadata($kind){
 }
 
 function render_documentation_page(){
-    require_once('header.php');
+    require_once('../fragments/header.php');
 ?>
 <main class="container">
     <h2>API for updating the portal index</h2>
@@ -471,5 +471,5 @@ function render_documentation_page(){
         property.</p>
 </main>
 <?php
-    require_once('footer.php');
+    require_once('../fragments/footer.php');
 }

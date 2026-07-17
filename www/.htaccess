@@ -13,6 +13,7 @@ RewriteCond %{REQUEST_URI} !^/data_cache.php
 RewriteCond %{REQUEST_URI} !^/api.php
 RewriteCond %{REQUEST_URI} !^/ini.php
 RewriteCond %{REQUEST_URI} !^/link_to_name.php
+RewriteCond %{REQUEST_URI} !^/link_to_data_source.php
 RewriteCond %{REQUEST_URI} !^/footer_modal_version.php
 
 #everything else goes to index.php

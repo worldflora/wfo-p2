@@ -23,6 +23,10 @@
 
 <!-- FOOTER MODALS -->
 
+<?php
+ require_once('../fragments/modal_data_source.php');
+?>
+
 
 <!-- Copyright -->
 <div class="modal fade" id="copyright_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -90,6 +94,8 @@
                 .then(text => modalContent.innerHTML = text);
     });
 </script>
+
+
 
 <script src="theme/js/bootstrap.bundle.min.js">
 </script>
