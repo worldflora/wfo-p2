@@ -129,10 +129,6 @@ require_once('../fragments/header.php');
 
     } // having facets
 
-    // modal dialogue to display the datasources for a facet value assertion
-    require_once('../fragments/modal_facet_prov.php');
-    require_once('../fragments/modal_row_metadata.php');
-
     // mapping card
     $facets = array(); // these are the facets to display - and in the correct order as defined in map_facets
     foreach($map_facets as $facet_id){ // map_facets is defined in the config.php
