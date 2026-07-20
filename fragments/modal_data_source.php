@@ -19,7 +19,7 @@
                 <p><strong>Source Link: </strong><a href="#" target="data-source"
                         id="dataSourceModalContentLink">link</a>&nbsp;↗</p>
                 <p><strong>Source file: </strong><a href="#" target="github" id="dataSourceModalContentFile">View on
-                        GitHub</a></p>
+                        GitHub</a>&nbsp;↗</p>
                 <p><strong>Last import: </strong><span id="dataSourceModalContentMod">date</span></p>
                 <div class="modal-footer">
                     <button id="dataSourceModalBackButton" type="button" aria-label="Close" data-bs-toggle="modal"

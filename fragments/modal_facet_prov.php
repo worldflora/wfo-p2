@@ -54,7 +54,7 @@
                     data-facet-value-id=""
                     data-source-id=""
                     data-taxon-name=""
-                    style="cursor: pointer;">metadata</a>]
+                    style="cursor: pointer;">row level metadata</a>]
             </div>
             
         </div>

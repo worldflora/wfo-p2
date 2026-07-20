@@ -770,19 +770,22 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 
         echo '<p>';
 
-        echo 'From a treatment in <em>'. $snippet->source_name .'</em>';
-
-        if($snippet->described_wfo_id == $current_wfo_id){
-            echo ' describing a taxon with this name ';
-        }else{
-            echo ' describing ';
-            $syn = new TaxonRecord($snippet->described_wfo_id . '-' . WFO_DEFAULT_VERSION);
-            echo "<a href=\"{$syn->getWfoId()}\">{$syn->getFullNameStringHtml()}</a>";
-            echo ' (which is a synonym of this taxon under the current classification)';
-        }
-
+        // we need to render this as a plain name but call the ajax to update it to 
+        // a datasource link if we have the object in the index
+        $link_id = 'wfo-' . rand(0, 1000000);
+        echo "From a treatment in <em id=\"{$link_id}\">{$snippet->source_name}</em>";
+?>
+        <script>
+        // set up an ajax call to populate the 
+        fetch("link_to_data_source.php?id=" + <?php echo $snippet->source_id ?>)
+            .then(response => response.text())
+            .then((text) => {
+                // only replace the text if we are returned a useful value
+                if(text)document.querySelector("#<?php echo $link_id ?>").innerHTML = text;
+            });
+        </script>
+<?php
         echo " in  $snippet->language_label. ";
-
 
         echo ' <strong>Imported: </strong> ' . $snippet->imported;
         echo '&nbsp;[<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
@@ -791,7 +794,7 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 
         // write the snippet metadata in as a string
         // we will fetch and render it in the modal if it is launched
-        echo '<script type="application/json">';
+        echo '<script type="application/json" class="wfo-row-metadata">';
         echo json_encode($snippet->metadata, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
         echo '</script>';
 
