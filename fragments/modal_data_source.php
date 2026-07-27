@@ -14,7 +14,7 @@
             </div>
             <div class="modal-body" id="dataSourceModalContent">
                 <h4 id="dataSourceModalContentName">name</h4>
-                <div id="dataSourceModalContentDescription">description</div>
+                <div id="dataSourceModalContentDescription" style="max-height: 30em; overflow: auto;">description</div>
                 <hr />
                 <p><strong>Source Link: </strong><a href="#" target="data-source"
                         id="dataSourceModalContentLink">link</a>&nbsp;↗</p>
@@ -46,7 +46,7 @@
         // load data from json in page
         const sourceMetadata = JSON.parse(document.getElementById(dataset.sourceMetadataId).innerHTML);
 
-        console.log(sourceMetadata);
+        // console.log(sourceMetadata);
 
         // write in the data
         document.querySelector("#dataSourceModalContentName").innerHTML = sourceMetadata.name;

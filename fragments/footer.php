@@ -23,6 +23,8 @@
 
 <?php
   // modal dialogues are all put at the bottom
+  require_once('../fragments/modal_facet_description.php');
+  require_once('../fragments/modal_facet_value_description.php');
   require_once('../fragments/modal_facet_prov.php');
   require_once('../fragments/modal_row_metadata.php');
   require_once('../fragments/modal_data_source.php');

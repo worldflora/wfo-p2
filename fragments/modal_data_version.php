@@ -17,12 +17,12 @@
 
 <script>
     // load the version content on demand
-    const myModalEl = document.getElementById('classification_modal');
-    myModalEl.addEventListener('show.bs.modal', function (event) {
+    const indexStateModal = document.getElementById('classification_modal');
+    indexStateModal.addEventListener('show.bs.modal', function (event) {
            const modalContent = document.getElementById('classification_modal_body');
             modalContent.innerHTML = 'Loading ...';
             // we pass the wfo id if there is one
-            fetch("footer_modal_version.php?wfo=<?php if(isset($wfo)){echo $wfo;} else { echo ''; } ?>")
+            fetch("modal_content_index_state.php?wfo=<?php if(isset($wfo)){echo $wfo;} else { echo ''; } ?>")
                 .then(response => response.text())
                 .then(text => modalContent.innerHTML = text);
     });

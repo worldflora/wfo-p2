@@ -59,13 +59,16 @@ function render_record_type_description($record, $link_wfo_id = true){
         // add an IUCN icon if we have an attribute for threat status
         if($facet_id == IUCN_THREAT_FACET_ID){ // from the config.php
             foreach($facet->facet_values as $fv_id => $fv){
-                if($fv->code){
+               // echo '<pre>';
+               // print_r($fv);
+               // echo '</pre>';
+                if($fv->facet_value_code){
                     echo '<span
                     data-bs-toggle="tooltip"
                     data-bs-placement="bottom"
-                    title="IUCN Threat Status is '. $fv->name . '."
+                    title="IUCN Threat Status is '. $fv->facet_value_name . '."
                     >';
-                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. IUCN_THREAT_FACET_ID .'/' . $fv->code . '.svg" alt="IUCN icon"/>';
+                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. IUCN_THREAT_FACET_ID .'/' . $fv->facet_value_code . '.svg" alt="IUCN icon"/>';
                     echo '</span>';
                 }
             }
@@ -74,16 +77,16 @@ function render_record_type_description($record, $link_wfo_id = true){
         // ditto for CITES
         if($facet_id == CITES_APPENDIX_FACET_ID){ // from the config.php
             foreach($facet->facet_values as $fv_id => $fv){
-                if($fv->code){
+                if($fv->facet_value_code){
                     echo '<span
                     data-bs-toggle="tooltip"
                     data-bs-placement="bottom"
-                    title="CITES '. $fv->name . '."
+                    title="CITES '. $fv->facet_value_name . '."
                     >';
                     // echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. CITES_APPENDIX_FACET_ID .'/' . $fv->code . '.png" alt="CITES icon"/>';
 
                     echo "<span style=\"vertical-align: super; font-size: smaller; font-family: courier; border:solid 1px blue; border-radius: 0.5em; padding-left: 0.33em; padding-right: 0.33em; margin-left: 0.33em;\">";
-                    echo 'CITES ' . str_replace('CITES_', '', $fv->code);
+                    echo 'CITES ' . str_replace('CITES_', '', $fv->facet_value_code);
                     echo"</span>";
                     echo '</span>';
                 }

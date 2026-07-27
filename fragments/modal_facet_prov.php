@@ -27,7 +27,28 @@
                         <div class="row gx-1">
                         <div class="col-2 text-end fw-bold">Attribute:</div>
                         <div class="col">
-                            <div><span id="facetModalFacetName">facet_name</span> - <span  id="facetModalFacetValueName" >facet_value_name</span></div>
+                            <div>
+                            <a 
+                                id="facetModalFacetName"
+                                href="#"
+                                data-dismiss="modal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#facetDescriptionModal"
+                                data-facet-id=""
+                                data-back-button="1"
+                                style="cursor: pointer;">facet_name</a>
+                            - 
+                            <a 
+                                id="facetModalFacetValueName"
+                                href="#"
+                                data-dismiss="modal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#facetValueDescriptionModal"
+                                data-facet-id=""
+                                data-facet-value-id=""
+                                data-back-button="1"
+                                style="cursor: pointer;">facet_value_name</a>
+                            </div>
                         </div>
                     </li>
                 </ul>
@@ -77,10 +98,15 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
     const facet = facetMetadata[dataset.facetId];
     const facetValue = facet.facet_values[dataset.facetValueId];
     
-    // write in the data
+    // write in the data for facet
     document.getElementById('facetModalTaxonName').innerHTML = atob(dataset.taxonName);
     document.getElementById('facetModalFacetName').innerHTML = facet.facet_name;
+    document.getElementById('facetModalFacetName').setAttribute('data-facet-id', 'wfo-f-' + facet.facet_id);
+
+    // write in data for facet value
     document.getElementById('facetModalFacetValueName').innerHTML = facetValue.facet_value_name;
+    document.getElementById('facetModalFacetValueName').setAttribute('data-facet-id', 'wfo-f-' + facet.facet_id);
+    document.getElementById('facetModalFacetValueName').setAttribute('data-facet-value-id', 'wfo-fv-' + facetValue.facet_value_id);
 
     const listGroup = document.querySelector("#facetProvModalContent ul");
     const template = document.querySelector("#datasourceRow");
@@ -144,7 +170,7 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
         fetch("link_to_name.php?id=" + source.scored_wfo_id)
             .then(response => response.text())
             .then((text) => {
-                document.querySelector("#" + rando).innerHTML = text
+               document.querySelector("#" + rando).innerHTML = text;
             });
 
         listGroup.appendChild(clone);

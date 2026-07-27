@@ -7,6 +7,7 @@
 
 require_once('../config.php');
 require_once('../includes/SolrIndex.php');
+require_once('../includes/Parsedown.php');
 
 $id = @$_GET['id'];
 
@@ -18,6 +19,11 @@ $doc = $index->getSolrDoc('ds-' . $id);
 if(!$doc) exit; // no doc then no play - it isn't in the index
 
 $meta = json_decode($doc->json_t);
+
+// The description - we turn it to HTML from markdown
+$parser = new Parsedown();
+$meta->description = $parser->text($meta->description);
+
 
 // tag them with random id so the javascript can find the data.
 $div_id = 'id-' . rand(0, 1000000);

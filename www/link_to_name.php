@@ -17,4 +17,6 @@ if(!$id){
 }
 $record = new TaxonRecord($id);
 
+
 echo "<a href=\"{$record->getId()}\">{$record->getFullNameStringHtml()}</a>";
+//echo "<a href=\"{$record->getId()}\">{$record->getId()}</a>";

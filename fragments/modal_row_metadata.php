@@ -21,7 +21,7 @@
                     <button
                     id="dataProvModalBackButton"
                     type="button"
-                    aria-label="Close"
+                    aria-label="Back"
                     data-bs-toggle="modal"
                     data-bs-target="#facetProvModal"
                     class="btn btn-primary"

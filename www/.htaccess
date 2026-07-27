@@ -14,7 +14,10 @@ RewriteCond %{REQUEST_URI} !^/api.php
 RewriteCond %{REQUEST_URI} !^/ini.php
 RewriteCond %{REQUEST_URI} !^/link_to_name.php
 RewriteCond %{REQUEST_URI} !^/link_to_data_source.php
-RewriteCond %{REQUEST_URI} !^/footer_modal_version.php
+RewriteCond %{REQUEST_URI} !^/modal_content_index_state.php
+RewriteCond %{REQUEST_URI} !^/modal_content_facet_description.php
+RewriteCond %{REQUEST_URI} !^/modal_content_facet_value_description.php
+RewriteCond %{REQUEST_URI} !^/modal_content_snippet_description.php
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]
