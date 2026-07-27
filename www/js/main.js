@@ -165,7 +165,6 @@ if(document.getElementById('listDownloadModal')){
 
 function sortFacetValues(facetValueId){
     const ul = document.getElementById(facetValueId);
-console.log(ul);
     // we build a sort function depending on how th
     let sortFunction = null;
     if(ul.dataset.currentSort == 'numerically'){
@@ -193,7 +192,5 @@ console.log(ul);
     listItems.forEach(item => {
         ul.appendChild(item);
     });
-
-    console.log( ul.children );
 
 }

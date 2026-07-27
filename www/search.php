@@ -73,7 +73,8 @@ foreach($search_facets as $fi){
     $facet_q = (object)array(
                 "type" => "terms",
                 'limit' => 200,
-                "field" => $fi->field_name
+                "field" => $fi->field_name,
+                "sort" => "count"
         );
 
     // the name of the facetting query is based on the field
@@ -187,12 +188,12 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                     }
                     echo "</div>"; // end the list group
 
-                    echo '<pre>';
-                    //print_r($query);
-                    //print_r($solr_response);
-                    //print_r($facets_response);
-                    //print_r($docs);
-                    echo '</pre>';                
+                    // echo '<pre>';
+                    // print_r($query);
+                    // print_r($solr_response);
+                    // print_r($facets_response);
+                    // print_r($docs);
+                    // echo '</pre>';                
                 
                 ?>
             </div>
@@ -273,15 +274,41 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
         if(count($f->buckets) > 7){
             echo '<li class="list-group-item list-group-item-light d-flex justify-content-between align-items-start"" data-sort-alphabetically="AAAAAAAA"  data-sort-numerically="10000000"  style="">';
             echo '<div class="ms-2 me-auto" ><input type="text" class="form-control form-control-sm" placeholder="Filter attribute values ..." style="width: 24em; margin-left: -10px;"></div>';
-            echo '<span onclick="sortFacetValues(\'' . $facet_details->getFacetDomId() . '\')" style="cursor: pointer;">↓☰↑</span>';
+            echo '<span ';
+            echo ' onclick="sortFacetValues(\'' . $facet_details->getFacetDomId() . '\')" ';
+            echo ' style="cursor: pointer;" ';
+            echo ' data-bs-toggle="tooltip" ';
+            echo ' data-bs-placement="top" ';
+            echo ' title="Toggle numerical or alphabetical sorting"';
+            echo ' >↓☰↑</span>';
             echo '</li>';
         }
 
         // debug!
-      //  echo '<li class="list-group-item"><pre>';
+        //echo '<li class="list-group-item"><pre>';
       //  echo $f_name;
-      //  print_r($f);
-      //  echo '</pre></li>';
+        //print_r($f);
+        //echo '</pre></li>';
+
+        // we have a sorting issue.
+        // SOLR will only return buckets sorted by count or index (the val)
+        // we default to count but that means if two buckets have the same number they will
+        // appear in random order alphabetically to the user. We therefore need to do a
+        // quick sort ourselves
+        usort($f->buckets, function($a, $b){
+
+            // numeric reverse order
+            if($a->count > $b->count) return -1;
+            if($a->count < $b->count) return 1;
+
+            // they have the same count so sort on the values
+            // the display names come after the ~ 
+            $a_val =  substr($a->val, strpos($a->val, " ~ ") + 1);
+            $b_val =  substr($b->val, strpos($b->val, " ~ ") + 1);
+            return strcasecmp($a_val, $b_val);
+
+        });
+
  
         foreach($f->buckets as $bucket){
 
