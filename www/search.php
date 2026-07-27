@@ -254,17 +254,35 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
         echo '<div class="accordion-item">';
 
         // header
-        echo '<h2 class="accordion-header">';
+        echo '<div class="accordion-header">';
         echo "<button class=\"accordion-button $collapsed\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#$f_name\" aria-expanded=\"true\" aria-controls=\"collapseOne\">";
         echo $facet_details->getFacetName();
+
         echo '</button>';
-        echo '</h2>';
+        echo '</div>';
        
         // body
         echo "<div id=\"$f_name\" class=\"accordion-collapse $collapse\" data-bs-parent=\"#accordionExample\">";
 
-        echo '<div class="accordion-body list-group list-group-flush" style="padding-right: 0px; padding-top: 1em; max-height: 20em; overflow: auto;">';
+        // the list group has some stuff in it to make it sort and filterable
+        echo '<div class="accordion-body list-group list-group-flush" style="padding-right: 0px; padding-top: 0em; max-height: 20em; overflow: auto;"';
+        echo " id=\"{$facet_details->getFacetDomId()}\""; // A unique id for the facet so we can refer to this in the javascript
+        echo ' data-current-sort="numerically" '; // we default the current sort order to numeric - as it comes from SOLR.
+        echo ' >';
 
+        if(count($f->buckets) > 7){
+            echo '<li class="list-group-item list-group-item-light d-flex justify-content-between align-items-start"" data-sort-alphabetically="AAAAAAAA"  data-sort-numerically="10000000"  style="">';
+            echo '<div class="ms-2 me-auto" ><input type="text" class="form-control form-control-sm" placeholder="Filter attribute values ..." style="width: 24em; margin-left: -10px;"></div>';
+            echo '<span onclick="sortFacetValues(\'' . $facet_details->getFacetDomId() . '\')" style="cursor: pointer;">↓☰↑</span>';
+            echo '</li>';
+        }
+
+        // debug!
+      //  echo '<li class="list-group-item"><pre>';
+      //  echo $f_name;
+      //  print_r($f);
+      //  echo '</pre></li>';
+ 
         foreach($f->buckets as $bucket){
 
             // for locally defined facets we can exclude particular values
@@ -278,7 +296,10 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
             $count = number_format($bucket->count, 0);
 
-            echo '<li class="list-group-item">';
+            echo '<li class="list-group-item" ';
+            echo " data-sort-alphabetically=\"{$facet_details->getFacetValueName($bucket->val)}\""; // value to use when sorting this alphabetically
+            echo " data-sort-numerically=\"{$bucket->count}\""; // value to use when sorting this numerically
+            echo '>';
         
             echo "<label class=\"form-check-label stretched-link text-wrap wfo-facet-value\" for=\"{$bucket->val}\">";
             

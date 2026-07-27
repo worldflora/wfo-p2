@@ -138,6 +138,7 @@ class FacetDetails{
     public function getFacetValueDescription($value_id){
 
         // if it is in the cache as a facet server defined thing return that
+        // FIXME: THIS SHOULD BE Markdown corrected but not sure if it is called anywhere.
         if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->description;
         else return null;
 
@@ -151,6 +152,21 @@ class FacetDetails{
     public function getFacetValueCode($value_id){
         if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->code;
         return null;
+    }
+
+    /**
+     * This is an id we can use in a the page dom
+     */
+    public function getFacetDomId(){
+        return $this->facetSolrDocId ? $this->facetSolrDocId : $this->solrFieldName; 
+    }
+
+    
+    /**
+     * This is an id we can use in a the page dom
+     */
+    public function getFacetValueDomId($value_id){
+        return $this->getFacetDomId() . '-' . $value_id;
     }
 
 

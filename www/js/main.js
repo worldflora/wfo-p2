@@ -161,3 +161,39 @@ if(document.getElementById('listDownloadModal')){
         window.location = "search";
     })
 }
+
+
+function sortFacetValues(facetValueId){
+    const ul = document.getElementById(facetValueId);
+console.log(ul);
+    // we build a sort function depending on how th
+    let sortFunction = null;
+    if(ul.dataset.currentSort == 'numerically'){
+        // switch to an alphabetical search
+        ul.setAttribute('data-current-sort', 'alphabetically');
+        sortFunction = function(a, b){
+            console.log(a.dataset.sortAlphabetically);
+            if (a.dataset.sortAlphabetically < b.dataset.sortAlphabetically) {
+                return -1;
+            } else if (a.dataset.sortAlphabetically > b.dataset.sortAlphabetically) {
+                return 1;
+            }
+            return 0;
+        };
+    }else{
+        // sitch to a numerical sort
+        ul.setAttribute('data-current-sort', 'numerically');
+        sortFunction = function(a, b){return b.dataset.sortNumerically - a.dataset.sortNumerically;}; // numerical is reverse
+    }
+
+    const listItems = Array.from(ul.getElementsByTagName('li'));
+    //console.log(listItems);
+    listItems.sort(sortFunction);
+    ul.innerHTML = '';
+    listItems.forEach(item => {
+        ul.appendChild(item);
+    });
+
+    console.log( ul.children );
+
+}
