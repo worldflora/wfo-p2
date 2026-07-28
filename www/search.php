@@ -216,7 +216,7 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
             </div>
             </div>
             <!--  End of Download progress modal -->
-            <div class="col-4 bg-light offcanvas-lg offcanvas-end " style="padding: 0px;" tabindex="-1"
+            <div class="col-4 offcanvas-lg offcanvas-end " style="padding: 0px;" tabindex="-1"
                 id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="offcanvasResponsiveLabel">Filter Settings</h5>
@@ -224,7 +224,7 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                         data-bs-target="#offcanvasResponsive" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    <div class="accordion" style="width: 100%;" id="accordionPanelsStayOpenExample">
+                    <div class="accordion" style="width: 100%; " id="accordionPanelsStayOpenExample" >
 
                         <?php
 
@@ -252,10 +252,10 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
 
         // we do an accordion item
-        echo '<div class="accordion-item">';
+        echo '<div class="accordion-item" style="border-top: 1px solid rgb(65, 169, 120);">';
 
         // header
-        echo '<div class="accordion-header">';
+        echo '<div class="accordion-header" >';
         echo "<button class=\"accordion-button $collapsed\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#$f_name\" aria-expanded=\"true\" aria-controls=\"collapseOne\">";
         echo $facet_details->getFacetName();
 
@@ -273,7 +273,7 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
         if(count($f->buckets) > 7){
             echo '<li class="list-group-item list-group-item-light d-flex justify-content-between align-items-start"" data-sort-alphabetically="AAAAAAAA"  data-sort-numerically="10000000"  style="">';
-            echo '<div class="ms-2 me-auto" ><input type="text" class="form-control form-control-sm" placeholder="Filter attribute values ..." style="width: 24em; margin-left: -10px;"></div>';
+            echo '<div class="ms-2 me-auto" ><input type="text" onkeyup="filterFacetValues(this, \''. $facet_details->getFacetDomId() .'\')" class="form-control form-control-sm" placeholder="Filter attribute values ..." style="width: 24em; margin-left: -10px;"></div>';
             echo '<span ';
             echo ' onclick="sortFacetValues(\'' . $facet_details->getFacetDomId() . '\')" ';
             echo ' style="cursor: pointer;" ';

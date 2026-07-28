@@ -171,7 +171,6 @@ function sortFacetValues(facetValueId){
         // switch to an alphabetical search
         ul.setAttribute('data-current-sort', 'alphabetically');
         sortFunction = function(a, b){
-            console.log(a.dataset.sortAlphabetically);
             if (a.dataset.sortAlphabetically < b.dataset.sortAlphabetically) {
                 return -1;
             } else if (a.dataset.sortAlphabetically > b.dataset.sortAlphabetically) {
@@ -194,3 +193,22 @@ function sortFacetValues(facetValueId){
     });
 
 }
+
+function filterFacetValues(input, listGroupId){
+
+    const terms = input.value;
+    const re = new RegExp( '^' + terms, "i");
+    const ul = document.getElementById(listGroupId);
+    const lis = Array.from(ul.getElementsByTagName('li'));
+
+    lis.forEach(li => {
+        const txt = li.textContent.trim();
+        if(txt.match(re)){
+            li.hidden = false;
+        }else{
+            li.hidden = true;
+        }
+    });
+
+}
+
