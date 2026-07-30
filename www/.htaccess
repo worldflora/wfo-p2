@@ -5,7 +5,7 @@ RewriteEngine On
 # page.php script - it's the static content
 # there will be other file types that need 
 # serving directly
-RewriteRule ^/pages/.+\.md$ page.php [L]
+RewriteRule ^pages/.*(\.md|/)$ /page.php [L]
 
 # exclude subdirectories
 RewriteCond %{REQUEST_URI} !^/.+/ 
