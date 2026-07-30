@@ -1,6 +1,13 @@
 RewriteEngine On
 
-#exclude subdirectories
+# everything that is in the pages directory 
+# and got an .md ending is handled by the 
+# page.php script - it's the static content
+# there will be other file types that need 
+# serving directly
+RewriteRule ^/pages/.+\.md$ page.php [L]
+
+# exclude subdirectories
 RewriteCond %{REQUEST_URI} !^/.+/ 
 
 # other files called by ajax
@@ -18,6 +25,8 @@ RewriteCond %{REQUEST_URI} !^/modal_content_index_state.php
 RewriteCond %{REQUEST_URI} !^/modal_content_facet_description.php
 RewriteCond %{REQUEST_URI} !^/modal_content_facet_value_description.php
 RewriteCond %{REQUEST_URI} !^/modal_content_snippet_description.php
+
+
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]
