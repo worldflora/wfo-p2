@@ -54,8 +54,6 @@ function build_index_for_dir($dir, &$md_text, $depth){
 
     $paths = glob($dir . '/*');
 
-    print_r($paths); exit;
-
     $files = array();
     $dirs = array();
 
@@ -102,6 +100,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
     else sort($files); // ascending alphabetical
 
     // write out the files
+    print_r($files); exit;
     foreach ($files as $path) {
         $title = get_title_from_path($path);
 
