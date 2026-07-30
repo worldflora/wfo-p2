@@ -2,5 +2,5 @@
 	path = www/theme
 	url = https://github.com/rogerhyam/wfo-p2-theme.git
 [submodule "www/static"]
-	path = www/static
+	path = www/pages
 	url = https://github.com/worldflora/wfo-static-content.git
