@@ -54,7 +54,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
 
     $paths = glob($dir . '/*');
 
-    print_r($files); exit;
+    print_r($paths);
 
     $files = array();
     $dirs = array();
