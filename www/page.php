@@ -54,6 +54,8 @@ function build_index_for_dir($dir, &$md_text, $depth){
 
     $paths = glob($dir . '/*');
 
+    print_r($paths); exit;
+
     $files = array();
     $dirs = array();
 
@@ -102,7 +104,14 @@ function build_index_for_dir($dir, &$md_text, $depth){
     // write out the files
     foreach ($files as $path) {
         $title = get_title_from_path($path);
+
+        // apache works in a different way to the PHP internal server used in dev
+        // apache adds a / to the end of the directory if it detects it
+        // we add one in if we detect it isn't there (we are in dev)
+        //$requested_path = parse_url($_SERVER["REQUEST_URI"],  PHP_URL_PATH);
+        //if(!preg_match('/^\/$/',$requested_path)) $path = '/' . $path;
         $md_text .=  "\n  * [{$title}](/$path)";
+
     }
 
     // if we have subdirectories build them 
