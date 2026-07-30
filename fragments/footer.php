@@ -9,13 +9,12 @@
 <footer class="footer border-top">
   <div class="container">
         <ul class="nav navbar justify-content-center pb-1 mb-3 " >
-            <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#copyright_modal">Copyright</button></li>
-            <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#cite_modal">How to cite</button></li>
-            <li class="nav-item"><a href="mailto:contact@worldfloraonline.org?subject=Enquiry from portal"
-                class="nav-link" style="color: gray;">Contact</a></li>
-            <li class="nav-item"><a href="#" class="nav-link" style="color: gray;">Terms of Use</a></li>
-            <li class="nav-item"><a href="#" class="nav-link" style="color: gray;">Privacy</a></li>
-            <li class="nav-item"><button href="#" class="nav-link" style="color: gray;">Social Media</button></li>
+            <li class="nav-item"><a href="/pages/copyright.md" class="nav-link" style="color: gray;">Copyright</a></li>
+            <li class="nav-item"><a href="/pages/cite.md" class="nav-link" style="color: gray;">How to cite</a></li>
+            <li class="nav-item"><a href="mailto:contact@worldfloraonline.org?subject=Enquiry from portal" class="nav-link" style="color: gray;">Contact</a></li>
+            <li class="nav-item"><a href="/pages/terms.md" class="nav-link" style="color: gray;">Terms of Use</a></li>
+            <li class="nav-item"><a href="/pages/privacy.md" class="nav-link" style="color: gray;">Privacy</a></li>
+            <li class="nav-item"><a href="/pages/socials.md" class="nav-link" style="color: gray;">Social Media</a></li>
             <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#classification_modal">Index State</button></li>
         </ul>
   </div>
@@ -29,13 +28,11 @@
   require_once('../fragments/modal_row_metadata.php');
   require_once('../fragments/modal_data_source.php');
   require_once('../fragments/modal_data_version.php');
-  require_once('../fragments/modal_copyright.php');
-  require_once('../fragments/modal_cite.php');
 ?>
 
-<script src="theme/js/bootstrap.bundle.min.js">
+<script src="/theme/js/bootstrap.bundle.min.js">
 </script>
-<script src="js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 </body>

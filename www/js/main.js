@@ -36,7 +36,7 @@ if (searchBox) {
 
         // simply call for ajax to update the suggestions
         // the logic will be handled in the php script
-        fetch('search_suggest.php?q=' + encodeURIComponent(val))
+        fetch('/search_suggest.php?q=' + encodeURIComponent(val))
             .then(function (response) {
                 return response.text();
             })
@@ -130,7 +130,7 @@ function generateListDownload(format){
 
     // get a handle on the div we will be updating
     const modalContent = document.getElementById('listDownloadModalContent');
-    fetch('list_download.php?format=' + format)
+    fetch('/list_download.php?format=' + format)
         .then(response => response.json())
         .then(json => {
             modalContent.innerHTML = json.message;

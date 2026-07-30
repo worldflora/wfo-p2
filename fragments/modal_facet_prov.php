@@ -138,7 +138,7 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
         clone.querySelector("li div div div").setAttribute('id', sourceCelId);
         
         // set up an ajax call to populate the 
-        fetch("link_to_data_source.php?id=" + source.source_id)
+        fetch("/link_to_data_source.php?id=" + source.source_id)
             .then(response => response.text())
             .then((text) => {
                 // only replace the text if we are returned a useful value
@@ -167,7 +167,7 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
         clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
 
         // set up an ajax call to populate that cell
-        fetch("link_to_name.php?id=" + source.scored_wfo_id)
+        fetch("/link_to_name.php?id=" + source.scored_wfo_id)
             .then(response => response.text())
             .then((text) => {
                document.querySelector("#" + rando).innerHTML = text;

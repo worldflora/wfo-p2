@@ -34,7 +34,7 @@ require_once('../fragments/header.php');
     echo '<span id="taxonStatsSpan">&nbsp;</span>';
     echo '<script>';
     echo "\tconst placeholder = document.getElementById('taxonStatsSpan');\n";
-    echo "\tfetch('widget_taxon_stats.php?wfo_id={$record->getWfoId()}&path={$record->getNameDescendentPath()}&name_string={$record->getNameString()}&rank_string={$record->getRank()}').then(response => response.text()).then(text => placeholder.innerHTML = text)";        
+    echo "\tfetch('/widget_taxon_stats.php?wfo_id={$record->getWfoId()}&path={$record->getNameDescendentPath()}&name_string={$record->getNameString()}&rank_string={$record->getRank()}').then(response => response.text()).then(text => placeholder.innerHTML = text)";        
     echo '</script>';
 
     echo "</p>"; // end of micro citation
@@ -428,7 +428,7 @@ require_once('../fragments/header.php');
         const tc = document.getElementById('toolsCard');
         const tcc = document.getElementById('toolsCardContent');
         const tcb = document.getElementById('toolsCardBadge');
-        fetch('widget_taxon_link_outs.php?wfo_id=<?php echo $record->getWfoId() ?>')
+        fetch('/widget_taxon_link_outs.php?wfo_id=<?php echo $record->getWfoId() ?>')
             .then(response => response.json())
             .then(json => {
                     if(json.count > 0){
@@ -777,7 +777,7 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 ?>
         <script>
         // set up an ajax call to populate the 
-        fetch("link_to_data_source.php?id=" + <?php echo $snippet->source_id ?>)
+        fetch("/link_to_data_source.php?id=" + <?php echo $snippet->source_id ?>)
             .then(response => response.text())
             .then((text) => {
                 // only replace the text if we are returned a useful value

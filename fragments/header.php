@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,9 +21,9 @@
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     -->
 
-    <link href="theme/css/custom.css" rel="stylesheet">
+    <link href="/theme/css/custom.css" rel="stylesheet">
 
-    <link href="style/main.css" rel="stylesheet">
+    <link href="/style/main.css" rel="stylesheet">
 
     <!-- FIXME: This is whilst in dev to prevent Google or Bing indexing the wrong URL -->
     <meta name="robots" content="noindex">
@@ -51,14 +52,41 @@
                             <a class="nav-link" aria-current="page" href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="search">Search</a>
+                            <a class="nav-link" aria-current="page" href="/search">Search</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="news">News</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="about">About</a>
-                        </li>
+
+<?php
+foreach ($pages_menu as $page) {
+
+    if(!isset($page['children']) || !$page['children']){
+        // no children so just a simple link
+        echo '<li class="nav-item">';
+        echo "<a class=\"nav-link\" aria-current=\"page\" href=\"{$page['path']}\">{$page['title']}</a>";
+        echo '</li>';
+    }else{
+
+        // children so it is a toggle of a submenu
+        echo '<li class="nav-item dropdown">';
+        echo '<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">';
+        echo $page['title'];
+        echo '</a>';
+
+        // then add the children
+        echo '<ul class="dropdown-menu">';
+        foreach ($page['children'] as $child) {
+            echo '<li>';
+            echo "<a class=\"dropdown-item\" href=\"{$child['path']}\">{$child['title']}</a>";
+            echo '</li>';
+        }
+        echo '</ul>';
+        echo '</li>';
+    }
+}
+
+?>
+
+<!--
+
                         <li class="nav-item dropdown">
 
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -71,7 +99,7 @@
                                 <li><a class="dropdown-item" href="contribute">Taxonomic Expert Networks</a></li>   
                             </ul>
                         </li>
-
+-->
                     </ul>
                 </div>
                 <a href="search" style="color: white; padding-right:1em; padding-bottom:0.5em;">

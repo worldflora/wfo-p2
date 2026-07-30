@@ -14,6 +14,11 @@ require_once('../../wfo_p2_secrets.php'); // things we don't put in github
 require_once('includes/language_codes.php');
 require_once('includes/SolrIndex.php');
 
+// we include the menu items from the static submodule 
+// should fail gracefully
+$pages_menu = array();
+@include_once('www/pages/config.php');
+
 // $system_message = null;
 if(!isset($system_message)) $system_message = null;
 

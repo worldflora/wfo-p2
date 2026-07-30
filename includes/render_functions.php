@@ -68,7 +68,7 @@ function render_record_type_description($record, $link_wfo_id = true){
                     data-bs-placement="bottom"
                     title="IUCN Threat Status is '. $fv->facet_value_name . '."
                     >';
-                    echo '<img style="vertical-align: bottom; height:28px;" src="../data/'. IUCN_THREAT_FACET_ID .'/' . $fv->facet_value_code . '.svg" alt="IUCN icon"/>';
+                    echo '<img style="vertical-align: bottom; height:28px;" src="/data/'. IUCN_THREAT_FACET_ID .'/' . $fv->facet_value_code . '.svg" alt="IUCN icon"/>';
                     echo '</span>';
                 }
             }

@@ -41,3 +41,45 @@ h1 .wfo-name-authors {
     color: gray;
 }
 
+/*
+style the mark down used in pages
+https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-attribute-for-styling
+*/
+.wfo-md img[alt$="~left"]{
+    max-width: 15%;
+    float: left;
+    margin-right: 1em;
+    margin-bottom: 1em;
+}
+
+.wfo-md p:has(img[alt$="~left"]),
+.wfo-md p:has(img[alt$="~right"])
+{
+    overflow: hidden;
+}
+
+.wfo-md img[alt$="~right"]{
+    max-width: 15%;
+    float: right;
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
+.wfo-md p:has(img[alt$="~grid"]){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-bottom: 0.5em;
+}
+.wfo-md img[alt$="~grid"]{
+    width: 98%;
+}
+
+.wfo-md img{
+    max-width: 98%;
+}
+
+.wfo-md a img:hover{
+    opacity: 0.8;
+    border: solid gray 1px;
+}
