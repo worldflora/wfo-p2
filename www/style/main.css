@@ -79,7 +79,7 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 }
 
 .wfo-md img[alt$="~rightflow"]{
-    max-width: 15%;
+    max-width: 25%;
     float: right;
     margin-left: 1em;
     margin-bottom: 1em;
