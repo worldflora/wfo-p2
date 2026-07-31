@@ -61,17 +61,22 @@ function build_index_for_dir($dir, &$md_text, $depth){
     // we work through the list first and
     // weed out unwanted files so they don't 
     // mess with the sorting
-    $date_order = false;
+    $files_desc = false;
+    $dirs_desc = false;
     foreach($paths as $path){
+
+        $info = pathinfo($path);
 
         // catch the directories
         if(is_dir($path)){
             $dirs[] = $path;
+
+            // reverse order if they are years
+            if(preg_match('/^[0-9]{4}$/', $info['basename'])){
+                $dirs_desc = true;
+            }
             continue;
         }
-
-        // all are files
-        $info = pathinfo($path);
         
         // don't link to the index files
         if($info['basename'] == 'index.md') continue;
@@ -87,7 +92,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
         // if any of the files start with a date then
         // we are sorting by reverse order
         if(preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}_/', $info['basename'])){
-            $date_order = true;
+            $files_desc = true;
         }
 
         // finally we have a kosha file to link to
@@ -95,9 +100,11 @@ function build_index_for_dir($dir, &$md_text, $depth){
     }
 
     // directories are always alphabetical ascending
-    sort($dirs);
+    // unless they are years
+    if($dirs_desc) rsort($dirs); 
+    else sort($dirs);
 
-    if($date_order) rsort($files,); // reverse alphabetical and therefore date
+    if($files_desc) rsort($files,); // reverse alphabetical and therefore date
     else sort($files); // ascending alphabetical
 
     // write out the files
