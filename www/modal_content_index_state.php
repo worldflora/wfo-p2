@@ -23,16 +23,34 @@ $solr = new SolrIndex();
     if(isset($wfo) && $wfo){
 
         $taxon = $solr->getSolrDoc($wfo . '-' . $classification_version);
-        echo '<li class="list-group-item list-group-item-primary">Current Taxon</li>';
-        echo '<li class="list-group-item">';
-        echo '<a href="/'. $taxon->wfo_id_s .'">';
-        echo $taxon->full_name_string_html_s;
-        echo '</a>';
-        echo '</li>';
-        echo '<li class="list-group-item">';
-        echo '<strong> Indexed: </strong> ';
-        echo $taxon->fyllo_last_indexed_dt;
-        echo '</li>';
+
+        if($taxon->role_s == 'accepted'){
+            echo '<li class="list-group-item list-group-item-primary">Current Taxon</li>';
+            echo '<li class="list-group-item">';
+            echo '<a href="/'. $taxon->wfo_id_s .'">';
+            echo $taxon->full_name_string_html_s;
+            echo '</a>';
+            echo '</li>';
+            echo '<li class="list-group-item justify-content-between">';
+            echo '<strong> Indexed: </strong> ';
+            echo $taxon->fyllo_last_indexed_dt;
+            echo "&nbsp;&nbsp;<button class=\"btn btn-outline-secondary btn-sm\" type=\"button\" onclick=\"enqueueTaxon(this, '{$taxon->wfo_id_s}')\">Enqueue</button>";
+ 
+            echo '</li>';
+        }else{
+            echo '<li class="list-group-item list-group-item-primary">Current Name</li>';
+            echo '<li class="list-group-item">';
+            echo '<a href="/'. $taxon->wfo_id_s .'">';
+            echo $taxon->full_name_string_html_s;
+            echo '</a>';
+            echo '</li>';
+            echo '<li class="list-group-item">';
+            echo '<strong> Role: </strong> ';
+            echo $taxon->role_s;
+            echo '</li>';
+
+        }
+
 
     }
 

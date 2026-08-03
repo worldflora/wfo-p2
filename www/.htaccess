@@ -25,8 +25,7 @@ RewriteCond %{REQUEST_URI} !^/modal_content_index_state.php
 RewriteCond %{REQUEST_URI} !^/modal_content_facet_description.php
 RewriteCond %{REQUEST_URI} !^/modal_content_facet_value_description.php
 RewriteCond %{REQUEST_URI} !^/modal_content_snippet_description.php
-
-
+RewriteCond %{REQUEST_URI} !^/modal_content_enqueue_taxon.php
 
 #everything else goes to index.php
 RewriteRule !index\.php$ index.php [L]

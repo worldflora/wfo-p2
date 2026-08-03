@@ -212,3 +212,22 @@ function filterFacetValues(input, listGroupId){
 
 }
 
+function enqueueTaxon(button, wfoId){
+
+    // stop them pressing it too often
+    button.disabled = true;
+
+    fetch('/modal_content_enqueue_taxon.php?wfo=' + wfoId)
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (text) {
+            button.innerHTML = text;
+        })
+        .catch(function (error) {
+            button.innerHTML = "Error";
+            console.log(error);
+        });
+
+}
+

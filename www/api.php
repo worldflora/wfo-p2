@@ -182,26 +182,50 @@ function update_single_taxon_values($values){
 
 }
 
-
 function get_page_of_taxon_graphs($page_size, $classification){
 
-   // get a list of wfo_ids to work on
-    $solr = new SolrIndex();
+    // get a list of wfo_ids to work on
 
-    // get the taxon
-    $query = array(
-        'query' => "role_s:accepted",
-        'filter' => ['classification_id_s:' . $classification ],
-        'fields' => ['wfo_id_s'],
-        'sort' => 'fyllo_last_indexed_d ASC, id ASC', // empty values will come first
-        'limit' => $page_size
-    );
+    // start with any queue jumpers that have been put in a 
+    // file using the UI
+    $queue_jumpers = array();
+    if(file_exists(INDEX_QUEUE_FILE_PATH)){
+        $lines = file(INDEX_QUEUE_FILE_PATH);
+        foreach($lines as $line){
+            $wfo = trim($line);
+            if(preg_match('/^wfo-[0-9]{10}$/', $wfo)) $queue_jumpers = $wfo;
+        }
+        // empty the list
+        file_put_contents(INDEX_QUEUE_FILE_PATH, '');
+    }
 
-    $docs = $solr->getSolrDocs($query);
+    $graphs = array(); 
+    foreach($queue_jumpers as $jumper){
+        $graphs[] = get_taxon_graph($jumper, $classification);
+    }
 
-    $graphs = array();
-    foreach($docs as $doc){
-        $graphs[] = get_taxon_graph($doc->wfo_id_s, $classification);
+    // call solr for the rest of them
+    $new_page_size = $page_size - count($queue_jumpers);
+    if($new_page_size > 0){
+        
+        // call solr for the rest of them
+        $solr = new SolrIndex();
+
+        // get the taxon
+        $query = array(
+            'query' => "role_s:accepted",
+            'filter' => ['classification_id_s:' . $classification ],
+            'fields' => ['wfo_id_s'],
+            'sort' => 'fyllo_last_indexed_d ASC, id ASC', // empty values will come first
+            'limit' => $new_page_size
+        );
+
+        $docs = $solr->getSolrDocs($query);
+
+        foreach($docs as $doc){
+            $graphs[] = get_taxon_graph($doc->wfo_id_s, $classification);
+        }
+
     }
 
     return (object)array(

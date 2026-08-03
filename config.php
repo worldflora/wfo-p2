@@ -39,6 +39,8 @@ define('LIST_DOWNLOAD_DIR', 'downloads/' ); // end in a slash
 define('LIST_DOWNLOAD_DIR_MAX_SIZE', 100 ); // maximum size in megabytes
 define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files, minutes
 
+define('INDEX_QUEUE_FILE_PATH', '../data/index_queue.txt'); // a file full of queue jumpers to be indexed at the start of the next run.
+
 /*
     Facet configuration
     Which facets are displayed on taxon pages and in the faceted searching
