@@ -193,7 +193,7 @@ function get_page_of_taxon_graphs($page_size, $classification){
         $lines = file(INDEX_QUEUE_FILE_PATH);
         foreach($lines as $line){
             $wfo = trim($line);
-            if(preg_match('/^wfo-[0-9]{10}$/', $wfo)) $queue_jumpers = $wfo;
+            if(preg_match('/^wfo-[0-9]{10}$/', $wfo)) $queue_jumpers[] = $wfo;
         }
         // empty the list
         file_put_contents(INDEX_QUEUE_FILE_PATH, '');
