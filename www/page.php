@@ -104,7 +104,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
     if($dirs_desc) rsort($dirs); 
     else sort($dirs);
 
-    if($files_desc) rsort($files,); // reverse alphabetical and therefore date
+    if($files_desc) rsort($files); // reverse alphabetical and therefore date
     else sort($files); // ascending alphabetical
 
     // write out the files

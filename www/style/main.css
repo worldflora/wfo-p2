@@ -103,3 +103,14 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     opacity: 0.8;
     border: solid gray 1px;
 }
+
+.wfo-md table td,
+.wfo-md table th
+{
+    border: 1px gray solid;
+    padding: 0.5em;
+}
+
+.wfo-md table tr:nth-child(even) {
+    background-color: #eee;
+}
