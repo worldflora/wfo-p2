@@ -95,6 +95,11 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     width: 98%;
 }
 
+.wfo-md img[alt$="~small"]{
+    max-width: 250px;
+    max-height: 250px;
+}
+
 .wfo-md img{
     max-width: 98%;
 }

@@ -105,7 +105,7 @@ $search_facets[] = (object)array('kind' => 'facet_service', 'field_name' =>  "fa
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_categories_ss", 'label' => 'Text category', 'exclude' => OVERRIDDEN_SNIPPET_CATEGORIES );
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_sources_ss", 'label' => 'Data source', 'exclude' => array());
+// $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_sources_ss", 'label' => 'Data source', 'exclude' => array());
 
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Name role', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "nomenclatural_status_s", 'label' => 'Nomenclatural status', 'exclude' => array());
@@ -116,7 +116,7 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "place
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_order_s", 'label' => 'Order', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_family_s", 'label' => 'Family', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "placed_in_genus_s", 'label' => 'Genus', 'exclude' => array());
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-facet-sources_ss", 'label' => 'Facet data source', 'exclude' => array());
+// $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "wfo-facet-sources_ss", 'label' => 'Facet data source', 'exclude' => array());
 
 // used to render icons on the record page
 define('IUCN_THREAT_FACET_ID', 7);
