@@ -95,9 +95,25 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     width: 98%;
 }
 
-.wfo-md img[alt$="~small"]{
+
+/*
+    A mechanism to have rotating 
+    images
+*/
+.wfo-md img[alt$="~logoshow"]{
     max-width: 250px;
-    max-height: 250px;
+    max-height: 200px;
+}
+.wfo-md p:has(img[alt$="~logoshow"]){
+    width: 250px;
+    height: 200px;
+    display: flex;
+    /* align-items: center; */
+    float: right;
+    padding: 1em;
+}
+.wfo-md a:has(img[alt$="~logoshow"]){
+    display: none;
 }
 
 .wfo-md img{
@@ -118,4 +134,29 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 
 .wfo-md table tr:nth-child(even) {
     background-color: #eee;
+}
+
+/*
+    for readability we keep the 
+    column a little narrower
+*/
+div.wfo-md{
+    max-width: 56em;
+}
+
+/*
+    a wrapper to make YouTube embeds 100%
+*/
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+}
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }

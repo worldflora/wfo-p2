@@ -231,3 +231,41 @@ function enqueueTaxon(button, wfoId){
 
 }
 
+/**
+ * do an animation of the gif
+ */
+if(document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])')){
+    const p = document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])');
+
+    // randomise the order of the logos
+    // so we show no preferences!
+    const kids = Array.from(p.querySelectorAll('a'));
+    p.innerHTML = "";
+    while(kids.length > 0){
+        const randomIndex = Math.floor(Math.random() * kids.length);
+        p.appendChild(kids[randomIndex]); // add a rando back in
+        kids.splice(randomIndex, 1); // remove it from the array
+    }
+
+    // show the first on
+    p.firstChild.style.display = "block";
+
+    // change the visible one in turn through the list
+    setInterval(function(){
+        let currentIndex = 0;
+        let nextIndex = 0;
+        for (let index = 0; index < p.children.length; index++) {
+            const child =  p.children[index];
+            if(child.style.display == "block"){
+                currentIndex = index;
+            }
+        }
+
+        nextIndex = currentIndex + 1;
+        if(nextIndex >= p.children.length) nextIndex =0;
+        p.children[currentIndex].style.display = "none";
+        p.children[nextIndex].style.display = "block";
+
+    }, 3000);
+
+}

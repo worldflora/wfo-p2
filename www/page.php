@@ -42,7 +42,7 @@ $parsed_text = $parser->text($md_text);
 $page_title = 'WFO: ' . get_title_from_path($path);
 
 require_once('../fragments/header.php');
-echo '<div class="container wfo-md">';
+echo '<div class="container container-sm wfo-md">';
 echo $parsed_text;
 echo '</div>';
 require_once('../fragments/footer.php');
