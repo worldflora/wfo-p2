@@ -93,6 +93,7 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 }
 .wfo-md img[alt$="~grid"]{
     width: 98%;
+    display: inline;
 }
 
 
@@ -108,14 +109,20 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     width: 250px;
     height: 200px;
     display: flex;
-    /* align-items: center; */
+    justify-content: center;
     float: right;
-    padding: 1em;
+    margin: 1em;
 }
 .wfo-md a:has(img[alt$="~logoshow"]){
     display: none;
+    animation: fade-in 3s;
 }
-
+@keyframes fade-in {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
 .wfo-md img{
     max-width: 98%;
 }

@@ -261,11 +261,12 @@ if(document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])')){
             }
         }
 
+        // swap the things over.
         nextIndex = currentIndex + 1;
         if(nextIndex >= p.children.length) nextIndex =0;
         p.children[currentIndex].style.display = "none";
         p.children[nextIndex].style.display = "block";
-
+        
     }, 3000);
 
 }

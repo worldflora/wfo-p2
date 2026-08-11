@@ -102,10 +102,10 @@ function build_index_for_dir($dir, &$md_text, $depth){
     // directories are always alphabetical ascending
     // unless they are years
     if($dirs_desc) rsort($dirs); 
-    else sort($dirs);
+    else sort($dirs, SORT_FLAG_CASE |  SORT_NATURAL);
 
     if($files_desc) rsort($files); // reverse alphabetical and therefore date
-    else sort($files); // ascending alphabetical
+    else sort($files, SORT_FLAG_CASE |  SORT_NATURAL ); // ascending alphabetical
 
     // write out the files
     foreach ($files as $path) {
