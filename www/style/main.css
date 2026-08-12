@@ -143,6 +143,11 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     background-color: #eee;
 }
 
+.wfo-md blockquote{
+    font-size: 150%;
+    font-weight:lighter;
+}
+
 /*
     for readability we keep the 
     column a little narrower
