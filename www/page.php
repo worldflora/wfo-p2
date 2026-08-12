@@ -87,6 +87,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
             if(strtolower($info['extension']) == 'jpg') continue;
             if(strtolower($info['extension']) == 'jpeg') continue;
             if(strtolower($info['extension']) == 'png') continue;
+            if(strtolower($info['extension']) == 'gif') continue;
         }
 
         // if any of the files start with a date then
