@@ -111,7 +111,13 @@ function build_index_for_dir($dir, &$md_text, $depth){
     // write out the files
     foreach ($files as $path) {
         $title = get_title_from_path($path);
-        $md_text .=  "\n  * [{$title}](/$path)";
+
+        // we need to encode the path parts but not the slashes
+        $parts = explode('/', $path);
+        array_walk($parts, function(&$part, $key){ $part = urlencode($part);});
+        $path_safe = implode('/', $parts);
+        
+        $md_text .=  "\n  * [{$title}](/$path_safe)";
     }
 
     // if we have subdirectories build them 
@@ -129,6 +135,6 @@ function get_title_from_path($path){
     $info = pathinfo($path);
     $title = preg_replace('/_/', ' ', $info['filename']);
     $title = preg_replace('/^[0-9]{4}-[0-9]{2}-[0-9]{2} /', '', $title);
-    $title = urldecode($title);
+    //$title = urldecode($title);
     return $title;
 }

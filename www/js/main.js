@@ -249,6 +249,7 @@ if(document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])')){
 
     // show the first on
     p.firstChild.style.display = "block";
+    p.firstChild.style['mix-blend-mode'] = 'multiply'; // transparent the white
 
     // change the visible one in turn through the list
     setInterval(function(){
@@ -266,6 +267,7 @@ if(document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])')){
         if(nextIndex >= p.children.length) nextIndex =0;
         p.children[currentIndex].style.display = "none";
         p.children[nextIndex].style.display = "block";
+        p.children[nextIndex].style['mix-blend-mode'] = 'multiply'; // transparent the white
         
     }, 3000);
 

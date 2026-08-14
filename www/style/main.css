@@ -83,6 +83,7 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
     float: right;
     margin-left: 1em;
     margin-bottom: 1em;
+    mix-blend-mode: multiply; /* make white backgrounds transparent */
 }
 
 .wfo-md p:has(img[alt$="~grid"]){
@@ -104,6 +105,7 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 .wfo-md img[alt$="~logoshow"]{
     max-width: 250px;
     max-height: 200px;
+    mix-blend-mode: multiply; /* make white backgrounds transparent */
 }
 .wfo-md p:has(img[alt$="~logoshow"]){
     width: 250px;
@@ -146,6 +148,8 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 .wfo-md blockquote{
     font-size: 150%;
     font-weight:lighter;
+    border-left: 1px gray solid;
+    padding-left: 1em;
 }
 
 /*
