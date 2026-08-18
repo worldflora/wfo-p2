@@ -25,6 +25,11 @@ if(!isset($system_message)) $system_message = null;
 // an api key for downloading backups and things we don't want generally open
 define('PORTAL_BEARER_TOKEN', $api_bearer_token);
 
+// setting used by BotGuard to filter bad actors
+define('WFO_BOTGUARD_DWELL_TIME', 5); // time in seconds to wait before being allowed access
+define('WFO_BOTGUARD_WINDOW_DURATION', 30); // duration of window we measure requests over
+define('WFO_BOTGUARD_MAXIMUM_REQUESTS', 10); // maximum number of requests during WFO_BOTGUARD_WINDOW_DURATION. Session is destroyed if this is exceeded.
+
 // Location of the solr server
 define('SOLR_QUERY_URI', $solr_query_uri); // from wfo_p2_secrets.php
 define('SOLR_USER', $solr_user); // from wfo_p2_secrets.php
@@ -140,9 +145,6 @@ $facets_cache = @$_SESSION['facets_cache'];
         $facets_cache[$doc->id] = json_decode($doc->json_t);
     }
 
-    //echo '<pre>';
-    //print_r($facets_cache);
-    //echo '</pre>';
 
     $_SESSION['facets_cache'] = $facets_cache;
     $_SESSION['facets_cache_modified'] = time();

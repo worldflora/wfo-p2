@@ -52,15 +52,17 @@ require_once('../fragments/header.php');
 
     // attributes (facets)
     $all_facets = $record->getFacets();
+
+    // we just bung the facet metadata in the html and we can then use it in javascript for the popup
+    echo '<script type="application/json" id="facetsMetadata">';
+    echo json_encode($all_facets, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
+    echo '</script>';
+
     $facets = array(); // these are the facets to display - and in the correct order as defined in attribute_facets
     foreach($attribute_facets as $facet_id){ // attribute_facets is defined in the config.php
         if(isset($all_facets[$facet_id])) $facets[] = $all_facets[$facet_id];
     }
-
-    echo '<pre>';
-  //  print_r($facets);
-    echo '</pre>';
-    
+ 
     if($facets){
         
         // we have facets to render as attribute box
@@ -120,11 +122,6 @@ require_once('../fragments/header.php');
 
         echo '</ul>'; // end list group
         echo '</div>'; // end card
-
-        // we just bung the facet metadata in the html and we can then use it in javascript for the popup
-        echo '<script type="application/json" id="facetsMetadata">';
-        echo json_encode($all_facets, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
-        echo '</script>';
 
 
     } // having facets

@@ -176,3 +176,13 @@ div.wfo-md{
     width: 100%;
     height: 100%;
 }
+
+.footer .wfo-botguard{
+   text-align: right;
+   margin: 1em;
+}
+
+.footer .wfo-botguard a{
+   color: lightgray;
+   text-decoration: none;
+}

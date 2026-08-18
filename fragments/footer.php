@@ -17,6 +17,10 @@
             <li class="nav-item"><a href="/pages/socials.md" class="nav-link" style="color: gray;">Social Media</a></li>
             <li class="nav-item"><button class="nav-link" style="color: gray;" data-bs-toggle="modal" data-bs-target="#classification_modal">Index State</button></li>
         </ul>
+          
+  </div>
+  <div class="wfo-botguard">
+    <?php echo BotGuard::summaryString(); ?>
   </div>
 </footer>
 

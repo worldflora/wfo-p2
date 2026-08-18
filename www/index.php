@@ -1,9 +1,9 @@
 <?php
 
 // common header file included in all pages
-require_once('../includes/SolrIndex.php');
 require_once('../includes/TaxonRecord.php');
 require_once('../includes/FacetDetails.php');
+require_once('../includes/BotGuard.php');
 require_once('../includes/render_functions.php');
 
 // config variables
@@ -27,19 +27,23 @@ if(preg_match('/\.jpeg$/i', $path)) return false;
 if(preg_match('/\.png$/i', $path)) return false;
 if(preg_match('/\.gif$/i', $path)) return false;
 
-
 // other things are handled by specific scripts
 if(preg_match('/^wfo-[0-9]{10}/', $path_parts[0])){
     // we are viewing a name or taxon
+    BotGuard::check();
     require_once('record.php');
 }elseif($path_parts[0] == 'search'){
+    BotGuard::check();
     require_once('search.php');
 }elseif($path_parts[0] == 'pages'){
+    BotGuard::check();
     require_once('page.php');
 }elseif($path_parts[0] == 'csv'){
+    BotGuard::check();
     require_once('csv.php');
 }elseif(!$path_parts[0]){
     // all else fails render the home page
+    BotGuard::check();
     require_once('home.php');
 }else{
     // finally return false for anything else
