@@ -24,7 +24,8 @@ class BotGuard{
             ||
             @$_REQUEST['botguard'] == 'true'
         ){
-            BotGuard::renderDwellPage();
+            header("HTTP/1.1 428 Precondition Required"); // tell them to ask again in a minute - with the php session cookie
+            BotGuard::renderDwellPage("Welcome!");
             exit;
         }else{
 
@@ -44,7 +45,8 @@ class BotGuard{
                 end($_SESSION['wfo-session-requests']) - $_SESSION['wfo-session-requests'][0] > WFO_BOTGUARD_WINDOW_DURATION
                 ){
                     // they are a very naughty boy - destroy their session
-                    BotGuard::renderDwellPage();
+                    header("HTTP/1.1 429 Too Many Requests"); // tell them too many requests
+                    BotGuard::renderDwellPage("Too many requests!");
                     exit;
             }
 
@@ -73,7 +75,27 @@ class BotGuard{
         return "<a href=\"{$url}\">{$text}</a>";
     }
 
-    private static function renderDwellPage(){
+
+    /**
+     * 
+     * 
+     */
+    public static function runTest($baseUrl){
+
+        // some wfo_ids to use in the test
+
+        // Call repeatedly without session cookie
+
+        // Call and return php session cookie
+
+        // Call at an acceptible rate
+
+        // call at an unacceptible rate
+
+
+    }
+
+    private static function renderDwellPage($reason){
 
         // this is when their WFO session starts
         $_SESSION['wfo-session-start'] = time();
@@ -408,7 +430,7 @@ class BotGuard{
             </g>
         </svg>
         <div id="message-box">
-            <p>One momement please.<br/>We are verifying your session.</p>
+            <p><?php echo $reason ?><br/>One momement please.<br/>We are verifying your session.</p>
         </div>
 </body>
 
