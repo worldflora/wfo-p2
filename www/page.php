@@ -69,6 +69,10 @@ function build_index_for_dir($dir, &$md_text, $depth){
 
         // catch the directories
         if(is_dir($path)){
+
+            // ignore directories starting with _
+            if(preg_match('/^_/', $info['basename'])) continue;
+
             $dirs[] = $path;
 
             // reverse order if they are years
@@ -81,6 +85,7 @@ function build_index_for_dir($dir, &$md_text, $depth){
         // don't link to the index files
         if($info['basename'] == 'index.md') continue;
         if($info['basename'] == 'header.md') continue;
+        if($info['basename'] == 'README.md') continue;
 
         // don't link to image files
         if(isset($info['extension'])){

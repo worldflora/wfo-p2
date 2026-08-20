@@ -272,3 +272,22 @@ if(document.querySelector('.wfo-md p:has(img[alt$="~logoshow"])')){
     }, 3000);
 
 }
+
+/*
+    in the grid versions of the image insert a title based on the alt
+    text
+*/
+
+if(document.querySelector('.wfo-md img[alt$="~grid"]')){
+    document.querySelectorAll('.wfo-md img[alt$="~grid"]').forEach(img => {
+
+        // create a title element from the alt text and add 
+        // a bootstrap tooltip to it.
+        const title = img.alt.replace(/~.+$/, '');
+        img.title = title;
+        img.setAttribute('data-bs-toggle', 'tooltip');
+        new bootstrap.Tooltip(img);
+
+    });
+}
+
