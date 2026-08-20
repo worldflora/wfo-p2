@@ -36,13 +36,15 @@ class BotGuard{
             // truncate the array to the latest WFO_BOTGUARD_MAXIMUM_REQUESTS - if it has exceeded that
             $_SESSION['wfo-session-requests'] = array_slice($_SESSION['wfo-session-requests'], WFO_BOTGUARD_MAXIMUM_REQUESTS * -1);
 
+            //error_log(print_r($_SESSION['wfo-session-requests'], true));
+
             // have we reached the maximum number of requests and
             // is the difference between the first and last less than the WFO_BOTGUARD_WINDOW_DURATION
 
             if(
                 count($_SESSION['wfo-session-requests']) == WFO_BOTGUARD_MAXIMUM_REQUESTS
                 &&
-                end($_SESSION['wfo-session-requests']) - $_SESSION['wfo-session-requests'][0] > WFO_BOTGUARD_WINDOW_DURATION
+                end($_SESSION['wfo-session-requests']) - $_SESSION['wfo-session-requests'][0] < WFO_BOTGUARD_WINDOW_DURATION
                 ){
                     // they are a very naughty boy - destroy their session
                     header("HTTP/1.1 429 Too Many Requests"); // tell them too many requests
@@ -56,7 +58,7 @@ class BotGuard{
 
     public static function summaryString(){
 
-        // work out the botguard destruction link
+        // work out the botguard session destruction link
         $url = $_SERVER['REQUEST_URI'];
 
         if(preg_match('/\?.+=.+/', $url)){
@@ -67,8 +69,9 @@ class BotGuard{
             $url .= "?botguard=true";
         }
 
-        $text = count($_SESSION['wfo-session-requests']);
-        $text .= ' requests in ';
+        $text = 'Last ';
+        $text .= count($_SESSION['wfo-session-requests']);
+        $text .= ' requests took ';
         $text .=  number_format(end($_SESSION['wfo-session-requests']) - $_SESSION['wfo-session-requests'][0], 0);
         $text .= ' seconds';
 
@@ -82,16 +85,109 @@ class BotGuard{
      */
     public static function runTest($baseUrl){
 
-        // some wfo_ids to use in the test
+        // 100 wfo_ids to use in the test
+        $wfo_ids = array('wfo-0000495499','wfo-0000865542','wfo-0000689500','wfo-0000537848','wfo-0001366746','wfo-0001086669','wfo-0000094868','wfo-0000067365','wfo-0001333350','wfo-0000689860','wfo-0000146672','wfo-0000213342','wfo-0000731048','wfo-0000600094','wfo-0001017317','wfo-0001410988','wfo-0001075817','wfo-0000493043','wfo-0000942767','wfo-0000865236','wfo-0000716648','wfo-0000067262','wfo-0000991629','wfo-0000194511','wfo-0000414300','wfo-0000506270','wfo-0001285160','wfo-0000337842','wfo-0000269011','wfo-0000889558','wfo-0000704976','wfo-4000035182','wfo-0000232816','wfo-0000499165','wfo-0000960249','wfo-0000652417','wfo-0000723127','wfo-0000540999','wfo-0000208294','wfo-0001105858','wfo-0000590987','wfo-0000661288','wfo-0000403671','wfo-0000171245','wfo-0000026034','wfo-0000795015','wfo-0001423677','wfo-0000083621','wfo-1200001679','wfo-0000244472','wfo-0000015978','wfo-0000179255','wfo-0001117706','wfo-0001112222','wfo-1000047852','wfo-4000003684','wfo-0000932097','wfo-0000398670','wfo-1000005633','wfo-0000684367','wfo-4000031870','wfo-0000107225','wfo-4000024223','wfo-4000033677','wfo-4000007376','wfo-0001115924','wfo-4000004712','wfo-4000006114','wfo-0000492595','wfo-0000465044','wfo-0000562103','wfo-0000163699','wfo-4000012499','wfo-0000501421','wfo-0000213761','wfo-0001423486','wfo-0001081444','wfo-0000334207','wfo-0001332006','wfo-0000048154','wfo-0000239315','wfo-0000496936','wfo-0001005175','wfo-0001248805','wfo-0000014950','wfo-0000533553','wfo-0000864553','wfo-0000049801','wfo-0000517688','wfo-4000005883','wfo-0000291531','wfo-0001246359','wfo-4000011336','wfo-0000918597','wfo-0000311939','wfo-0000170207','wfo-0000877551','wfo-0000751935','wfo-0000964822','wfo-0000067371');
 
-        // Call repeatedly without session cookie
+        $cookie_lines = array(); // holds the session cookies between calls
 
-        // Call and return php session cookie
+         // Call and return php session cookie
+        echo "\nCalling without session cookie";
+        
+        $http_code = BotGuard::getResponseCode($baseUrl, $wfo_ids, $cookie_lines); 
+        
+        if($http_code != 428){
+            echo "\n\nERROR: SHOULD RETURN 428 BUT RETURNED {$http_code}\n\n";
+            exit;
+        }else{
+            echo "\n\tGood - got a 428 response as no cookie provided;";
+        }
 
-        // Call at an acceptible rate
+        $have_php_cookie = false;
+        foreach($cookie_lines as $line){
+            echo "\n\t{$line}";
+            if(preg_match('/PHPSESSID/', $line)) $have_php_cookie = true;
+        }
 
-        // call at an unacceptible rate
+        if($http_code != 428){
+            echo "\n\nERROR: SHOULD RETURN 428 BUT RETURNED {$http_code}\n\n";
+            exit;
+        }else{
+            echo "\n\tGood got: $http_code";
+        }
 
+        if($have_php_cookie){
+            echo "\n\tHave PHP session cookie now";
+        }else{
+            echo "\n\tERROR: NO PHP SESSION COOKIE";
+            exit;
+        }
+
+        echo "\nCalling with cookie before dwell time";
+        $http_code = BotGuard::getResponseCode($baseUrl, $wfo_ids, $cookie_lines); 
+        
+        if($http_code != 428){
+            echo "\n\nERROR: SHOULD RETURN 428 BUT RETURNED {$http_code}\n\n";
+            exit;
+        }else{
+            echo "\n\tGot: $http_code";
+        }
+
+        echo "\nWaiting for dwell time ". WFO_BOTGUARD_DWELL_TIME ." seconds";
+        sleep(WFO_BOTGUARD_DWELL_TIME);
+
+        echo "\nCalling again after dwell time of ". WFO_BOTGUARD_DWELL_TIME ." seconds";
+        $http_code = BotGuard::getResponseCode($baseUrl, $wfo_ids, $cookie_lines); 
+
+        if($http_code != 200){
+            echo "\n\nERROR: SHOULD RETURN 200 BUT RETURNED {$http_code}\n\n";
+            exit;
+        }else{
+            echo "\n\tGot: 200";
+        }
+
+        // calculate permissible rate
+        $request_every_seconds = ceil(WFO_BOTGUARD_WINDOW_DURATION / WFO_BOTGUARD_MAXIMUM_REQUESTS);
+
+        echo "\nRequests every {$request_every_seconds} are permissible";
+
+        for ($every=$request_every_seconds + 1; $every > -1  ; $every--) { 
+            echo "\nCall ". WFO_BOTGUARD_MAXIMUM_REQUESTS ." at one every {$every} seconds.";
+            for ($i=0; $i < WFO_BOTGUARD_MAXIMUM_REQUESTS ; $i++) { 
+                $http_code = BotGuard::getResponseCode($baseUrl, $wfo_ids, $cookie_lines);
+                if($http_code != 200){
+                    echo "\n\nRETURNED {$http_code} - limit reached.\n\n";
+                    break;
+                }else{
+                    echo "\t$i\t200";
+                }
+                sleep($every);
+            }
+        }
+
+    }
+
+    private static function getResponseCode($baseUrl, $wfo_ids, &$cookie_lines){
+
+        $url = $baseUrl . $wfo_ids[rand(0,99)];
+        echo "\n\t{$url}";
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_HEADER, true);    // we want headers
+        curl_setopt($curl, CURLOPT_NOBODY, true);    // we don't need body
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($curl, CURLOPT_COOKIEFILE, ""); // empty string put it in memory
+        curl_setopt($curl, CURLOPT_TIMEOUT,10);
+        // set the cookies from the last call
+        foreach($cookie_lines as $cookie_line) curl_setopt($curl, CURLOPT_COOKIELIST, $cookie_line);
+
+        $output = curl_exec($curl);
+        curl_close($curl);
+        $info = curl_getinfo($curl);
+
+        $cookie_lines = curl_getinfo($curl, CURLINFO_COOKIELIST);
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        return $http_code;
 
     }
 
@@ -441,3 +537,4 @@ class BotGuard{
     } // render dwell page
 
 }
+
