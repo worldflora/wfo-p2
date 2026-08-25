@@ -51,12 +51,18 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
    color: rgb(33, 37, 41);
 }
 
-.wfo-md h2,
-.wfo-md h3,
-.wfo-md h3
-{
-   font-weight: 336;
+.wfo-md h2{
+    font-weight: 336;
 }
+.wfo-md h3{
+    font-size: 120%;
+}
+.wfo-md h4{
+   font-size: 110%;
+   font-weight: 250;
+}
+
+
 
 .wfo-md img[alt$="~left"]{
     max-width: 15%;

@@ -139,7 +139,8 @@ function build_index_for_dir($dir, &$md_text, $depth){
 
 function get_title_from_path($path){
     $info = pathinfo($path);
-    $title = preg_replace('/_/', ' ', $info['filename']);
+    $title = preg_replace('/_/', ' ', $info['basename']);
+    //print_r($info);
     $title = preg_replace('/^[0-9]{4}-[0-9]{2}-[0-9]{2} /', '', $title);
     $title = urldecode($title);
     return $title;
