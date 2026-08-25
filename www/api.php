@@ -303,6 +303,9 @@ function get_taxon_graph($wfo_id, $classification){
 
     $docs = $solr->getSolrDocs($query);
     foreach ($docs as $doc) {
+    
+        // we mustn't include the taxon in the path or it will be in the graph twice
+        if(in_array($doc->wfo_id_s, $graph['taxon'])) continue;
 
         // all the wfo_ids the name is known by
         if(isset($doc->wfo_id_deduplicated_ss)){

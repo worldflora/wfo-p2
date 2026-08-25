@@ -116,64 +116,76 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
 
     // insert a li for each source
     let count = 1;
+
+    // console.log(facetValue);
+
     for(const sourceId in facetValue.sources){
-        
+
         let source = facetValue.sources[sourceId];
 
-        const clone = document.importNode(template.content, true);
-    
-        // the count of the source
-        clone.querySelector("li div div span").innerHTML = count;
-        count++;
+        // we can have multiple scores per source 
+        source.forEach(score => {
+            
+                const clone = document.importNode(template.content, true);
+            
+                // the count of the source
+                clone.querySelector("li div div span").innerHTML = count;
+                count++;
 
-        // source name
-        // we have the name but if there is source object in the index we want to 
-        // be able to display a link to it (it may not be there)
+                // console.log(score);
 
-        // put the cached name is as a place holder
-        clone.querySelector("li div div div").innerHTML = source.source_name;
+                // source name
+                // we have the name but if there is source object in the index we want to 
+                // be able to display a link to it (it may not be there)
 
-        // tag the element with a unique id so the ajax call can find it later
-        const sourceCelId = 'wfo-' + Math.random().toString(36).substring(2, 20);
-        clone.querySelector("li div div div").setAttribute('id', sourceCelId);
+                // put the cached name is as a place holder
+                clone.querySelector("li div div div").innerHTML = score.source_name;
+
+                // tag the element with a unique id so the ajax call can find it later
+                const sourceCelId = 'wfo-' + Math.random().toString(36).substring(2, 20);
+                clone.querySelector("li div div div").setAttribute('id', sourceCelId);
+                
+                // set up an ajax call to populate the 
+                fetch("/link_to_data_source.php?id=" + score.source_id)
+                    .then(response => response.text())
+                    .then((text) => {
+                        // only replace the text if we are returned a useful value
+                        if(text)document.querySelector("#" + sourceCelId).innerHTML = text;
+                    });
+
+                // method of scoring
+                if (score.scored_via == 'direct'){
+                    clone.querySelector("li div div strong").innerHTML = 'directly to: ';
+                }
+                if (score.scored_via == 'synonym'){                            
+                    clone.querySelector("li div div strong").innerHTML = 'the synonym: ';
+                }
+                if (score.scored_via == 'ancestor'){
+                    clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
+                }
+
+                // add the values to the model launch button
+                clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-id', facet.facet_id);
+                clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-value-id', facetValue.facet_value_id);
+                clone.querySelector("li div:nth-child(2) a").setAttribute('data-source-id', score.source_id);
+                clone.querySelector("li div:nth-child(2) a").setAttribute('data-taxon-name', dataset.taxonName);
+                
+                // add an id to the name span so we can ajax update it
+                const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
+                clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
+
+                // set up an ajax call to populate that cell
+                fetch("/link_to_name.php?id=" + score.scored_wfo_id)
+                    .then(response => response.text())
+                    .then((text) => {
+                    document.querySelector("#" + rando).innerHTML = text;
+                    });
+
+                listGroup.appendChild(clone);
+
+        });
+
         
-        // set up an ajax call to populate the 
-        fetch("/link_to_data_source.php?id=" + source.source_id)
-            .then(response => response.text())
-            .then((text) => {
-                // only replace the text if we are returned a useful value
-                if(text)document.querySelector("#" + sourceCelId).innerHTML = text;
-            });
-
-        // method of scoring
-        if (source.scored_via == 'direct'){
-            clone.querySelector("li div div strong").innerHTML = 'directly to: ';
-        }
-        if (source.scored_via == 'synonym'){                            
-            clone.querySelector("li div div strong").innerHTML = 'the synonym: ';
-        }
-            if (source.scored_via == 'ancestor'){
-            clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
-        }
-
-        // add the values to the model launch button
-        clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-id', facet.facet_id);
-        clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-value-id', facetValue.facet_value_id);
-        clone.querySelector("li div:nth-child(2) a").setAttribute('data-source-id', source.source_id);
-        clone.querySelector("li div:nth-child(2) a").setAttribute('data-taxon-name', dataset.taxonName);
-        
-        // add an id to the name span so we can ajax update it
-        const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
-        clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
-
-        // set up an ajax call to populate that cell
-        fetch("/link_to_name.php?id=" + source.scored_wfo_id)
-            .then(response => response.text())
-            .then((text) => {
-               document.querySelector("#" + rando).innerHTML = text;
-            });
-
-        listGroup.appendChild(clone);
 
     
     }

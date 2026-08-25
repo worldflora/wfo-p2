@@ -1033,11 +1033,12 @@ class TaxonRecord{
         // we can just return the facet metadata as it is a superset of a the data in the other
         // fields we facet on
         $in = json_decode($this->solrDoc->facets_metadata_t);
-        foreach ($in as $facet) {
 
-    //   echo '<pre>';
-     //   print_r($facet);
-    //    echo '</pre>';
+        //echo '<pre>';
+        //print_r($in);
+        //echo '</pre>';
+
+        foreach ($in as $facet) {
 
             // have we got the facet yet?
             if(!isset($out[$facet->facet_id])){
@@ -1058,16 +1059,22 @@ class TaxonRecord{
                 );
             }
 
-            // have we got the source for this value's presence?
+            // have we got the sources for this value's presence?
+
+            // ONE SOURCE MIGHT SCORE IT MULTIPLE TIMES AT BOTH HIGHER AN LOWER LEVELS FOR EXAMPLE
+            // create the array or scores in this source
             if(!isset($out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id])){
-                $out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id] = (object)array(
-                    'source_id' => $facet->source_id,
-                    'source_name' => $facet->source_name,
-                    'scored_wfo_id' => $facet->wfo_id,
-                    'scored_via' => $facet->scored_via,
-                    'score_metadata' => $facet->score_meta_data
-                );
+                $out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id] = array();
             }
+            
+            // add scoring to this source's array of scores
+            $out[$facet->facet_id]->facet_values[$facet->facet_value_id]->sources[$facet->source_id][] = (object)array(
+                'source_id' => $facet->source_id,
+                'source_name' => $facet->source_name,
+                'scored_wfo_id' => $facet->wfo_id,
+                'scored_via' => $facet->scored_via,
+                'score_metadata' => $facet->score_meta_data
+            );
         
         }
 

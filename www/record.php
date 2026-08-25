@@ -111,7 +111,14 @@ require_once('../fragments/header.php');
                 echo ' data-taxon-name="'. base64_encode($record->getFullNameStringHtml()) .'" >';
                 echo $fv->facet_value_name;
                 // badge with the data source count 
-                echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format(count($fv->sources), 0)  .'</span>';
+                
+                // we count the scores in the sources
+                $number_scores = 0;
+                foreach ($fv->sources as $source_id => $scores) {
+                    $number_scores += count($scores);
+                }
+
+                echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format($number_scores, 0)  .'</span>';
                 echo '</span>';
                             
             } // end facet value
