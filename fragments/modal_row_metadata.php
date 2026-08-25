@@ -62,10 +62,11 @@ document.getElementById('dataProvModal').addEventListener('show.bs.modal', event
         const facetMetadata = JSON.parse(document.getElementById('facetsMetadata').innerHTML);
         const facet = facetMetadata[dataset.facetId];
         const facetValue = facet.facet_values[dataset.facetValueId];
-        let source = facetValue.sources[dataset.sourceId];
+        let source = facetValue.sources[dataset.sourceId][dataset.scoreIndex];
+        console.log(source);
         row_metadata = source.score_metadata;
 
-        // make sure the backbutton is visible
+        // make sure the back button is visible
         document.querySelector("#dataProvModalBackButton").hidden = false;
     }else{
         // we are rendering a snippet and the json is in the 

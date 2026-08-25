@@ -74,6 +74,7 @@
                     data-facet-id=""
                     data-facet-value-id=""
                     data-source-id=""
+                    data-source-index=""
                     data-taxon-name=""
                     style="cursor: pointer;">row level metadata</a>]
             </div>
@@ -124,64 +125,68 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
         let source = facetValue.sources[sourceId];
 
         // we can have multiple scores per source 
+        let scoreIndex = 0;
         source.forEach(score => {
             
-                const clone = document.importNode(template.content, true);
+            const clone = document.importNode(template.content, true);
+        
+            // the count of the source
+            clone.querySelector("li div div span").innerHTML = count;
+            count++;
+
+            // console.log(score);
+
+            // source name
+            // we have the name but if there is source object in the index we want to 
+            // be able to display a link to it (it may not be there)
+
+            // put the cached name is as a place holder
+            clone.querySelector("li div div div").innerHTML = score.source_name;
+
+            // tag the element with a unique id so the ajax call can find it later
+            const sourceCelId = 'wfo-' + Math.random().toString(36).substring(2, 20);
+            clone.querySelector("li div div div").setAttribute('id', sourceCelId);
             
-                // the count of the source
-                clone.querySelector("li div div span").innerHTML = count;
-                count++;
+            // set up an ajax call to populate the 
+            fetch("/link_to_data_source.php?id=" + score.source_id)
+                .then(response => response.text())
+                .then((text) => {
+                    // only replace the text if we are returned a useful value
+                    if(text)document.querySelector("#" + sourceCelId).innerHTML = text;
+                });
 
-                // console.log(score);
+            // method of scoring
+            if (score.scored_via == 'direct'){
+                clone.querySelector("li div div strong").innerHTML = 'directly to: ';
+            }
+            if (score.scored_via == 'synonym'){                            
+                clone.querySelector("li div div strong").innerHTML = 'the synonym: ';
+            }
+            if (score.scored_via == 'ancestor'){
+                clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
+            }
 
-                // source name
-                // we have the name but if there is source object in the index we want to 
-                // be able to display a link to it (it may not be there)
+            // add the values to the model launch button
+            clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-id', facet.facet_id);
+            clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-value-id', facetValue.facet_value_id);
+            clone.querySelector("li div:nth-child(2) a").setAttribute('data-source-id', score.source_id);
+            clone.querySelector("li div:nth-child(2) a").setAttribute('data-score-index', scoreIndex);
+            clone.querySelector("li div:nth-child(2) a").setAttribute('data-taxon-name', dataset.taxonName);
 
-                // put the cached name is as a place holder
-                clone.querySelector("li div div div").innerHTML = score.source_name;
+            // add an id to the name span so we can ajax update it
+            const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
+            clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
 
-                // tag the element with a unique id so the ajax call can find it later
-                const sourceCelId = 'wfo-' + Math.random().toString(36).substring(2, 20);
-                clone.querySelector("li div div div").setAttribute('id', sourceCelId);
-                
-                // set up an ajax call to populate the 
-                fetch("/link_to_data_source.php?id=" + score.source_id)
-                    .then(response => response.text())
-                    .then((text) => {
-                        // only replace the text if we are returned a useful value
-                        if(text)document.querySelector("#" + sourceCelId).innerHTML = text;
-                    });
+            // set up an ajax call to populate that cell
+            fetch("/link_to_name.php?id=" + score.scored_wfo_id)
+                .then(response => response.text())
+                .then((text) => {
+                document.querySelector("#" + rando).innerHTML = text;
+                });
 
-                // method of scoring
-                if (score.scored_via == 'direct'){
-                    clone.querySelector("li div div strong").innerHTML = 'directly to: ';
-                }
-                if (score.scored_via == 'synonym'){                            
-                    clone.querySelector("li div div strong").innerHTML = 'the synonym: ';
-                }
-                if (score.scored_via == 'ancestor'){
-                    clone.querySelector("li div div strong").innerHTML = 'the ancestor: ';
-                }
+            listGroup.appendChild(clone);
 
-                // add the values to the model launch button
-                clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-id', facet.facet_id);
-                clone.querySelector("li div:nth-child(2) a").setAttribute('data-facet-value-id', facetValue.facet_value_id);
-                clone.querySelector("li div:nth-child(2) a").setAttribute('data-source-id', score.source_id);
-                clone.querySelector("li div:nth-child(2) a").setAttribute('data-taxon-name', dataset.taxonName);
-                
-                // add an id to the name span so we can ajax update it
-                const rando = 'wfo-' + Math.random().toString(36).substring(2, 20);
-                clone.querySelector("li div:nth-child(2) span").setAttribute('id', rando);
-
-                // set up an ajax call to populate that cell
-                fetch("/link_to_name.php?id=" + score.scored_wfo_id)
-                    .then(response => response.text())
-                    .then((text) => {
-                    document.querySelector("#" + rando).innerHTML = text;
-                    });
-
-                listGroup.appendChild(clone);
+            scoreIndex++;
 
         });
 
