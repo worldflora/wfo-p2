@@ -141,6 +141,7 @@ function get_title_from_path($path){
     $info = pathinfo($path);
     $title = preg_replace('/_/', ' ', $info['basename']);
     //print_r($info);
+    $title = preg_replace('/\.md$/', '', $title);
     $title = preg_replace('/^[0-9]{4}-[0-9]{2}-[0-9]{2} /', '', $title);
     $title = urldecode($title);
     return $title;
