@@ -199,7 +199,9 @@ class ListExporter{
             'role_s',
             'name_path_s',
             'parent_id_s',
-            'accepted_id_s'
+            'accepted_id_s',
+            'citation_micro_t',
+            'nomenclatural_status_s'
         );
 
         $data = SolrIndex::getSolrResponse($query);
