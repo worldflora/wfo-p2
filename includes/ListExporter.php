@@ -132,6 +132,9 @@ class ListExporter{
             if($this->format == 'html'){
                 $out .= "<p>The file is an HTML page in a zip archive that can be opened in a web browser or word processor. It is UTF-8 encoded.</p>";
             }
+
+            $out .= "<p>Rename the file after download as filenames are only specific to your session and the format.</p>";
+
         }else{
             $total_pretty = number_format($this->total, 0);
             $offset_pretty = number_format($this->offset, 0);
