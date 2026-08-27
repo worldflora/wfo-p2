@@ -42,18 +42,24 @@ function generateListDownload(format){
     // get a handle on the div we will be updating
     const modalContent = document.getElementById('listDownloadModalContent');
 
+    let timeoutId = null;
+
     fetch('/list_download.php?format=' + format)
         .then(response => response.json())
         .then(json => {
             modalContent.innerHTML = json.message;
             if(json.finished){
+
+                // stop any timeouts that might be running
+                if(timeoutId) clearTimeout(timeoutID);
+
                 // change the button
                 const button = document.getElementById('listDownloadModalButton');
                 button.innerHTML = "Close";
                 button.classList.remove('btn-danger');
                 button.classList.add('btn-success');
             }else{ 
-                setTimeout( () => { 
+                timeoutId = setTimeout( () => { 
                     generateListDownload(format);
                 }, 10);
             }

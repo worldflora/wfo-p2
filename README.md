@@ -32,6 +32,10 @@ There are two separate repositories embedded within this one so as to provide se
 
 ### Prerequisites - Software
 
+#### PHP Modules enabled
+
+- SQLite3
+
 ### Front end (PHP)
 
 1. `mkdir wfo_home` 
@@ -46,6 +50,12 @@ There are two separate repositories embedded within this one so as to provide se
 10. `./dev_start.sh` (This will run the site on localhost for development and testing but not for production use.)
 
 __The site will not run if it is not connected to an appropriate SOLR Index__
+
+For downloads to work there must be a downloads directory writeable by the webserver. Do something like this:
+
+1. `cd wfo_home/wfo-p2/www/`
+2. `mkdir downloads`
+3. `sudo chown -R <user>:www-data downloads/`
 
 ### Populating the SOLR Index
 
