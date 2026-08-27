@@ -198,24 +198,6 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                 ?>
             </div>
 
-            <!--  Download progress modal -->
-            <div class="modal fade" id="listDownloadModal" tabindex="-1" aria-labelledby="listDownloadModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="listDownloadModalLabel">Download checklist</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="listDownloadModalContent">
-                    Working ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="listDownloadModalButton" data-bs-dismiss="modal">Stop</button>
-                </div>
-                </div>
-            </div>
-            </div>
-            <!--  End of Download progress modal -->
             <div class="col-4 offcanvas-lg offcanvas-end " style="padding: 0px;" tabindex="-1"
                 id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
                 <div class="offcanvas-header">

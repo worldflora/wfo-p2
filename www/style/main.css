@@ -52,14 +52,18 @@ https://stackoverflow.com/questions/39718782/css-is-it-possible-to-use-img-alt-a
 }
 
 .wfo-md h2{
-    font-weight: 336;
+    font-weight: bold;
+    color: rgb(29, 76, 103);
 }
 .wfo-md h3{
     font-size: 120%;
+    font-weight: bold;
+    color: rgb(29, 76, 103);
 }
 .wfo-md h4{
-   font-size: 110%;
-   font-weight: 250;
+   font-size: 100%;
+   font-weight: bold;
+   color: rgb(46, 138, 136)
 }
 
 

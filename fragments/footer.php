@@ -32,6 +32,7 @@
   require_once('../fragments/modal_row_metadata.php');
   require_once('../fragments/modal_data_source.php');
   require_once('../fragments/modal_data_version.php');
+  require_once('../fragments/modal_download_progress.php');
 ?>
 
 <script src="/theme/js/bootstrap.bundle.min.js">

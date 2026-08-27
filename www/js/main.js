@@ -121,48 +121,6 @@ function searchSuggestKeyDown(e) {
 }
 
 
-/*
-
-    Generating the download list with a progress bar
-
-*/
-function generateListDownload(format){
-
-    // get a handle on the div we will be updating
-    const modalContent = document.getElementById('listDownloadModalContent');
-    fetch('/list_download.php?format=' + format)
-        .then(response => response.json())
-        .then(json => {
-            modalContent.innerHTML = json.message;
-            if(json.finished){
-                // change the button
-                const button = document.getElementById('listDownloadModalButton');
-                button.innerHTML = "Close";
-                button.classList.remove('btn-danger');
-                button.classList.add('btn-success');
-            }else{ 
-                setTimeout( () => { 
-                    generateListDownload(format);
-                }, 10);
-            }
-            return json;
-    })
-}
-
-if(document.getElementById('listDownloadModal')){
-    // When we show the modal we start the process that then
-    // polls until it is finished
-    document.getElementById('listDownloadModal').addEventListener('show.bs.modal', event => {
-        generateListDownload(event.relatedTarget.dataset.wfoFormat);
-    })
-
-    // If they close the modal we stop everything by reloading the page.
-    document.getElementById('listDownloadModal').addEventListener('hide.bs.modal', event => {
-        window.location = "search";
-    })
-}
-
-
 function sortFacetValues(facetValueId){
     const ul = document.getElementById(facetValueId);
     // we build a sort function depending on how th
