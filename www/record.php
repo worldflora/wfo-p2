@@ -118,6 +118,7 @@ require_once('../fragments/header.php');
                     $number_scores += count($scores);
                 }
 
+                echo "<span style=\"display:none;\" class=\"wfo-taxon-name\">{$record->getFullNameStringHtml()}</span>";
                 echo '<span class="badge rounded-pill text-bg-light" style="font-size: 60%; vertical-align: super;">'. number_format($number_scores, 0)  .'</span>';
                 echo '</span>';
                             

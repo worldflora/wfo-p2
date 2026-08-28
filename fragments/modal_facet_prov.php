@@ -89,6 +89,7 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
 
     // data passed from click event
     const dataset = event.relatedTarget.dataset;
+    const nameFull = event.relatedTarget.querySelectorAll(".wfo-name-full")[0];
 
     // if we haven't got a facet value we are being called by the back button
     // so don't change existing values
@@ -100,7 +101,8 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
     const facetValue = facet.facet_values[dataset.facetValueId];
     
     // write in the data for facet
-    document.getElementById('facetModalTaxonName').innerHTML = atob(dataset.taxonName);
+    document.getElementById('facetModalTaxonName').innerHTML =  '';
+    document.getElementById('facetModalTaxonName').appendChild(nameFull);
     document.getElementById('facetModalFacetName').innerHTML = facet.facet_name;
     document.getElementById('facetModalFacetName').setAttribute('data-facet-id', 'wfo-f-' + facet.facet_id);
 

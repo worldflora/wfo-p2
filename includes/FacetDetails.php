@@ -14,15 +14,16 @@ class FacetDetails{
 
     public function __construct($facet_id){
 
+        $this->facetId = $facet_id;
+
         // the facet_id is either a solr field name or 
         // it is a prefixed field on the facet_values_ss field
 
-        $matches = array();
-        if( preg_match('/^([0-9]+)-facet_values_ss$/', $facet_id, $matches)){
+        if( preg_match('/^wfo-f-[0-9]+$/', $facet_id)){
             
             // there should be a solr doc describing the facet (that may be cached)
             $this->solrFieldName = 'facet_values_ss';
-            $this->facetSolrDocId = "wfo-f-{$matches[1]}";
+            $this->facetSolrDocId = $facet_id;
 
             // we used the cached values if they exist
             if(isset($_SESSION['facets_cache']) && isset($_SESSION['facets_cache'][$this->facetSolrDocId])){
@@ -150,6 +151,19 @@ class FacetDetails{
     }
 
     public function getFacetValueCode($value_id){
+
+//    echo "<pre>";
+  //  echo $value_id;
+   // print_r($this->facetCache->facet_values);
+
+        // if we are passed full value like this then convert it to a solr id
+        // 1-158 ~ New Caledonia [NC]
+
+        $matches = array();
+        if(preg_match('/^([0-9]+)-([0-9]+) ~ /', $value_id, $matches)){
+            $value_id = 'wfo-fv-' . $matches[2];
+        }
+
         if($this->facetCache && isset($this->facetCache->facet_values->{$value_id})) return $this->facetCache->facet_values->{$value_id}->code;
         return null;
     }

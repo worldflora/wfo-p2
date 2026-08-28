@@ -6,11 +6,13 @@ require_once('../fragments/header.php');
 ?>
 
 <div class="container" style="margin-top: 4%;">
-        <div class="row">
-            <div id="logo" class="text-center">
-                <h2 style="font-size: 300%; padding-top: 2em; padding-bottom: 0.5em;">An Online Flora of All Known Plants</h2>
 
-<?php
+    <div class="row">
+        <div id="logo" class="text-center">
+            <h2 style="font-size: 300%;  padding-bottom: 0.5em;">An Online Flora of All Known Plants
+            </h2>
+
+            <?php
 
     $index = new SolrIndex();
 
@@ -47,7 +49,8 @@ require_once('../fragments/header.php');
                 'mincount' => 1,
                 'missing' => false,
                 'sort' => 'index',
-                'field' =>  $map_choropleth_facet . '_ss',
+                'field' => 'facet_values_ss', // all the facets are here now
+                'prefix' => '1-', // iso countries facet id
                 'facet' => (object) array(
                     'rank_s' => (object) array(
                         'type' => "terms",
@@ -103,29 +106,19 @@ require_once('../fragments/header.php');
 
     echo "<p><strong>$names scientific names representing {$accepted_taxa} taxa - $accepted_species species in $accepted_genera genera and $accepted_families families from $country_count countries.</strong></p>";
 
-   // print_r($solr_response->facets->snippet_text_bodies_txt);
-
-    /*
-    $solr_response->facets->count // total names
-    $solr_response->facets->role_s->buckets // roles
-
-    $solr_response->facets->role_s->buckets // roles - accepted is broken down into ranks
-
-    $solr_response->facets->{$map_choropleth_facet}->buckets
-
-    */
-
 
 ?>
 
-                <form role="form" method="GET" action="search">
-                    <?php require_once('search_box.php') ?>
-                </form>
-  
-<p>&nbsp</p>
-                <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-<?php
+            <form role="form" method="GET" action="search">
+                <?php require_once('search_box.php') ?>
+            </form>
+
+
+            <div class="container" style="margin-top: 3em; margin-bottom: 2em;">
+
+                <div id="mapCarousel" class="carousel carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <?php
 
                 $facet_details = new FacetDetails($map_choropleth_facet);
                 
@@ -137,13 +130,26 @@ require_once('../fragments/header.php');
 
                 foreach($solr_response->facets->{$map_choropleth_facet}->buckets as $country){
 
-                    echo '<div class="carousel-item '. $active .'">';
+                    $country_code = $facet_details->getFacetValueCode($country->val);
+
+                    // only do the ones we can draw a map for.
+                    if(!file_exists("data/1/{$country_code}.json")) continue;
+
+                    echo "<div class=\"carousel-item $active text-start\"
+                        data-facet-value-code=\"{$country_code}\" 
+                        data-facet-value=\"{$country->val}\"
+                        >";
+
+                    $search_url = "/search?q=&search_type=name&timestamp=".time()."&1-facet_values_ss%5B%5D=" . urlencode($country->val);
+
+                    echo "<a href=\"$search_url\">";
+                    echo '<h2>';
+                    echo $facet_details->getFacetValueName($country->val);
+                    echo '</h2>';
+                    echo '</a>';
 
                     echo '<p>';
 
-                    echo '<strong>';
-                    echo $facet_details->getFacetValueName($country->val);
-                    echo ': </strong>';
 
                     echo number_format($country->count, 0);
 
@@ -164,31 +170,72 @@ require_once('../fragments/header.php');
                 }
 
 ?>
-                </div>
+                    </div>
 
-            </div> <!-- end carousel -->
+                </div> <!-- end carousel -->
 
-            <p></p>
-            <p></p>
-            <p></p>
+                <div id="backgroundMap" style="width: 100%; height: 350px; "></div>
 
-            <p>&nbsp;</p>
-            <p>&nbsp;</p>
-            <p>&nbsp;</p>
-<!--
-            <p style="padding: 0.5em; margin-top: 4em; margin-left: 20%; margin-right: 20%; font-size: 120%; border: solid 1px black;">
-                    This is a mock-up of a new WFO data portal for evaluation purposes only.
-                    <br/>
-                    <strong>The data here may not be correct at this stage.</strong>
-                    <br/>
-                    The current official portal is available <a href="https://www.worldfloraonline.org">here</a>.
-                </p>
--->
-            </div><!-- centering -->
+                <!-- map behind everything -->
+                <script>
+                // the map itself
+                const map = L.map('backgroundMap', {
+                    zoomControl: false,
+                    attributionControl: false
+                }).setView([33, 120], 3);
+
+                // base layer is top
+                const openTopoMap = L.tileLayer(
+                    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                    }).addTo(map);
+
+                // make it responsive
+                map.invalidateSize();
+                const resizeObserver = new ResizeObserver(() => {
+                    map.invalidateSize();
+                });
+                resizeObserver.observe(document.getElementById('backgroundMap'));
+
+                // change the map with the carousel
+                let activeLayer = null;
+                document.getElementById('mapCarousel').addEventListener('slide.bs.carousel', function(event) {
+                    const countryCode = event.relatedTarget.dataset.facetValueCode;
+                    const jsonFilePath = `data/1/${countryCode}.json`;
+                    console.log(jsonFilePath);
+
+                    // get rid of the last layer if there is one
+                    if(activeLayer) map.removeLayer(activeLayer);
+
+                    // fetch a new one and display that.
+                    fetch(jsonFilePath).then(response => response.json())
+                        .then(json => {
+                            activeLayer =  L.geoJson(json, {
+                                style: {
+                                    fillColor: 'blue',
+                                    fillOpacity: 0.5,
+                                    weight: 0
+                                }
+                            });
+                            activeLayer.addTo(map);
+                            map.fitBounds(activeLayer.getBounds());
+                        })
+
+                    console.log(countryCode);
+                });
+
+                
+
+                </script>
+
+            </div>
+
+        </div><!-- centering -->
 
 
 
-        </div>
+    </div>
 </div>
 
 <?php

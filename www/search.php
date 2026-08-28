@@ -216,7 +216,13 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
         if($f_name == 'count') continue;
         
-        $facet_details = new FacetDetails($f_name);
+        // we need to remove the field name to fetch the details
+        $matches = array();
+        if(preg_match('/^([0-9]+)-/', $f_name, $matches)){
+            $facet_details = new FacetDetails('wfo-f-' . $matches[1]);
+        }else{
+            $facet_details = new FacetDetails($f_name);
+        }
 
         // calculate if we are collapsed or not
         // any value is ticked then we render as open
