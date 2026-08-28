@@ -415,7 +415,7 @@ require_once('../fragments/header.php');
     // Load the tools associated but do it assync because it will
     // require another faceting search or two.
 ?>
-    <div class="card shadow-sm bg-secondary-subtle banana" id="toolsCard">
+    <div class="card shadow-sm bg-secondary-subtle" id="toolsCard">
     <div class="card-header">
         <span
             data-bs-toggle="tooltip"

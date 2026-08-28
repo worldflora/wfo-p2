@@ -113,12 +113,16 @@ require_once('../fragments/header.php');
                 <?php require_once('search_box.php') ?>
             </form>
 
+            <div class="card shadow-sm  bg-secondary-subtle" style="margin-top: 3em; margin-bottom: 2em;" >
 
-            <div class="container" style="margin-top: 3em; margin-bottom: 2em;">
+
+           <!--  <div class="container" style="margin-top: 3em; margin-bottom: 2em;> -->
+
+           <div class="card-header">
 
                 <div id="mapCarousel" class="carousel carousel-fade" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        <?php
+                <div class="carousel-inner">
+                    <?php
 
                 $facet_details = new FacetDetails($map_choropleth_facet);
                 
@@ -128,12 +132,16 @@ require_once('../fragments/header.php');
                 // we want it to be in a random order
                 shuffle($solr_response->facets->{$map_choropleth_facet}->buckets);
 
+                $first_country_code = null;
                 foreach($solr_response->facets->{$map_choropleth_facet}->buckets as $country){
 
                     $country_code = $facet_details->getFacetValueCode($country->val);
 
                     // only do the ones we can draw a map for.
                     if(!file_exists("data/1/{$country_code}.json")) continue;
+
+                    // keep hold of the first one in the list so we can load it with the page
+                    if(!$first_country_code) $first_country_code = $country_code;
 
                     echo "<div class=\"carousel-item $active text-start\"
                         data-facet-value-code=\"{$country_code}\" 
@@ -143,16 +151,13 @@ require_once('../fragments/header.php');
                     $search_url = "/search?q=&search_type=name&timestamp=".time()."&1-facet_values_ss%5B%5D=" . urlencode($country->val);
 
                     echo "<a href=\"$search_url\">";
-                    echo '<h2>';
+                    echo '<h3>';
                     echo $facet_details->getFacetValueName($country->val);
-                    echo '</h2>';
+                    echo '</h3>';
                     echo '</a>';
 
-                    echo '<p>';
-
-
+                    echo '<p style="margin-bottom: 0px;">';
                     echo number_format($country->count, 0);
-
                     echo ' taxa';
 
                     foreach($country->rank_s->buckets as $rank){
@@ -170,72 +175,82 @@ require_once('../fragments/header.php');
                 }
 
 ?>
-                    </div>
+                </div>
 
-                </div> <!-- end carousel -->
+            </div> <!-- end carousel -->
+</div>
 
-                <div id="backgroundMap" style="width: 100%; height: 350px; "></div>
+            <div id="backgroundMap" style="width: 100%; height: 350px; "></div>
 
-                <!-- map behind everything -->
-                <script>
-                // the map itself
-                const map = L.map('backgroundMap', {
-                    zoomControl: false,
-                    attributionControl: false
-                }).setView([33, 120], 3);
+            <!-- map behind everything -->
+            <script>
+            // the map itself
+            const map = L.map('backgroundMap', {
+                zoomControl: false,
+                attributionControl: false
+            }).setView([33, 120], 3);
 
-                // base layer is top
-                const openTopoMap = L.tileLayer(
-                    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-                    }).addTo(map);
+            // base layer is top
+            const openTopoMap = L.tileLayer(
+                'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+                }).addTo(map);
 
-                // make it responsive
+            // make it responsive
+            map.invalidateSize();
+            const resizeObserver = new ResizeObserver(() => {
                 map.invalidateSize();
-                const resizeObserver = new ResizeObserver(() => {
-                    map.invalidateSize();
-                });
-                resizeObserver.observe(document.getElementById('backgroundMap'));
+            });
+            resizeObserver.observe(document.getElementById('backgroundMap'));
 
-                // change the map with the carousel
-                let activeLayer = null;
-                document.getElementById('mapCarousel').addEventListener('slide.bs.carousel', function(event) {
-                    const countryCode = event.relatedTarget.dataset.facetValueCode;
-                    const jsonFilePath = `data/1/${countryCode}.json`;
-                    console.log(jsonFilePath);
+            // change the map with the carousel
+            let activeLayer = null;
 
-                    // get rid of the last layer if there is one
-                    if(activeLayer) map.removeLayer(activeLayer);
+            // add the first displayed country
+            fetch('data/1/<?php echo $first_country_code ?>.json').then(response => response.json())
+                .then(json => {
+                    activeLayer = L.geoJson(json, {
+                        style: {
+                            fillColor: 'blue',
+                            fillOpacity: 0.5,
+                            weight: 0
+                        }
+                    });
+                    activeLayer.addTo(map);
+                    map.fitBounds(activeLayer.getBounds());
+                })
 
-                    // fetch a new one and display that.
-                    fetch(jsonFilePath).then(response => response.json())
-                        .then(json => {
-                            activeLayer =  L.geoJson(json, {
-                                style: {
-                                    fillColor: 'blue',
-                                    fillOpacity: 0.5,
-                                    weight: 0
-                                }
-                            });
-                            activeLayer.addTo(map);
-                            map.fitBounds(activeLayer.getBounds());
-                        })
+            // listen for the changes.
+            document.getElementById('mapCarousel').addEventListener('slide.bs.carousel', function(event) {
+                const countryCode = event.relatedTarget.dataset.facetValueCode;
+                const jsonFilePath = `data/1/${countryCode}.json`;
+                console.log(jsonFilePath);
 
-                    console.log(countryCode);
-                });
+                // get rid of the last layer if there is one
+                if (activeLayer) map.removeLayer(activeLayer);
 
-                
+                // fetch a new one and display that.
+                fetch(jsonFilePath).then(response => response.json())
+                    .then(json => {
+                        activeLayer = L.geoJson(json, {
+                            style: {
+                                fillColor: 'blue',
+                                fillOpacity: 0.5,
+                                weight: 0
+                            }
+                        });
+                        activeLayer.addTo(map);
+                        map.fitBounds(activeLayer.getBounds());
+                    })
 
-                </script>
+                console.log(countryCode);
+            });
+            </script>
 
-            </div>
-
-        </div><!-- centering -->
-
-
-
-    </div>
+        </div>
+    </div><!-- centering -->
+</div>
 </div>
 
 <?php
