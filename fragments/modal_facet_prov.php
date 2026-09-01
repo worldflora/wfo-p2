@@ -89,7 +89,11 @@ document.getElementById('facetProvModal').addEventListener('show.bs.modal', even
 
     // data passed from click event
     const dataset = event.relatedTarget.dataset;
-    const nameFull = event.relatedTarget.querySelectorAll(".wfo-name-full")[0];
+    let nameFull = event.relatedTarget.querySelectorAll(".wfo-name-full")[0];
+    if(!nameFull){
+         nameFull= document.createElement('span');
+         nameFull.innerHTML = atob(dataset.taxonName); // FIXME: names from map have encoding errors
+    }
 
     // if we haven't got a facet value we are being called by the back button
     // so don't change existing values
