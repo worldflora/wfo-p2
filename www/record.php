@@ -756,6 +756,9 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
     $done_one = false;
     foreach($snippets as $snippet){
 
+    //echo '<pre>';
+    //print_r($snippet);
+
         // separator line
         if($done_one) echo "<hr/>";
         else $done_one = true;
@@ -775,22 +778,45 @@ function render_snippet_category_body($category, $snippets, $current_wfo_id){
 
         echo '<p>';
 
-        // we need to render this as a plain name but call the ajax to update it to 
-        // a datasource link if we have the object in the index
-        $link_id = 'wfo-' . rand(0, 1000000);
-        echo "From a treatment in <em id=\"{$link_id}\">{$snippet->source_name}</em>";
+        // What taxon is this a treatment of
+        $name_link_id = 'wfo-' . rand(100000, 9999999);
+        if($snippet->described_wfo_id == $current_wfo_id){
+            echo "From a treatment of <span id=\"$name_link_id\">{$current_wfo_id}</span>";
+            $name_id_to_load = $current_wfo_id;
+        }else{
+            echo "From a treatment of the <strong>synonym</strong> <span id=\"$name_link_id\">{$snippet->described_wfo_id}</span>";
+            $name_id_to_load = $snippet->described_wfo_id;
+        }
+        
+        // Where was it published
+        $ref_link_id = 'wfo-' . rand(0, 1000000);
+        echo " in <em id=\"{$ref_link_id}\">{$snippet->source_name}</em>";
+
+        // and in what language
+        echo " in  {$snippet->language_label}.";
+
+
 ?>
         <script>
-        // set up an ajax call to populate the 
-        fetch("/link_to_data_source.php?id=" + <?php echo $snippet->source_id ?>)
-            .then(response => response.text())
-            .then((text) => {
-                // only replace the text if we are returned a useful value
-                if(text)document.querySelector("#<?php echo $link_id ?>").innerHTML = text;
+
+            // set up an ajax call to populate the reference
+            fetch("/link_to_data_source.php?id=" + <?php echo $snippet->source_id ?>)
+                .then(response => response.text())
+                .then((text) => {
+                    // only replace the text if we are returned a useful value
+                    if(text)document.querySelector("#<?php echo $ref_link_id ?>").innerHTML = text;
             });
+
+                // set up an ajax call to populate the name scored
+            fetch("/link_to_name.php?id=" + "<?php echo $name_id_to_load; ?>")
+                .then(response => response.text())
+                .then((text) => {
+                document.querySelector("#" + "<?php echo $name_link_id ?>").innerHTML = text;
+            });
+
         </script>
+
 <?php
-        echo " in  $snippet->language_label. ";
 
         echo ' <strong>Imported: </strong> ' . $snippet->imported;
         echo '&nbsp;[<a href="#" data-bs-toggle="modal" data-bs-target="#dataProvModal" data-wfoprov="' . $prov_json . '" style="cursor: pointer;">';
