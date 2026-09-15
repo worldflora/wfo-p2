@@ -30,7 +30,19 @@ There are two separate repositories embedded within this one so as to provide se
 
 ### Prerequisites - Hardware
 
+This process has been tested on VMWARE FUSION with 5meg RAM and 20G of disk space.
+
+In production a ?? RAM and ??G would be required.
+
+
 ### Prerequisites - Software
+
+Default platform tested here is __Ubuntu Server 26.04.1 LTS__ but other OS setups would probably work.
+
+- Starting with a fresh install of __Ubuntu Server 26.04.1 LTS__.
+- sudo apt install net-tools
+- 
+
 
 #### PHP Modules enabled
 

@@ -112,15 +112,9 @@ require_once('../fragments/header.php');
             <form role="form" method="GET" action="search">
                 <?php require_once('search_box.php') ?>
             </form>
+     
 
-            <div class="card shadow-sm  bg-secondary-subtle" style="margin-top: 3em; margin-bottom: 2em;" >
-
-
-           <!--  <div class="container" style="margin-top: 3em; margin-bottom: 2em;> -->
-
-           <div class="card-header">
-
-                <div id="mapCarousel" class="carousel carousel-fade" data-bs-ride="carousel">
+                <div id="mapCarousel" class="carousel carousel-fade" data-bs-ride="carousel" style="margin-top: 2em; margin-bottom: 2em;">
                 <div class="carousel-inner">
                     <?php
 
@@ -143,20 +137,19 @@ require_once('../fragments/header.php');
                     // keep hold of the first one in the list so we can load it with the page
                     if(!$first_country_code) $first_country_code = $country_code;
 
-                    echo "<div class=\"carousel-item $active text-start\"
+                    echo "<div class=\"carousel-item $active text-center\"
                         data-facet-value-code=\"{$country_code}\" 
                         data-facet-value=\"{$country->val}\"
                         >";
 
                     $search_url = "/search?q=&search_type=name&timestamp=".time()."&1-facet_values_ss%5B%5D=" . urlencode($country->val);
 
-                    echo "<a href=\"$search_url\">";
-                    echo '<h3>';
-                    echo $facet_details->getFacetValueName($country->val);
-                    echo '</h3>';
-                    echo '</a>';
 
-                    echo '<p style="margin-bottom: 0px;">';
+                    echo '<p>';
+                    echo "<a href=\"$search_url\">";
+                    echo $facet_details->getFacetValueName($country->val);
+                    echo '</a>&nbsp;-&nbsp;';
+
                     echo number_format($country->count, 0);
                     echo ' taxa';
 
@@ -175,81 +168,11 @@ require_once('../fragments/header.php');
                 }
 
 ?>
-                </div>
-
+                </div> <!-- carousel-inner -->
             </div> <!-- end carousel -->
-</div>
-
-            <div id="backgroundMap" style="width: 100%; height: 350px; "></div>
-
-            <!-- map behind everything -->
-            <script>
-            // the map itself
-            const map = L.map('backgroundMap', {
-                zoomControl: false,
-                attributionControl: false
-            }).setView([33, 120], 3);
-
-            // base layer is top
-            const openTopoMap = L.tileLayer(
-                'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
-                }).addTo(map);
-
-            // make it responsive
-            map.invalidateSize();
-            const resizeObserver = new ResizeObserver(() => {
-                map.invalidateSize();
-            });
-            resizeObserver.observe(document.getElementById('backgroundMap'));
-
-            // change the map with the carousel
-            let activeLayer = null;
-
-            // add the first displayed country
-            fetch('data/1/<?php echo $first_country_code ?>.json').then(response => response.json())
-                .then(json => {
-                    activeLayer = L.geoJson(json, {
-                        style: {
-                            fillColor: 'blue',
-                            fillOpacity: 0.5,
-                            weight: 0
-                        }
-                    });
-                    activeLayer.addTo(map);
-                    map.fitBounds(activeLayer.getBounds());
-                })
-
-            // listen for the changes.
-            document.getElementById('mapCarousel').addEventListener('slide.bs.carousel', function(event) {
-                const countryCode = event.relatedTarget.dataset.facetValueCode;
-                const jsonFilePath = `data/1/${countryCode}.json`;
-                console.log(jsonFilePath);
-
-                // get rid of the last layer if there is one
-                if (activeLayer) map.removeLayer(activeLayer);
-
-                // fetch a new one and display that.
-                fetch(jsonFilePath).then(response => response.json())
-                    .then(json => {
-                        activeLayer = L.geoJson(json, {
-                            style: {
-                                fillColor: 'blue',
-                                fillOpacity: 0.5,
-                                weight: 0
-                            }
-                        });
-                        activeLayer.addTo(map);
-                        map.fitBounds(activeLayer.getBounds());
-                    })
-
-                console.log(countryCode);
-            });
-            </script>
-
-        </div>
-    </div><!-- centering -->
+      
+    </div> <!-- row -->
+</div><!-- centering -->
 </div>
 </div>
 

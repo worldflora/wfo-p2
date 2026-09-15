@@ -172,7 +172,7 @@ class FacetDetails{
      * This is an id we can use in a the page dom
      */
     public function getFacetDomId(){
-        return $this->facetSolrDocId ? $this->facetSolrDocId : $this->solrFieldName; 
+        return $this->facetSolrDocId ? base64_encode($this->facetSolrDocId) : base64_encode($this->solrFieldName); 
     }
 
     

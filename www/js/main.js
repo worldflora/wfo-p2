@@ -122,7 +122,12 @@ function searchSuggestKeyDown(e) {
 
 
 function sortFacetValues(facetValueId){
+
     const ul = document.getElementById(facetValueId);
+
+    console.log(facetValueId);
+    console.log(ul);
+    
     // we build a sort function depending on how th
     let sortFunction = null;
     if(ul.dataset.currentSort == 'numerically'){
@@ -137,7 +142,7 @@ function sortFacetValues(facetValueId){
             return 0;
         };
     }else{
-        // sitch to a numerical sort
+        // switch to a numerical sort
         ul.setAttribute('data-current-sort', 'numerically');
         sortFunction = function(a, b){return b.dataset.sortNumerically - a.dataset.sortNumerically;}; // numerical is reverse
     }
@@ -146,6 +151,7 @@ function sortFacetValues(facetValueId){
     //console.log(listItems);
     listItems.sort(sortFunction);
     ul.innerHTML = '';
+
     listItems.forEach(item => {
         ul.appendChild(item);
     });
