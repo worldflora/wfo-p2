@@ -37,11 +37,6 @@ require_once('../fragments/header.php');
                     ),
                 )
             ),
-            'snippet_text_bodies_txt' => (object) array(
-                'type' => "query",
-                'q' => "snippet_text_bodies_txt:[* TO *]"
-            ),
-
             // get a list by country so we can iterate through them
             $map_choropleth_facet => (object) array(
                 'type' => "terms",
@@ -71,8 +66,6 @@ require_once('../fragments/header.php');
     $solr_response  = SolrIndex::getSolrResponse($query);
 
     $names = number_format($solr_response->facets->count, 0);
-    
-    $taxa_with_text =  number_format($solr_response->facets->snippet_text_bodies_txt->count, 0);
 
     $accepted_taxa = 0;
     $accepted_genera = 0;
@@ -105,7 +98,6 @@ require_once('../fragments/header.php');
     $country_count = number_format(count($solr_response->facets->{$map_choropleth_facet}->buckets, 0 ));
 
     echo "<p><strong>$names scientific names representing {$accepted_taxa} taxa - $accepted_species species in $accepted_genera genera and $accepted_families families from $country_count countries.</strong></p>";
-
 
 ?>
 
