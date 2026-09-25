@@ -28,25 +28,126 @@ There are two separate repositories embedded within this one so as to provide se
 
 ## Installation
 
-### Prerequisites - Hardware
+There are two components required. 
 
-This process has been tested on VMWARE FUSION with 5meg RAM and 20G of disk space.
+- A PHP front end application that runs the website and a simple administrative API for updating the index
+- An instance of Apache SOLR that contains all the data displayed by the PHP application
 
-In production a ?? RAM and ??G would be required.
+These two components can be installed on the same machine or on separate machines. For production use it would be better to have them on separate machines but one machine could probably run them fine if sufficiently specified. The PHP application communicates with the SOLR index over HTTP and so the two machines should sit on the same LAN with good communications speeds.
+
+For development and testing it is possible to run the PHP application locally and point it at a remote index somewhere on the internet. It will run slowly.
+
+It should be possible to have multiple front end applications use the same SOLR index provided only one of them does index updating. This can be controlled by restricting the API access key to only one instance. Users also need to maintain PHP sessions. If multiple front end instances exist a session sharing mechanism would need to be established e.g. by using sticky sessions on the load balancer or Redis or MemCache as shared sessions stores.
+
+### Hardware
+
+This install process has been tested on VMWARE FUSION with 5meg RAM and 20G of disk space. Production specifications are to be determined and will depend on OS.
 
 
-### Prerequisites - Software
+### OS Software
 
 Default platform tested here is __Ubuntu Server 26.04.1 LTS__ but other OS setups would probably work.
 
 - Starting with a fresh install of __Ubuntu Server 26.04.1 LTS__.
-- sudo apt install net-tools
-- 
+- sudo apt install net-tools - for convenience.
 
+__Aside:__ FIXME: is this needed? in dev [need to configure firewall on test machine](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu)
+
+```
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow OpenSSH
+sudo ufw allow https
+sudo ufw allow http
+sudo ufw allow 8983
+sudo ufw enable
+```
+
+### Apache SOLR 10.0 setup
+
+SOLR is a Java application so we need a virtual machine. The Ubuntu 26 packaged one is suitable.
+
+```
+sudo apt-get update
+sudo apt install openjdk-25-jdk -y
+java -version
+```
+
+This should return 25+ and will probably be 25. e.g.
+
+```
+openjdk version "25.0.4.1" 2026-08-18
+OpenJDK Runtime Environment (build 25.0.4.1+1-1-26.04.4-Ubuntu)
+OpenJDK 64-Bit Server VM (build 25.0.4.1+1-1-26.04.4-Ubuntu, mixed mode, sharing)
+```
+
+For reference SOLR install instructions are here: https://solr.apache.org/guide/solr/latest/deployment-guide/installing-solr.html
+
+Set by step we do this:
+
+Download the binary package from the Apache SOLR site (https://solr.apache.org/downloads.html). Change the download and file name if using a later dot release.
+ 
+```
+cd 
+wget -O solr-10.0.0.tgz https://www.apache.org/dyn/closer.lua/solr/solr/10.0.0/solr-10.0.0.tgz?action=download
+```
+
+Unzip the file to get access to the install script, run the installer and then delete unzipped directory.
+
+```
+tar -xvzf solr-10.0.0.tgz
+sudo ./solr-10.0.0/bin/install_solr_service.sh solr-10.0.0.tgz
+rm -rf solr-10.0.0
+```
+
+SOLR should now be running. You can check it like this.
+
+```
+sudo systemctl status solr
+```
+
+The SOLR Web UI will also be running on port 8983 but will only be available from the local host. To view it from another machine you need to alter the config file.
+
+```
+sudo nano /etc/default/solr.in.sh
+#SOLR_HOST_BIND="127.0.0.1"
+SOLR_HOST_BIND="0.0.0.0"
+sudo systemctl status solr
+```
+
+You should now see it in your browser on http://<host name\>:8983/ In production routing rules should make sure the machine is only visible to other machines that need it. i.e. set the net mask appropriately.
+
+At this point we have an empty Apache SOLR instance running.
+
+Create a core (index) called __wfo__ to load the data in.
+
+```
+sudo su - solr -c "/opt/solr/bin/solr create -c wfo"
+```
+
+There will be a warning about autoCreateFields in production use that we ignore for now. We could maybe turn this off once index if fully populated but before that point we rely on autofield creation because our data is so heterogenous.
+
+Refresh the Web UI and select the WFO core (left panel);
+
+Select 'Schema' on the left then the 'Add Copy Field' button at the top. Add a copy from `*` and to `_text_`. This will mean all the data we add also gets added to a generic field called `_text_`.
+
+Lock it down with basicAuth in addition to the protection by IP routing done above.
+
+```
+sudo /opt/solr/bin/solr auth enable --type basicAuth --credentials wfo:long-and-complex-password --block-unknown true
+```
+
+Refresh the Web UI and you'll be asked for a username and password. Keep a note of the password!
+
+#### Importing The Plant List
+
+Coming soon
 
 #### PHP Modules enabled
 
 - SQLite3
+
+
 
 ### Front end (PHP)
 
