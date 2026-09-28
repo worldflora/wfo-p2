@@ -50,18 +50,7 @@ Default platform tested here is __Ubuntu Server 26.04.1 LTS__ but other OS setup
 
 - Starting with a fresh install of __Ubuntu Server 26.04.1 LTS__.
 - sudo apt install net-tools - for convenience.
-
-__Aside:__ FIXME: is this needed? in dev [need to configure firewall on test machine](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu)
-
-```
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow OpenSSH
-sudo ufw allow https
-sudo ufw allow http
-sudo ufw allow 8983
-sudo ufw enable
-```
+- sudo apt install zip
 
 ### Apache SOLR 10.0 setup
 
@@ -106,13 +95,13 @@ SOLR should now be running. You can check it like this.
 sudo systemctl status solr
 ```
 
-The SOLR Web UI will also be running on port 8983 but will only be available from the local host. To view it from another machine you need to alter the config file.
+The SOLR Web UI will also be running on port 8983 but will only be available from the local host. To view it from another machine you need to alter the config file. (__Subnet mask should be set appropriately and probably not 0.0.0.0 outside testing.__)
 
 ```
 sudo nano /etc/default/solr.in.sh
 #SOLR_HOST_BIND="127.0.0.1"
 SOLR_HOST_BIND="0.0.0.0"
-sudo systemctl status solr
+sudo systemctl restart solr
 ```
 
 You should now see it in your browser on http://<host name\>:8983/ In production routing rules should make sure the machine is only visible to other machines that need it. i.e. set the net mask appropriately.
@@ -141,7 +130,33 @@ Refresh the Web UI and you'll be asked for a username and password. Keep a note 
 
 #### Importing The Plant List
 
-Coming soon
+The classification (1.7 million names arranged into a hierarchy) is loaded into the index as a single file. These classification files are generated as part of a six monthly data release cycle. Each data release is deposited in the Zenodo.org archive. This URL will always go to the latest version of the repository <https://doi.org/10.5281/zenodo.7460141>. The file that is needed will be named like this `plant_list_2026-06.json.zip`.
+
+__You will always need to get the URL of the latest version by visiting the repository at <https://doi.org/10.5281/zenodo.7460141>__ and change the values in the commands below, including the long-and-complex-password
+
+Download the latest version, unzip it and import it into the index using curl like this:
+
+```
+unzip plant_list_2026-06.json.zip
+curl -H 'Content-type:application/json' 'http://localhost:8983/solr/wfo/update?commit=true' -X POST -T plant_list_2026-06.json --user wfo:long-and-complex-password
+rm plant_list_2026-06.json
+```
+
+The curl command above will take about half and hour to run. You may want to wrap it in a nohup if you're on a slow machine and your terminal might time out. The response should be something like this:
+
+```
+{
+  "responseHeader":{
+    "rf":1,
+    "status":0,
+    "QTime":485850
+   }
+}
+```
+
+Go back to the Web UI for SOLR. Make sure the `wfo` core is selected. Select `Query` and just run the default `*:*` query. The response should have a numFound or around 1.7 million documents.
+
+Congratulations the SOLR server is now up and running and populated with the current Plant List classification. The next step is to set up the PHP front end and connect it to the index. After that a web service will call the API on the front end to populate the index with the text content (descriptions) of the taxa in the classification.
 
 #### PHP Modules enabled
 
