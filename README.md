@@ -1,6 +1,5 @@
-# WFO Portal V2.
+# WFO Website V2.
 
-This is a mockup of how a version 2 of the WFO portal could work. We are currently taking it forward as a potential replacement for the main portal.
 
 ## Design principles
 
@@ -30,8 +29,8 @@ There are two separate repositories embedded within this one so as to provide se
 
 There are two components required. 
 
-- A PHP front end application that runs the website and a simple administrative API for updating the index
 - An instance of Apache SOLR that contains all the data displayed by the PHP application
+- A PHP front end application that runs the website and a simple administrative API for updating the index
 
 These two components can be installed on the same machine or on separate machines. For production use it would be better to have them on separate machines but one machine could probably run them fine if sufficiently specified. The PHP application communicates with the SOLR index over HTTP and so the two machines should sit on the same LAN with good communications speeds.
 
@@ -41,18 +40,23 @@ It should be possible to have multiple front end applications use the same SOLR 
 
 ### Hardware
 
-This install process has been tested on VMWARE FUSION with 5meg RAM and 20G of disk space. Production specifications are to be determined and will depend on OS.
+This install process has been tested on VMWARE FUSION with virtual machines running on a laptop. Production specifications are to be determined and will depend on OS. Initial suggestion are as follows:
 
+- __SOLR Server:__ This will need a minimum 100G of disk space, ideally 500G. The WFO Plant List json file is 7.5G before it is imported into the index and twice that amount of data will be added. There will also be times when the index will double in size as we swap from one classification to another. The RAM requirements for a Java application are difficult to estimate because it depends so much on how the index is built and request loading. A suggested starting point is 10G.
+
+- __Frontend Server__ This machine will be less memory and storage intensive. A suggested starting point is 100G of disk space and 5G of memory. It will depend on the request rate. One bottle neck is the creation of PHP sessions which could fill a disk during a bot attack.
 
 ### OS Software
 
 Default platform tested here is __Ubuntu Server 26.04.1 LTS__ but other OS setups would probably work.
 
 - Starting with a fresh install of __Ubuntu Server 26.04.1 LTS__.
-- sudo apt install net-tools - for convenience.
-- sudo apt install zip
+- `sudo apt install net-tools` - for convenience.
+- `sudo apt install zip` - required.
 
-### Apache SOLR 10.0 setup
+### Apache SOLR 10.0 Setup
+
+It is best to get the SOLR index running and initialized with Plant List data first.
 
 SOLR is a Java application so we need a virtual machine. The Ubuntu 26 packaged one is suitable.
 
@@ -158,34 +162,93 @@ Go back to the Web UI for SOLR. Make sure the `wfo` core is selected. Select `Qu
 
 Congratulations the SOLR server is now up and running and populated with the current Plant List classification. The next step is to set up the PHP front end and connect it to the index. After that a web service will call the API on the front end to populate the index with the text content (descriptions) of the taxa in the classification.
 
-#### PHP Modules enabled
+### PHP Frontend Setup
 
-- SQLite3
+The frontend can either run on the same machine as the SOLR index or a separate machine that has fast HTTP access to the SOLR instance.
 
+#### Prerequisites
 
+Install Apache2 and PHP. The list of modules includes a few that may not be in use now but are likely to be used with code updates in the future.
 
-### Front end (PHP)
+```
+sudo apt install apache2
+sudo apt install php libapache2-mod-php
+sudo apt install php-bz2 php-curl php-dom php-gd php-mbstring php-simplexml php-xml php-xmlreader php-xmlwriter php-xsl php-zip php-bcmath php-sqlite3
+sudo a2enmod headers rewrite proxy proxy_http
+```
 
-1. `mkdir wfo_home` 
-2. `cd wfo_home`
-3. `git clone https://github.com/worldflora/wfo-p2.git`
-4. `cd wfo-p2`
-5. `git submodule init`
-6. `git submodule update`
-7. `cd ..`
-8. `cp wfo-p2/wfo_p2_secrets.php .` (edit this template to add the SOLR connection care not to add any spaces at the top!)
-9.  `cd wfo-p2/www`
-10. `./dev_start.sh` (This will run the site on localhost for development and testing but not for production use.)
+#### Install code
 
-__The site will not run if it is not connected to an appropriate SOLR Index__
+We assume the application will live in `/var/wfo-home` alongside any other WFO infrastructure applications that may be placed on the same machine. Having a consistent approach is helpful even if they are on separate machines.
 
-For downloads to work there must be a downloads directory writeable by the webserver. Do something like this:
+Ownership of the wfo-home/ directory should not be a user or a group could be established for the purpose if multiple users will be administering the code. This is a sysadmin decision.
 
-1. `cd wfo_home/wfo-p2/www/`
-2. `mkdir downloads`
-3. `sudo chown -R <user>:www-data downloads/`
+There must be a `downloads` directory within the `www` directory that is writeable by the webserver (www-data). It is used to build the downloadable checklists when requested by the user.
 
-### Populating the SOLR Index
+```
+cd /var/
+sudo mkdir wfo-home/
+sudo chown -R <user>:root wfo-home/
+cd wfo-home
+git submodule init
+git submodule update
+mkdir www/downloads
+sudo chown -R <user>:www-data www/downloads
+cd ..
+cp wfo-p2/wfo_p2_secrets.php .
+nano wfo_p2_secrets.php
+```
 
+We have now installed the code and opened the config file (which will contain credentials that shouldn't go in GitHub) for editing.
 
+- The URL to the SOLR instance. Check the IP address is that of the machine the SOLR server is running on or localhost if it is the current machine. Check the name of the SOLR core within the path is correct. If the core was named as above it should be `wfo`. e.g. `http://192.168.28.132:8983/solr/wfo`
+-  The username and password for SOLR as configured above.
+-  The classification version. This will be the same as you imported above. e.g. `2026-06`
+-  The api_bearer_token is used for communication between web services when updating the index and can be set once the basic application is running.
 
+Before moving on to configuring Apache try and run the application using PHP's built in webserver. __Obviously this is for testing and dev only.__
+
+```
+cd /var/wfo-home/wfo-p2/www
+php -S <server-ip-address>:1965 -c php.ini index.php
+```
+
+The website should be available on port 1965 at the server IP address, or localhost if you set that. There will be errors in the faceted searching because we haven't populated the index fully yet but you should be able to search for a plant name like "Rhododendron" and get a response if the frontend is talking to the index correctly. `ctrl-c` to kill the webserver.
+
+#### Configuring Apache
+
+This is more or a systems administration section than application installation. There is an `.htaccess` file in /var/wfo-home/wfo-p2/www that gives mod-rewrite rules for the application itself so you need to make sure that is honoured. Otherwise it is just a regular virtual host set up for a www directory in the application.
+
+An HTTP (port 80 version would look like this)
+
+```
+<VirtualHost *:80>
+
+      ServerName test01.worldfloraonline.org
+
+      ServerAdmin rhyam@rbge.org.uk
+      DocumentRoot /var/wfo-home/wfo-p2/www
+
+      <Directory />
+             Options FollowSymLinks
+             AllowOverride None
+      </Directory>
+
+      <Directory /var/wfo-home/wfo-p2/www/>
+             Options Indexes FollowSymLinks
+             AllowOverride All
+             Require all granted
+      </Directory>
+
+      ErrorLog ${APACHE_LOG_DIR}/wfo-website-error.log
+      CustomLog ${APACHE_LOG_DIR}/wfo-website-access.log combined
+
+      # we would never actually server on plain http but redirect to https version
+      RewriteEngine on
+      RewriteCond %{SERVER_NAME} =test01.worldfloraonline.org
+      RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+</VirtualHost>
+```
+
+A identical VirtualHost configuration file for HTTPS requests but with the redirects replaced with links to the SSL certificates should be created manually or using `certbot` and the Let's Encrypt service. Sites can be enable and disabled using the `a2ensite` command.
