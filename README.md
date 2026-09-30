@@ -160,6 +160,13 @@ The curl command above will take about half and hour to run. You may want to wra
 
 Go back to the Web UI for SOLR. Make sure the `wfo` core is selected. Select `Query` and just run the default `*:*` query. The response should have a numFound or around 1.7 million documents.
 
+If you want to remove the classification from the index you can do it like this
+
+```
+curl -X POST -H 'Content-Type: application/json' 'http://localhost:8983/solr/wfo/update' --data-binary '{"delete":{"query":"classification_id_s:2026-06"} }' --user wfo:long-and-complex-password
+curl -X POST -H 'Content-Type: application/json' 'http://localhost:8983/solr/wfo/update' --data-binary '{"commit":{} }' --user wfo:long-and-complex-password
+```
+
 Congratulations the SOLR server is now up and running and populated with the current Plant List classification. The next step is to set up the PHP front end and connect it to the index. After that a web service will call the API on the front end to populate the index with the text content (descriptions) of the taxa in the classification.
 
 ### PHP Frontend Setup
@@ -214,6 +221,13 @@ php -S <server-ip-address>:1965 -c php.ini index.php
 ```
 
 The website should be available on port 1965 at the server IP address, or localhost if you set that. There will be errors in the faceted searching because we haven't populated the index fully yet but you should be able to search for a plant name like "Rhododendron" and get a response if the frontend is talking to the index correctly. `ctrl-c` to kill the webserver.
+
+N.B. To update the code you need to pull in the submodules as well as the main repository
+
+```
+cd /var/wfo-home/wfo-p2
+git pull --recurse-submodules
+```
 
 #### Configuring Apache
 
