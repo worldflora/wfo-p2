@@ -182,6 +182,7 @@ sudo apt install apache2
 sudo apt install php libapache2-mod-php
 sudo apt install php-bz2 php-curl php-dom php-gd php-mbstring php-simplexml php-xml php-xmlreader php-xmlwriter php-xsl php-zip php-bcmath php-sqlite3
 sudo a2enmod headers rewrite proxy proxy_http
+sudo systemctl restart apache2
 ```
 
 #### Install code
@@ -197,6 +198,7 @@ cd /var/
 sudo mkdir wfo-home/
 sudo chown -R <user>:root wfo-home/
 cd wfo-home
+git clone https://github.com/worldflora/wfo-p2.git
 git submodule init
 git submodule update
 mkdir www/downloads

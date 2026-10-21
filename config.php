@@ -44,7 +44,10 @@ define('LIST_DOWNLOAD_DIR', 'downloads/' ); // end in a slash
 define('LIST_DOWNLOAD_DIR_MAX_SIZE', 100 ); // maximum size in megabytes
 define('LIST_DOWNLOAD_FILE_TTL', 30); // maximum time to live of download files, minutes
 
-define('INDEX_QUEUE_FILE_PATH', '../data/index_queue.txt'); // a file full of queue jumpers to be indexed at the start of the next run.
+// a file full of queue jumpers to be indexed at the start of the next run.
+// this file is shared with the list API application
+// must be www-data readable
+define('INDEX_QUEUE_FILE_PATH', '../data/index_queue.txt'); 
 
 /*
     Facet configuration
