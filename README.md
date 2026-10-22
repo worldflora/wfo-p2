@@ -93,7 +93,33 @@ sudo ./solr-10.0.0/bin/install_solr_service.sh solr-10.0.0.tgz
 rm -rf solr-10.0.0
 ```
 
-SOLR should now be running. You can check it like this.
+SOLR should now be running. You can check it like this.<VirtualHost *:80>
+
+      ServerName list.worldfloraonline.org
+
+      ServerAdmin rhyam@rbge.org.uk
+      DocumentRoot /var/wfo-home/wfo-plant-list/www
+
+      <Directory />
+             Options FollowSymLinks
+             AllowOverride None
+      </Directory>
+
+      <Directory /var/wfo-home/wfo-plant-list/www/>
+             Options Indexes FollowSymLinks
+             AllowOverride All
+             Require all granted
+      </Directory>
+
+      ErrorLog ${APACHE_LOG_DIR}/wfo-list-api-error.log
+      CustomLog ${APACHE_LOG_DIR}/wfo-list-api-access.log combined
+
+      # we would never actually server on plain http but redirect to https version
+      RewriteEngine on
+      RewriteCond %{SERVER_NAME} =test01.worldfloraonline.org
+      RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+
+</VirtualHost>
 
 ```
 sudo systemctl status solr
