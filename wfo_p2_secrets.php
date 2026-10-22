@@ -12,9 +12,5 @@ $solr_password = '*****';
 // uncomment to display a system message
 //$system_message = "Index rebuilding - this could be a mess for a while!";
 
-// authorisation for updates from an API
-// this is used for communications between Fyllo / Airflow tasks and the portal API methods.
-$api_bearer_token = "***";
-
 // the name of the classification to be used
 $classification_version = '2026-06';

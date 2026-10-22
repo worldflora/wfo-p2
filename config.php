@@ -7,6 +7,9 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL & ~E_DEPRECATED   );
+
+ini_set("pcre.jit",0); // needed on later versions of PHP to prevent memory access errors.
+
 //error_reporting(E_ALL);
 session_start();
 
@@ -21,9 +24,6 @@ $pages_menu = array();
 
 // $system_message = null;
 if(!isset($system_message)) $system_message = null;
-
-// an api key for downloading backups and things we don't want generally open
-define('PORTAL_BEARER_TOKEN', $api_bearer_token);
 
 // setting used by BotGuard to filter bad actors
 define('WFO_BOTGUARD_DWELL_TIME', 5); // time in seconds to wait before being allowed access
