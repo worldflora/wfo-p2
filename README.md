@@ -167,7 +167,7 @@ curl -X POST -H 'Content-Type: application/json' 'http://localhost:8983/solr/wfo
 curl -X POST -H 'Content-Type: application/json' 'http://localhost:8983/solr/wfo/update' --data-binary '{"commit":{} }' --user wfo:long-and-complex-password
 ```
 
-Congratulations the SOLR server is now up and running and populated with the current Plant List classification. The next step is to set up the PHP front end and connect it to the index. After that a web service will call the API on the front end to populate the index with the text content (descriptions) of the taxa in the classification.
+Congratulations the SOLR server is now up and running and populated with the current Plant List classification. The next step is to set up the PHP front end and connect it to the index. After that a web service will call the [List API application](https://github.com/worldflora/wfo-plant-list) to populate the index with the text content (descriptions) of the taxa in the classification. You'll need to install the [List API application](https://github.com/worldflora/wfo-plant-list) to get this going.
 
 ### PHP Frontend Setup
 
