@@ -31,8 +31,8 @@ if (searchBox) {
         const targetDiv = document.getElementById("search_suggest");
 
         // we only do a suggestion if we are in name mode
-        const searchBoxSwitch = document.getElementById("search_box_switch_button");
-        if (searchBoxSwitch.value != 'name') return null;
+        const searchTypeInput = document.getElementById("search_type_input");
+        if (searchTypeInput.value != 'name') return null;
 
         // simply call for ajax to update the suggestions
         // the logic will be handled in the php script
@@ -54,31 +54,42 @@ if (searchBox) {
 /*
     Search box switching name/text
 */
-const searchBoxSwitch = document.getElementById("search_box_switch_button");
-const searchTypeInput = document.getElementById("search_type_input");
-if (searchBoxSwitch) {
-    searchBoxSwitch.addEventListener("click", (e) => {
+const searchBoxSwitches = document.querySelectorAll(".search_box_switch");
+if (searchBoxSwitches) {
 
-        // for some reason this event capture enter in the
-        // input text box so we need a hack to ignore it.
-        if (searchBox === document.activeElement) return;
+    const searchTypeInput = document.getElementById("search_type_input");
+    const searchButton = document.getElementById("search_box_switch_button");
+    const searchBox = document.getElementById("search_box");
 
-        if (e.target.value == 'name') {
-            e.target.value = 'text';
-            e.target.innerHTML = 'Text:';
-            searchTypeInput.value = 'text';  // submitted with the form
+    searchBoxSwitches.forEach(bs => {
 
-            // hide any suggested names
-            const targetDiv = document.getElementById("search_suggest");
-            targetDiv.innerHTML = null;
+        bs.addEventListener("click", (e) => {
 
-        } else {
-            e.target.value = 'name';
-            e.target.innerHTML = 'Name:';
-            searchTypeInput.value = 'name'; // submitted with the form
-        }
-        document.getElementById("search_box").focus(); // hides the help buble
-        e.preventDefault();
+                console.log(bs);
+
+                const searchKind = e.target.dataset['searchKind'];
+
+                if (searchKind == 'text') {
+                    searchButton.innerHTML = 'Text:';
+                    searchTypeInput.value = 'text';  // submitted with the form
+                    searchBox.setAttribute('placeholder', 'Search all text ...');
+                    searchBox.form.submit();
+
+                    // hide any suggested names
+                    const targetDiv = document.getElementById("search_suggest");
+                    targetDiv.innerHTML = null;
+
+                } else {
+                    searchButton.innerHTML = 'Names:';
+                    searchTypeInput.value = 'name'; // submitted with the form
+                    searchBox.setAttribute('placeholder', 'Start typing a name ...');
+                    searchBox.value = ''; // we clear the value going from text to names
+                    searchBox.form.submit();
+                }
+                document.getElementById("search_box").focus(); // hides the help buble
+                e.preventDefault();
+            });
+
     });
 
 }

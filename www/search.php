@@ -153,7 +153,7 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                     require_once('search_box.php');
                     
                     // always render a list
-                    echo '<div class="list-group  list-group-flush">';
+                    echo '<ul class="list-group  list-group-flush">';
                     if($docs){
                         echo "<p></p>"; // spacer
                         
@@ -176,17 +176,23 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
                             // each response
                             foreach($docs as $doc){
                                 $record = new TaxonRecord($doc);
-                                echo "<a href=\"/{$record->getWfoId()}\" class=\"list-group-item  list-group-item-action\" >";
+                                echo "<li class=\"list-group-item  list-group-item-action\" onclick=\"window.location = '/{$record->getWfoId()}'\" >";
                                 echo '<span style="font-size: 80%;">';
                                 render_record_type_description($record, false   );
                                 echo '</span>';
                                 echo '<span class="fs-4">' . $record->getFullNameStringHtml() . '</span>';
-                                echo "</a>";
+
+                                // 2026-11-24 - link to accepted name from synonym
+                                if($record->getRole() == 'synonym'){
+                                    $accepted_record = new TaxonRecord($record->getAcceptedId());
+                                    echo "<div style=\"float: right; margin-top: 0.6em;\">&nbsp;<strong>See:</strong> <a href=\"/{$accepted_record->getWfoId()}\" style=\"display: inline;\">{$accepted_record->getFullNameStringHtml()}</a></div>";
+                                }
+                               echo "</li>";
                             }
                     }else{
                         echo "<div class=\"list-group-item\" >Nothing found</div>";
                     }
-                    echo "</div>"; // end the list group
+                    echo "</ul>"; // end the list group
 
                     // echo '<pre>';
                     // print_r($query);
@@ -261,7 +267,16 @@ if(isset($solr_response->facets)) $facets_response = $solr_response->facets;
 
         if(count($f->buckets) > 7){
             echo '<li class="list-group-item list-group-item-light d-flex justify-content-between align-items-start"" data-sort-alphabetically="AAAAAAAA"  data-sort-numerically="10000000"  style="">';
-            echo '<div class="ms-2 me-auto" ><input type="text" onkeyup="filterFacetValues(this, \''. $facet_details->getFacetDomId() .'\')" class="form-control form-control-sm" placeholder="Filter attribute values ..." style="width: 24em; margin-left: -10px;"></div>';
+            echo '<div style="width: 100%" >';
+            echo '<input ';
+            echo ' id="' . $facet_details->getFacetDomId() . '"';
+            echo ' type="text"';
+            echo ' onkeyup="filterFacetValues(this, \''. $facet_details->getFacetDomId() .'\')"';
+            echo ' class="form-control form-control-sm"';
+            echo ' placeholder="Filter attribute values ..."';
+            echo ' style="width: 95%; padding-right: 1em;    "';
+            echo ' />';
+            echo '</div>';
             echo '<span ';
             echo ' onclick="sortFacetValues(\'' . $facet_details->getFacetDomId() . '\')" ';
             echo ' style="cursor: pointer;" ';

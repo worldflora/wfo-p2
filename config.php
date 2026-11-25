@@ -115,7 +115,7 @@ $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snipp
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_languages_ss", 'label' => 'Text language', 'exclude' => array('zz') ); // hidden language non-text things
 // $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "snippet_sources_ss", 'label' => 'Data source', 'exclude' => array());
 
-$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Name role', 'exclude' => array());
+$search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "role_s", 'label' => 'Taxonomic status', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "nomenclatural_status_s", 'label' => 'Nomenclatural status', 'exclude' => array());
 $search_facets[] = (object)array('kind' => 'solr_field', 'field_name' =>  "rank_s", 'label' => 'Taxonomic rank', 'exclude' => array());
 

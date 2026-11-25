@@ -526,7 +526,7 @@ class BotGuard{
             </g>
         </svg>
         <div id="message-box">
-            <p><?php echo $reason ?><br/>One momement please.<br/>We are verifying your session.</p>
+            <p><?php echo $reason ?><br/>One moment please.<br/>We are verifying your session.</p>
         </div>
 </body>
 

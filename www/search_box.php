@@ -10,32 +10,42 @@
     // set up the type based on the previously submitted values.
     if($request){
         $search_type = @$request["search_type"];
-        $search_type_label = $search_type == 'name' ? "Name:" : 'Text:';
+        $search_type_placeholder = $search_type == 'name' ? 'Start typing a name ...' : 'Search all text ...';
+        $search_type_label = $search_type == 'name' ? "Names:" : 'Text:';
     }else{
         $search_type = 'name';
-        $search_type_label = "Name:";
+        $search_type_placeholder = 'Start typing a name ...';
+        $search_type_label = "Names:";
     }
+
+
     
 ?>
 
 <div class="form-group">
     <div class="input-group">
-        <button 
-            class="btn btn-outline-secondary" 
-            id="search_box_switch_button"
-            name="search_box_switch_button"
-            data-bs-toggle="tooltip" 
-            data-bs-placement="right" 
-            title="Click to toggle between name and text searching."
-            value="<?php echo $search_type; ?>"><?php echo $search_type_label; ?>
-        </button>
-        
+
+ <button 
+    id="search_box_switch_button"
+    class="btn btn-outline-secondary dropdown-toggle"
+    type="button"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    data-bs-toggle="tooltip" 
+    data-bs-placement="right" 
+    title="Click to switch between name and text searching."
+    ><?php echo $search_type_label; ?></button>
+  <ul class="dropdown-menu" > 
+    <li><a class="dropdown-item search_box_switch" href="#" data-search-kind="name" >Search names alphabetically</a></li>
+    <li><a class="dropdown-item search_box_switch" href="#" data-search-kind="text" >Search all text</a></li>
+  </ul>
+     
         <input id="search_box" 
             autofocus 
             class="form-control"
             type="text"
             name="q"
-            placeholder="Seach text ..."
+            placeholder="<?php echo $search_type_placeholder; ?>"
             value="<?php echo $q ?>" />
 
         <button class="btn btn-success" type="submit">Search</button>
