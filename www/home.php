@@ -8,8 +8,8 @@ require_once('../fragments/header.php');
 <div class="container" style="margin-top: 4%;">
 
     <div class="row">
-        <div id="logo" class="text-center">
-            <h2 style="font-size: 300%;  padding-bottom: 0.5em;">An Online Flora of All Known Plants
+        <div id="logo" class="text-center" style="margin-bottom: 20em;">
+            <h2 style="font-size: 300%;  padding-bottom: 0.5em; margin-top: 1em;">An Online Flora of All Known Plants
             </h2>
 
             <?php

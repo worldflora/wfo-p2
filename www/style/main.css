@@ -189,6 +189,10 @@ div.wfo-md{
     height: 100%;
 }
 
+.footer{
+    margin-top: 4em;
+}
+
 .footer .wfo-botguard{
    text-align: right;
    margin: 1em;
