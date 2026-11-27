@@ -22,9 +22,7 @@
       <p>
       <a href="/pages/terms.md" >Terms of Use</a>
       |
-      <a href="/pages/copyright.md" >Copyright</a>
-      |
-      <a href="/pages/cookies.md" >Cookies</a>
+      <a href="/pages/Privacy.md" >Privacy</a>
       </p>
     </div>
 
